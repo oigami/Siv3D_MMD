@@ -1,9 +1,13 @@
+#include "../include/MMD.h"
+#ifdef USE_BULLET_PHYSICS
 #include "MmdPhysics.h"
 #include "../BulletPhysics/BulletPhysics.h"
-#include "BulletCollision/CollisionShapes/btCollisionShape.h"
+#endif
 #include <DirectXMath.h>
 using namespace std;
 namespace s3d_mmd {
+
+#ifdef USE_BULLET_PHYSICS
   using namespace s3d_bullet;
   //#pragma unmanaged
   MmdPhysics::MmdPhysics(BulletPhysicsPtr bulletPhysics) {
@@ -175,7 +179,7 @@ namespace s3d_mmd {
       auto &rigidBodie = m_rigidBodies[i].body_;
       using namespace DirectX;
       switch (m_rigidbodyType[i]) {
-      case 0: //bone追従
+      case 2:case 0: //bone追従
       {
         // ボーン追従タイプの剛体にボーン行列を設定
         // ボーンの移動量を剛体の初期姿勢に適用したものが剛体の現在の姿勢
@@ -185,7 +189,7 @@ namespace s3d_mmd {
         rigidBodie->MoveRigidBody(m);
         break;
       }
-      case 2: //物理演算(bone合わせ)
+       //物理演算(bone合わせ)
       {
         // ボーン位置あわせタイプの剛体の位置移動量にボーンの位置移動量を設定
         const Vector m1 = m_bones->CalcBoneMatML(m_rigidbodyRelatedBoneIndex[i]).r[3];
@@ -296,4 +300,6 @@ namespace s3d_mmd {
     //pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
     //pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
   }
+#endif // USE_BULLET_PHYSICS
+
 }

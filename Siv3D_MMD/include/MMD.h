@@ -1,4 +1,6 @@
 #pragma once
+//•¨—‰‰Z‚ğg—p‚·‚éê‡‚É’è‹`‚·‚é
+//#define USE_BULLET_PHYSICS
 #include <memory>
 #include "MMDModel.h"
 #include "MMDBone.h"

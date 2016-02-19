@@ -1,8 +1,10 @@
 #include "../include/MMD.h"
 #include "../include/MMDModel.h"
 #include "../ShaderAttacher.h"
+#ifdef USE_BULLET_PHYSICS
 #include "MMDPhysics.h"
-#include "../BulletPhysics/BulletPhysics.h"
+#endif // USE_BULLET_PHYSICS
+
 namespace s3d_mmd {
   namespace mmd {
     namespace {
@@ -124,11 +126,15 @@ namespace s3d_mmd {
     }
   }
   namespace {
+#ifdef USE_BULLET_PHYSICS
+
     std::shared_ptr<s3d_bullet::BulletPhysics> getBulletInstance() {
       static std::shared_ptr<s3d_bullet::BulletPhysics> bulletPhysics =
         std::make_shared<s3d_bullet::BulletPhysics>(Vec3(0, -9.8, 0), nullptr);
       return bulletPhysics;
     }
+#endif // USE_BULLET_PHYSICS
+
   }
   class MMD::Pimpl {
   public:
@@ -147,11 +153,17 @@ namespace s3d_mmd {
       return{ x + 0.1, y + 0.1 };
     }
 
-    Pimpl(const MMDModel& model) : m_mmdPhysics(getBulletInstance()) {
+    Pimpl(const MMDModel& model) 
+#ifdef USE_BULLET_PHYSICS
+      : m_mmdPhysics(getBulletInstance()) 
+#endif
+    {
       m_bones = model.bones();
       m_name = model.name();
       m_comment = model.comment();
+#ifdef USE_BULLET_PHYSICS
       m_mmdPhysics.Create(m_bones, model.rigidBodies(), model.joints());
+#endif
       mmd::AllNode nodes;
       ImageRGBA32F vertexImage(1024, 1024);
       int vPos = 0;
@@ -214,7 +226,9 @@ namespace s3d_mmd {
     }
 
     void draw() {
+#ifdef USE_BULLET_PHYSICS
       m_mmdPhysics.BoneUpdate(Mat4x4::Identity());
+#endif
       const auto rasterizerState = Graphics3D::GetRasterizerState();
       const auto rasterizerStateForawrt = Graphics3D::GetRasterizerStateForward();
       draw(m_nodes.nodeCullBack, RasterizerState::SolidCullBack);
@@ -236,8 +250,9 @@ namespace s3d_mmd {
       }
       Graphics3D::SetRasterizerState(rasterizerState);
     }
-
+#ifdef USE_BULLET_PHYSICS
     MmdPhysics m_mmdPhysics;
+#endif
     mmd::AllNode m_nodes;
     Array<mmd::Node> m_edges;
     String m_name;
