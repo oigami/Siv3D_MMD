@@ -92,6 +92,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BulletPhysics\BulletDebug.cpp" />
     <ClCompile Include="BulletPhysics\BulletPhysics.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MMD\MMD.cpp" />
@@ -204,6 +205,7 @@
     <Font Include="Example\YomogiFont.ttf" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BulletPhysics\BulletDebug.h" />
     <ClInclude Include="BulletPhysics\BulletPhysics.h" />
     <ClInclude Include="include\MMD.h" />
     <ClInclude Include="include\MMDModel.h" />

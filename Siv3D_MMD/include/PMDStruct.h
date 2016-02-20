@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <cstdint>
 #include <vector>
 namespace s3d_mmd {
@@ -6,7 +6,7 @@ namespace s3d_mmd {
 
 #pragma pack(push, 1)
 
-    /// PMD\‘¢‘Ì’è‹`
+    /// PMDæ§‹é€ ä½“å®šç¾©
     struct Header {
       std::uint8_t magic[3];
       float version;
@@ -31,37 +31,37 @@ namespace s3d_mmd {
       float mirror_color[3];
       std::uint8_t toon_index;
       std::uint8_t edge_flag;
-      std::uint32_t face_vert_count; // ‚±‚ÌŞ—¿‚Ì–Ê’¸“_” ¨ Ş—¿”Ô†i‚Ìƒ|ƒŠƒSƒ“”Ô†F pmdMaterial[i - 1].face_vert_count/3 ` pmdMaterial[i].face_vert_count/3 - 1
+      std::uint32_t face_vert_count; // ã“ã®ææ–™ã®é¢é ‚ç‚¹æ•° â†’ ææ–™ç•ªå·iã®ãƒãƒªã‚´ãƒ³ç•ªå·ï¼š pmdMaterial[i - 1].face_vert_count/3 ï½ pmdMaterial[i].face_vert_count/3 - 1
       char texture_file_name[20];
     };
 
     struct Bone {
       char bone_name[20];
-      std::uint16_t parent_bone_index;    // ‚È‚¢ê‡‚Í0xFFFF
-      std::uint16_t tail_pos_bone_index;  // ‚È‚¢ê‡‚Í0xFFFF
-      std::uint8_t bone_type;             // 0:‰ñ“] 1:‰ñ“]‚ÆˆÚ“® 2:IK 3:•s–¾ 4:IK‰e‹¿‰º 5:‰ñ“]‰e‹¿‰º 6:IKÚ‘±æ 7:”ñ•\¦ 8:”P‚è 9:‰ñ“]‰^“® (8, 9‚ÍMMD4.0ˆÈ~)
-      std::uint16_t ik_parent_bone_index; // ‚È‚¢ê‡‚Í0
+      std::uint16_t parent_bone_index;    // ãªã„å ´åˆã¯0xFFFF
+      std::uint16_t tail_pos_bone_index;  // ãªã„å ´åˆã¯0xFFFF
+      std::uint8_t bone_type;             // 0:å›è»¢ 1:å›è»¢ã¨ç§»å‹• 2:IK 3:ä¸æ˜ 4:IKå½±éŸ¿ä¸‹ 5:å›è»¢å½±éŸ¿ä¸‹ 6:IKæ¥ç¶šå…ˆ 7:éè¡¨ç¤º 8:æ»ã‚Š 9:å›è»¢é‹å‹• (8, 9ã¯MMD4.0ä»¥é™)
+      std::uint16_t ik_parent_bone_index; // ãªã„å ´åˆã¯0
       float bone_head_pos[3];
     };
 
     struct IkDataWithoutArray {
-      std::uint16_t ik_bone_index;        // IKƒ{[ƒ“”Ô†
-      std::uint16_t ik_target_bone_index; // IKƒ{[ƒ“‚ÌˆÊ’u‚É‚±‚Ìƒ{[ƒ“‚ğˆê’v‚³‚¹‚é‚æ‚¤‚ÉIKˆ—‚ªs‚í‚ê‚é
-      std::uint8_t ik_child_bone_length;  // IKƒ`ƒF[ƒ“‚Ì’·‚³
-      std::uint16_t iterations;           // Ä‹A‰‰Z‰ñ”
-      float control_weight;               // ƒ{[ƒ“‚Ì’PˆÊ§ŒÀŠp 1.0 ¨ 4.0[rad]B‚Ü‚½u‚Ğ‚´v‚ğŠÜ‚Şƒ{[ƒ“–¼‚ğ‚à‚Âƒ{[ƒ“‚ÍX²•ûŒü‚É‚µ‚©“®‚©‚È‚¢§ŒÀ‚ª‚ ‚éB
-                                          // unsigned short ik_child_bone_index[ik_chain_length]; // IK‰e‹¿‰º‚Ìƒ{[ƒ“”Ô† (”z—ñ‚Ì‘å‚«‚³‚ª•Ï‰»)
+      std::uint16_t ik_bone_index;        // IKãƒœãƒ¼ãƒ³ç•ªå·
+      std::uint16_t ik_target_bone_index; // IKãƒœãƒ¼ãƒ³ã®ä½ç½®ã«ã“ã®ãƒœãƒ¼ãƒ³ã‚’ä¸€è‡´ã•ã›ã‚‹ã‚ˆã†ã«IKå‡¦ç†ãŒè¡Œã‚ã‚Œã‚‹
+      std::uint8_t ik_child_bone_length;  // IKãƒã‚§ãƒ¼ãƒ³ã®é•·ã•
+      std::uint16_t iterations;           // å†å¸°æ¼”ç®—å›æ•°
+      float control_weight;               // ãƒœãƒ¼ãƒ³ã®å˜ä½åˆ¶é™è§’ 1.0 â†’ 4.0[rad]ã€‚ã¾ãŸã€Œã²ã–ã€ã‚’å«ã‚€ãƒœãƒ¼ãƒ³åã‚’ã‚‚ã¤ãƒœãƒ¼ãƒ³ã¯Xè»¸æ–¹å‘ã«ã—ã‹å‹•ã‹ãªã„åˆ¶é™ãŒã‚ã‚‹ã€‚
+                                          // unsigned short ik_child_bone_index[ik_chain_length]; // IKå½±éŸ¿ä¸‹ã®ãƒœãƒ¼ãƒ³ç•ªå· (é…åˆ—ã®å¤§ãã•ãŒå¤‰åŒ–)
     };
 
     struct SkinDataWithoutArray {
-      char skin_name[20];            // •\î–¼
-      std::uint32_t skin_vert_count; // •\î—p‚Ì’¸“_”
-      std::uint8_t skin_type;        // •\î‚Ìí—Ş ¨ 0:baseA1:‚Ü‚äA2:–ÚA3:ƒŠƒbƒvA4:‚»‚Ì‘¼
-                                     // PmdSkinVertexData skin_vert_data[skin_vert_count];	// (”z—ñ‚Ì‘å‚«‚³‚ª•Ï‰»)
+      char skin_name[20];            // è¡¨æƒ…å
+      std::uint32_t skin_vert_count; // è¡¨æƒ…ç”¨ã®é ‚ç‚¹æ•°
+      std::uint8_t skin_type;        // è¡¨æƒ…ã®ç¨®é¡ â†’ 0:baseã€1:ã¾ã‚†ã€2:ç›®ã€3:ãƒªãƒƒãƒ—ã€4:ãã®ä»–
+                                     // PmdSkinVertexData skin_vert_data[skin_vert_count];	// (é…åˆ—ã®å¤§ãã•ãŒå¤‰åŒ–)
     };
 
     struct SkinVertexData {
-      std::uint32_t skin_vert_index; // •\î—p‚Ì’¸“_‚Ì”Ô†(’¸“_ƒŠƒXƒg‚É‚ ‚é”Ô†)
+      std::uint32_t skin_vert_index; // è¡¨æƒ…ç”¨ã®é ‚ç‚¹ã®ç•ªå·(é ‚ç‚¹ãƒªã‚¹ãƒˆã«ã‚ã‚‹ç•ªå·)
       float skin_vert_pos[3];
     };
 
@@ -70,41 +70,41 @@ namespace s3d_mmd {
     };
 
     struct BoneDisp {
-      std::uint16_t bone_index;           // ˜g—pƒ{[ƒ“”Ô†
-      std::uint8_t bone_disp_frame_index; // •\¦˜g”Ô†
+      std::uint16_t bone_index;           // æ ç”¨ãƒœãƒ¼ãƒ³ç•ªå·
+      std::uint8_t bone_disp_frame_index; // è¡¨ç¤ºæ ç•ªå·
     };
 
     struct RigidBody {
-      char rigidbody_name[20];                // –¼Ì
-      std::uint16_t rigidbody_rel_bone_index; // ŠÖ˜Aƒ{[ƒ“”Ô† i‚È‚µ¨0xFFFFj
-      std::uint8_t rigidbody_group_index;     // ƒOƒ‹[ƒv(1`16)
-      std::uint16_t rigidbody_group_target;   // ”ñÕ“ËƒOƒ‹[ƒv(ƒrƒbƒg’PˆÊ)
-      std::uint8_t shape_type;                // Œ`óƒ^ƒCƒv 0:‹… 1:”  2:ƒJƒvƒZƒ‹
-      float shape_w;                          // •/2(–”‚Í”¼Œa)
-      float shape_h;                          // ‚‚³/2(ƒJƒvƒZƒ‹‚Ìê‡‚Í‹…’†SŠÔ‚Ì‹——£)
-      float shape_d;                          // ‰œs/2
-      float pos_pos[3];                       // ˆÊ’u (x, y, z)  : ŠÖ˜Aƒ{[ƒ“‚ª‚ ‚éê‡‚ÍA„‘Ìƒ^ƒCƒv‚É‚æ‚ç‚¸ŠÖ˜Aƒ{[ƒ“ˆÊ’u‚©‚ç‚Ì‘Š‘ÎˆÊ’u(PMDƒGƒfƒBƒ^‚Å‚Íƒ‚ƒfƒ‹‚Ìƒ[ƒJƒ‹À•WŒn‚Å‚ ‚èA’l‚ªˆá‚¤‚Ì‚Å’ˆÓI)
-      float pos_rot[3];                       // ‰ñ“] : ‰ñ“]s—ñ‚Í MATRIXRotationYawPitchRoll(&rotation, pos_rot[1], pos_rot[0], pos_rot[2])
-      float rigidbody_weight;                 // ¿—Ê
-      float rigidbody_pos_dim;                // ˆÚ“®Œ¸Š
-      float rigidbody_rot_dim;                // ‰ñ“]Œ¸Š
-      float rigidbody_recoil;                 // ”½”­—Í
-      float rigidbody_friction;               // –€C—Í
-      std::uint8_t rigidbody_type;            // „‘Ìƒ^ƒCƒv 0:Bone’Ç] 1:•¨—‰‰Z 2:•¨—‰‰Z(BoneˆÊ’u‚ ‚í‚¹)
+      char rigidbody_name[20];                // åç§°
+      std::uint16_t rigidbody_rel_bone_index; // é–¢é€£ãƒœãƒ¼ãƒ³ç•ªå· ï¼ˆãªã—â†’0xFFFFï¼‰
+      std::uint8_t rigidbody_group_index;     // ã‚°ãƒ«ãƒ¼ãƒ—(1ï½16)
+      std::uint16_t rigidbody_group_target;   // éè¡çªã‚°ãƒ«ãƒ¼ãƒ—(ãƒ“ãƒƒãƒˆå˜ä½)
+      std::uint8_t shape_type;                // å½¢çŠ¶ã‚¿ã‚¤ãƒ— 0:çƒ 1:ç®± 2:ã‚«ãƒ—ã‚»ãƒ«
+      float shape_w;                          // å¹…/2(åˆã¯åŠå¾„)
+      float shape_h;                          // é«˜ã•/2(ã‚«ãƒ—ã‚»ãƒ«ã®å ´åˆã¯çƒä¸­å¿ƒé–“ã®è·é›¢)
+      float shape_d;                          // å¥¥è¡Œ/2
+      float pos_pos[3];                       // ä½ç½® (x, y, z)  : é–¢é€£ãƒœãƒ¼ãƒ³ãŒã‚ã‚‹å ´åˆã¯ã€å‰›ä½“ã‚¿ã‚¤ãƒ—ã«ã‚ˆã‚‰ãšé–¢é€£ãƒœãƒ¼ãƒ³ä½ç½®ã‹ã‚‰ã®ç›¸å¯¾ä½ç½®(PMDã‚¨ãƒ‡ã‚£ã‚¿ã§ã¯ãƒ¢ãƒ‡ãƒ«ã®ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»ã§ã‚ã‚Šã€å€¤ãŒé•ã†ã®ã§æ³¨æ„ï¼)
+      float pos_rot[3];                       // å›è»¢ : å›è»¢è¡Œåˆ—ã¯ MATRIXRotationYawPitchRoll(&rotation, pos_rot[1], pos_rot[0], pos_rot[2])
+      float rigidbody_weight;                 // è³ªé‡
+      float rigidbody_pos_dim;                // ç§»å‹•æ¸›è¡°
+      float rigidbody_rot_dim;                // å›è»¢æ¸›è¡°
+      float rigidbody_recoil;                 // åç™ºåŠ›
+      float rigidbody_friction;               // æ‘©æ“¦åŠ›
+      std::uint8_t rigidbody_type;            // å‰›ä½“ã‚¿ã‚¤ãƒ— 0:Boneè¿½å¾“ 1:ç‰©ç†æ¼”ç®— 2:ç‰©ç†æ¼”ç®—(Boneä½ç½®ã‚ã‚ã›)
     };
 
     struct Joint {
-      char joint_name[20];             // –¼Ì
-      std::uint32_t joint_rigidbody_a; // „‘ÌA
-      std::uint32_t joint_rigidbody_b; // „‘ÌB
-      float joint_pos[3];              // ˆÊ’u (x, y, z) : ƒ‚ƒfƒ‹ƒ[ƒJƒ‹À•WŒn
-      float joint_rot[3];              // ‰ñ“] (rad(x), rad(y), rad(z))
-      float constrain_pos_1[3];        // ˆÚ“®§ŒÀ‰ºŒÀ (x, y, z)
-      float constrain_pos_2[3];        // ˆÚ“®§ŒÀãŒÀ (x, y, z)
-      float constrain_rot_1[3];        // ‰ñ“]§ŒÀ‰ºŒÀ (rad(x), rad(y), rad(z))
-      float constrain_rot_2[3];        // ‰ñ“]§ŒÀãŒÀ (rad(x), rad(y), rad(z))
-      float spring_pos[3];             // ˆÚ“®‚Î‚Ë (x, y, z)
-      float spring_rot[3];             // ‰ñ“]‚Î‚Ë (rad(x), rad(y), rad(z))
+      char joint_name[20];             // åç§°
+      std::uint32_t joint_rigidbody_a; // å‰›ä½“A
+      std::uint32_t joint_rigidbody_b; // å‰›ä½“B
+      float joint_pos[3];              // ä½ç½® (x, y, z) : ãƒ¢ãƒ‡ãƒ«ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»
+      float joint_rot[3];              // å›è»¢ (rad(x), rad(y), rad(z))
+      float constrain_pos_1[3];        // ç§»å‹•åˆ¶é™ä¸‹é™ (x, y, z)
+      float constrain_pos_2[3];        // ç§»å‹•åˆ¶é™ä¸Šé™ (x, y, z)
+      float constrain_rot_1[3];        // å›è»¢åˆ¶é™ä¸‹é™ (rad(x), rad(y), rad(z))
+      float constrain_rot_2[3];        // å›è»¢åˆ¶é™ä¸Šé™ (rad(x), rad(y), rad(z))
+      float spring_pos[3];             // ç§»å‹•ã°ã­ (x, y, z)
+      float spring_rot[3];             // å›è»¢ã°ã­ (rad(x), rad(y), rad(z))
     };
 
     struct BoneEnglishName {
@@ -134,11 +134,11 @@ namespace s3d_mmd {
     };
 
     struct Ik : public IkDataWithoutArray {
-      std::vector<std::uint16_t> ik_child_bone_index; // unsigned short ik_child_bone_index[ik_chain_length]; // IK‰e‹¿‰º‚Ìƒ{[ƒ“”Ô†
+      std::vector<std::uint16_t> ik_child_bone_index; // unsigned short ik_child_bone_index[ik_chain_length]; // IKå½±éŸ¿ä¸‹ã®ãƒœãƒ¼ãƒ³ç•ªå·
     };
 
     struct Skin : public SkinDataWithoutArray {
-      std::vector<SkinVertexData> skin_vert_data; //•\î—p’¸“_ƒf[ƒ^
+      std::vector<SkinVertexData> skin_vert_data; //è¡¨æƒ…ç”¨é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿
     };
 
     using Vertices = Array<Vertex>;

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <Siv3D.hpp>
 #include "PMDStruct.h"
 #include "MMDBone.h"
@@ -12,12 +12,12 @@ namespace s3d_mmd {
       String diffuseTextureName;
       bool isCullNone;
       bool isEdge;
-      //TODO: ƒXƒtƒBƒA
+      //TODO: ã‚¹ãƒ•ã‚£ã‚¢
       String SphereTextureName;
       //TODO: Toon
       int toonTextureIndex;
 
-      //s3d::Material‚Æ“¯‚¶‚æ‚¤‚Éˆµ‚¦‚é‚æ‚¤‚É•s—v‚Èƒf[ƒ^‚à’Ç‰Á
+      //s3d::Materialã¨åŒã˜ã‚ˆã†ã«æ‰±ãˆã‚‹ã‚ˆã†ã«ä¸è¦ãªãƒ‡ãƒ¼ã‚¿ã‚‚è¿½åŠ 
     };
 
     struct MeshVertex {
@@ -49,26 +49,26 @@ namespace s3d_mmd {
     MMDModel();
 
     /// <summary>
-    /// 3D ƒ‚ƒfƒ‹ƒtƒ@ƒCƒ‹‚©‚çƒ‚ƒfƒ‹‚ğƒ[ƒh‚µ‚Ü‚·B
+    /// 3D ãƒ¢ãƒ‡ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ¢ãƒ‡ãƒ«ã‚’ãƒ­ãƒ¼ãƒ‰ã—ã¾ã™ã€‚
     /// </summary>
     /// <param name="path">
-    /// 3D ƒ‚ƒfƒ‹ƒtƒ@ƒCƒ‹‚ÌƒpƒX
+    /// 3D ãƒ¢ãƒ‡ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹
     /// </param>
     /// <remarks>
-    /// MikuMikuDance pmdŒ`®‚Ì‚İƒTƒ|[ƒg‚µ‚Ä‚¢‚Ü‚·B
+    /// MikuMikuDance pmdå½¢å¼ã®ã¿ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã¾ã™ã€‚
     /// </remarks>
     MMDModel(const FilePath& path);
 
     /// <summary>
-    /// ƒfƒXƒgƒ‰ƒNƒ^
+    /// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
     /// </summary>
     ~MMDModel();
 
     /// <summary>
-    /// ƒ‚ƒfƒ‹‚ğƒŠƒŠ[ƒX‚µ‚Ü‚·B
+    /// ãƒ¢ãƒ‡ãƒ«ã‚’ãƒªãƒªãƒ¼ã‚¹ã—ã¾ã™ã€‚
     /// </summary>
     /// <returns>
-    /// ‚È‚µ
+    /// ãªã—
     /// </returns>
     void release();
 
@@ -83,10 +83,10 @@ namespace s3d_mmd {
     bool operator != (const MMDModel& model) const;
 
     /// <summary>
-    /// ƒ‚ƒfƒ‹ƒm[ƒh‚Ìˆê——‚ğæ“¾‚µ‚Ü‚·B
+    /// ãƒ¢ãƒ‡ãƒ«ãƒãƒ¼ãƒ‰ã®ä¸€è¦§ã‚’å–å¾—ã—ã¾ã™ã€‚
     /// </summary>
     /// <returns>
-    /// ƒ‚ƒfƒ‹ƒm[ƒh‚Ìˆê——
+    /// ãƒ¢ãƒ‡ãƒ«ãƒãƒ¼ãƒ‰ã®ä¸€è¦§
     /// </returns>
     Array<mmd::ModelNode>& nodes() const;
     Array<mmd::ModelNode>& edgeNodes() const;

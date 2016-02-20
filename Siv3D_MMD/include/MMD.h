@@ -1,11 +1,18 @@
-#pragma once
-//•¨—‰‰Z‚ğg—p‚·‚éê‡‚É’è‹`‚·‚é
-//#define USE_BULLET_PHYSICS
+ï»¿#pragma once
+//ç‰©ç†æ¼”ç®—ã‚’ä½¿ç”¨ã™ã‚‹å ´åˆã«å®šç¾©ã™ã‚‹
+#define USE_BULLET_PHYSICS
 #include <memory>
 #include "MMDModel.h"
 #include "MMDBone.h"
 #include "VMDController.h"
+#include "../BulletPhysics/BulletPhysics.h"
 namespace s3d_mmd {
+
+#ifdef USE_BULLET_PHYSICS
+
+  std::shared_ptr<s3d_bullet::BulletPhysics> getBulletInstance();
+#endif // USE_BULLET_PHYSICS
+
 
   class MMD {
     class Pimpl;

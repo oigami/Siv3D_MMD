@@ -1,252 +1,99 @@
-/**************************************************************************//**
-    @file       DebugDraw.cpp
-    @brief      DebugDrawƒNƒ‰ƒX À‘•
-    @author     Simplestar
-    @date       2011-08-19
-    @par
-        [à–¾]
-            DebugDrawƒNƒ‰ƒX À‘•ƒtƒ@ƒCƒ‹
-    @note
-        Copyright c 2011  SimpleStar Game
-        http://simplestar.syuriken.jp/
-*//***************************************************************************/
+ï»¿#include "BulletPhysics.h"
+#include "BulletDebug.h"
 
-//------------------------------------------------------------------------
-// File Dependencies
-//------------------------------------------------------------------------
+namespace s3d_bullet {
 
-
-
-#include    "BulletDebug.h"
-#include"BulletPhysics.h"
-// Bulletƒ‰ƒCƒuƒ‰ƒŠ‚Íƒ}ƒl[ƒWƒIƒvƒVƒ‡ƒ“‚ÅƒRƒ“ƒpƒCƒ‹‚Å‚«‚È‚¢I
-//#pragma unmanaged
-//#include"bullet/src/btBulletDynamicsCommon.h"
-
-//------------------------------------------------------------------------
-// Implements
-//------------------------------------------------------------------------
-
-
-/**********************************************************************//**
-    @brief      btVector3 ¨ D3DXVECTOR4
-    @param[in]  btVec3  :   “ü—Í
-    @param[out] dxVec4  :   o—Íi‘æ4¬•ª‚Ìw’l‚Í•K‚¸1.0f‚É‚È‚è‚Ü‚·j
-    @author     Simplestar
-    @par    [à–¾]
-        Bullet ‚ÌƒxƒNƒgƒ‹¬•ª‚ğ DirectX ‚Ì“¯ŸÀ•W‚É•ÏŠ·‚µ‚Ü‚·B
-    @return     •ÏŠ·‚µ‚½ D3DXVECTOR4 ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-*//***********************************************************************/
-VECTOR4* DebugDraw::_GetDXVector4(const btVector3& btVec3, VECTOR4& dxVec4) {
-  dxVec4.x = btVec3.x();
-  dxVec4.y = btVec3.y();
-  dxVec4.z = btVec3.z();
-  dxVec4.w = 1.0f;
-  return &dxVec4;
-}
-
-/**********************************************************************//**
-    @brief      btVector3 ¨ D3DXCOLOR
-    @param[in]  btVec3  :   “ü—Í
-    @param[in]  dxColor :   o—Íi‘æ4¬•ª‚Ìa’l‚Í•K‚¸1.0f‚É‚È‚è‚Ü‚·j
-    @author     Simplestar
-    @par    [à–¾]
-        Bullet ‚ÌRGBƒJƒ‰[‚ğ D3DXCOLOR ‚ÌRGBA‚É•ÏŠ·‚µ‚Ü‚·B
-    @return     •ÏŠ·‚µ‚½ D3DXCOLOR ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-*//***********************************************************************/
-XMCOLOR* DebugDraw::_GetDXColor(const btVector3& btVec3, XMCOLOR& dxColor) {
-  dxColor.x = btVec3.x();
-  dxColor.y = btVec3.y();
-  dxColor.z = btVec3.z();
-  dxColor.w = 1.0f;
-  return &dxColor;
-}
-
-/**********************************************************************//**
-    @brief      ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-*//***********************************************************************/
-DebugDraw::DebugDraw(const ICamera *camera)
-  : m_debugMode(0)
-  , m_effectIndex(0)
-  , m_bInitialized(false)
-  , m_camera(camera) {
-  // FPS ‚Ì•\¦—Ìˆæ
-    {
-      m_fpsArea.left = 10;
-      m_fpsArea.top = 10;
-      m_fpsArea.right = 100;
-      m_fpsArea.bottom = 24;
+  namespace {
+    template<class F> void SetRasterizerState(RasterizerState state, F f) {
+      const RasterizerState rasterizerState = Graphics3D::GetRasterizerState();
+      Graphics3D::SetRasterizerState(state);
+      f();
+      Graphics3D::SetRasterizerState(rasterizerState);
     }
-    // ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ
-    {
-      m_clientRect.left = 0;
-      m_clientRect.top = 0;
-      m_clientRect.right = 800;
-      m_clientRect.bottom = 600;
-    }
+
+  }
+  DebugDraw::DebugDraw()
+    : m_debugMode(1) {
+  }
+
+  DebugDraw::~DebugDraw() {
+  }
+
+ 
+  void DebugDraw::drawLine(const btVector3& from, const btVector3& to, const btVector3& btColor) {
+    const Vec3 vec1 = bullet::ConvertFloat3(from);
+    const Vec3 vec2 = bullet::ConvertFloat3(to);
+    ColorF color = bullet::ConvertColor(btColor);
+    Line3D(vec1, vec2).drawForward(color);
+  }
+
+ 
+
+  void DebugDraw::drawSphere(btScalar radius, const btTransform &transform, const btVector3 & color) {
+    const Vec3 pos = bullet::ConvertFloat3(transform.getOrigin());
+    SetRasterizerState(RasterizerState::WireframeCullBack, [&]() {
+      Sphere(pos, radius).draw(bullet::ConvertColor(color));
+    });
+  }
+
+  void DebugDraw::drawBox(const btVector3 & bbMin, const btVector3 & bbMax, const btVector3 & color) {
+    const Vec3 from = bullet::ConvertFloat3(bbMin);
+    const Vec3 to = bullet::ConvertFloat3(bbMax);
+    SetRasterizerState(RasterizerState::WireframeCullBack, [&]() {
+      Box(from, to).draw(bullet::ConvertColor(color));
+    });
+  }
+
+  void DebugDraw::drawBox(const btVector3 & bbMin, const btVector3 & bbMax, const btTransform& trans, const btVector3 & color) {
+    const Vec3 from = bullet::ConvertFloat3(bbMin);
+    const Vec3 to = bullet::ConvertFloat3(bbMax);
+    const auto rot = bullet::ConvertQuaternion(trans.getRotation());
+    SetRasterizerState(RasterizerState::WireframeCullBack, [&]() {
+      Box(from, to, rot).draw(bullet::ConvertColor(color));
+    });
+  }
+
+  void DebugDraw::drawCapsule(btScalar radius, btScalar halfHeight, int upAxis,
+    const btTransform& transform, const btVector3& color) {
+
+    const Vec3 vec = bullet::ConvertFloat3(transform.getOrigin());
+    const Quaternion rot = bullet::ConvertQuaternion(transform.getRotation()*upAxis);
+    SetRasterizerState(RasterizerState::WireframeCullBack, [&]() {
+      //TODO: CapsuleãŒãªã„
+      Cylinder(vec, radius, halfHeight * 2, rot).draw(bullet::ConvertColor(color));
+    });
+  }
+
+  void DebugDraw::drawCylinder(btScalar radius, btScalar halfHeight, int upAxis, 
+    const btTransform & transform, const btVector3 & color) {
+
+    const Vec3 vec = bullet::ConvertFloat3(transform.getOrigin());
+    const Quaternion rot = bullet::ConvertQuaternion(transform.getRotation()*upAxis);
+    SetRasterizerState(RasterizerState::WireframeCullBack, [&]() {
+      Cylinder(vec, radius, halfHeight * 2, rot).draw(bullet::ConvertColor(color));
+    });
+  }
+
+  void DebugDraw::drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB,
+    btScalar distance, int, const btVector3& color) {
+    btVector3 to = distance * (PointOnB + normalOnB);
+    drawLine(PointOnB, to, color);
+  }
+
+  void DebugDraw::reportErrorWarning(const char* warningString) {
+    Println(Widen(warningString));
+  }
+
+  void DebugDraw::draw3dText(const btVector3& location, const char* textString) {
+    Println(Widen(textString));
+  }
+
+  void DebugDraw::setDebugMode(int debugMode) {
+    m_debugMode = debugMode;
+  }
+
+  int DebugDraw::getDebugMode() const {
+    return m_debugMode;
+  }
+
 }
-
-/**********************************************************************//**
-    @brief      ƒfƒXƒgƒ‰ƒNƒ^
-*//***********************************************************************/
-DebugDraw::~DebugDraw() {
-
-}
-
-/**********************************************************************//**
-    @brief      ü‚Ì•`‰æ
-    @param[in]  from    :   ŠJn“_
-    @param[in]  to      :   I’[“_
-    @param[in]  color   :   ü‚ÌF
-    @author     Simplestar
-    @par    [à–¾]
-        2“_ŠÔ‚ğŒ‹‚Ôƒ‰ƒCƒ“‚ğ•`‚«‚Ü‚·B
-    @return     ‚È‚µ
-*//***********************************************************************/
-void DebugDraw::drawLine(const btVector3& from, const btVector3& to, const btVector3& color) {
-  std::array<VECTOR3, 2> vec;
-  vec[0] = bullet::ConvertVectorBtToDx(from);
-  vec[1] = bullet::ConvertVectorBtToDx(to);
-  //line.vertex.push_back(vec[0]);
-  //line.vertex.push_back(vec[1]);
-  XMCOLOR xmcolor(color.x(), color.y(), color.z(), 1.0);
-  //DrawLine(vec[0], vec[1],xmcolor);
-
-  //MATRIX view, proj;
-  //camera->GetMatrix(&view, &proj);
-  //nt240::g_pd3dDevice->SetTransform(D3DTS_WORLD, world);
-  //nt240::g_pd3dDevice->SetTransform(D3DTS_VIEW, &view);
-  //nt240::g_pd3dDevice->SetTransform(D3DTS_PROJECTION, &proj);
-//	nt240::g_pd3dDevice->SetFVF(D3DFVF_XYZ);
-  //nt240::g_pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
-  //nt240::g_pd3dDevice->SetTexture(0, 0);
-  //nt240::g_pd3dDevice->DrawPrimitiveUP(D3DPT_LINELIST, 1, vec, sizeof(VECTOR3));
-  //nt240::g_pd3dDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-}
-
-/**********************************************************************//**
-    @brief      Õ“Ë“_i•ûŒü•t‚«j‚Ì•`‰æ
-    @param[in]  PointOnB    :   Õ“ËˆÊ’u
-    @param[in]  normalOnB   :   Õ“Ë•ûŒü
-    @param[in]  distance    :   Õ“Ë‚Ì‘å‚«‚³
-    @param[in]  lifeTime    :   ƒ‰ƒCƒtƒ^ƒCƒ€
-    @param[in]  color   :   •\¦F
-    @author     Simplestar
-    @par    [à–¾]
-        Õ“Ë“_‚Ì•`‰æA•ûŒü‚Í”½”­‚·‚éŒü‚«‚ğ•\‚µ‚Ä‚¢‚é
-    @return     ‚È‚µ
-*//***********************************************************************/
-void DebugDraw::drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int, const btVector3& color) {
-  btVector3 to = distance * (PointOnB + normalOnB);
-  drawLine(PointOnB, to, color);
-}
-
-/**********************************************************************//**
-    @brief      ŒxAƒGƒ‰[•¶‚Ìo—Í
-    @param[in]  warningString   :   ŒxAƒGƒ‰[•¶
-    @author     Simplestar
-    @par    [à–¾]
-        o—ÍƒEƒBƒ“ƒhƒE‚ÉŒxƒƒbƒZ[ƒWAƒGƒ‰[ƒƒbƒZ[ƒW‚ğo—Í‚µ‚Ü‚·B
-    @return     ‚È‚µ
-*//***********************************************************************/
-void DebugDraw::reportErrorWarning(const char* warningString) {
-  puts(warningString);
-  //wchar_t wideString[MAX_PATH];
-  // SMPLDX10::PathUtility::MBToWC(warningString, wideString);
-  // OutputDebugString(wideString);
-}
-
-/**********************************************************************//**
-    @brief      3D•¶š‚Ì•`‰æ
-    @param[in]  location    :   •`‰æˆÊ’u
-    @param[in]  textString  :   •\¦‚·‚é•¶š—ñ
-    @author     Simplestar
-    @par    [à–¾]
-        w’è‚µ‚½ˆÊ’u‚É•¶š—ñ‚ª•\¦‚³‚ê‚é
-    @return     ‚È‚µ
-*//***********************************************************************/
-void DebugDraw::draw3dText(const btVector3& location, const char* textString) {
-  // •¶š‚Ì•`‰æ
-  /* if (m_pFont)
-  {
-      MATRIX matViewProjection;
-      XMMatrixMultiply( &matViewProjection, &m_matView, &m_matProjection );
-      VECTOR3 dxLocation;
-      {
-          dxLocation.x = location.x();
-          dxLocation.y = location.y();
-          dxLocation.z = location.z();
-      }
-      D3DXVec3TransformCoord( &dxLocation, &dxLocation, &matViewProjection );
-      RECT stringArea;
-      {
-          stringArea.left = static_cast<LONG>((1.0f + dxLocation.x) * m_clientRect.right/2.0f);
-          stringArea.top = static_cast<LONG>((1.0f - dxLocation.y) * m_clientRect.bottom/2.0f);
-          stringArea.right = stringArea.left + 100;
-          stringArea.bottom = stringArea.top + 50;
-      }
-      m_pFont->DrawTextA(NULL, textString, -1, &stringArea, DT_NOCLIP, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-  }*/
-}
-
-/**********************************************************************//**
-    @brief      ƒfƒoƒbƒOƒ‚[ƒh‚Ìİ’è
-    @param[in]  debugMode   :   ƒfƒoƒbƒOƒ‚[ƒh
-    @author     Simplestar
-    @par    [à–¾]
-        ƒfƒoƒbƒOƒ‚[ƒh‚Ìİ’è
-    @return     ‚È‚µ
-*//***********************************************************************/
-void DebugDraw::setDebugMode(int debugMode) {
-  m_debugMode = debugMode;
-}
-
-/**********************************************************************//**
-    @brief      ƒfƒoƒbƒOƒ‚[ƒh‚Ìæ“¾
-    @author     Simplestar
-    @par    [à–¾]
-        ’P‚È‚éæ“¾
-    @return     ƒfƒoƒbƒOƒ‚[ƒh
-*//***********************************************************************/
-int DebugDraw::getDebugMode() const {
-  return m_debugMode;
-}
-
-/**********************************************************************//**
-    @brief      ƒrƒ…[s—ñ‚Ìæ“¾
-    @author     Simplestar
-    @return     ƒrƒ…[s—ñ
-*//***********************************************************************/
-const MATRIX& DebugDraw::GetViewMatrix() const {
-  return m_matView;
-}
-
-/**********************************************************************//**
-    @brief      ƒrƒ…[s—ñ‚Ìİ’è
-    @param[in]  viewMatrix  :   İ’è‚·‚éƒrƒ…[s—ñ
-    @author     Simplestar
-    @return     ‚È‚µ
-*//***********************************************************************/
-void DebugDraw::SetViewMatrix(const MATRIX& viewMatrix) {
-  m_matView = viewMatrix;
-}
-
-/**********************************************************************//**
-    @brief      ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚Ìæ“¾
-    @author     Simplestar
-    @return     ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ
-*//***********************************************************************/
-const MATRIX& DebugDraw::GetProjectionMatrix() const {
-  return m_matProjection;
-}
-
-/**********************************************************************//**
-    @brief      ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚Ìİ’è
-    @param[in]  projectionMatirx    :   İ’è‚·‚éƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ
-    @author     Simplestar
-*//***********************************************************************/
-void DebugDraw::SetProjectionMatrix(const MATRIX& projectionMatirx) {
-  m_matProjection = projectionMatirx;
-}
-
-

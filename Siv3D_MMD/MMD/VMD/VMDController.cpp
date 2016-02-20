@@ -1,4 +1,4 @@
-#include <Siv3D.hpp>
+ï»¿#include <Siv3D.hpp>
 #include "../../include/MMDBone.h"
 #include "../../include/PMDStruct.h"
 #include "../../include/VMDController.h"
@@ -14,19 +14,19 @@ namespace s3d_mmd {
     }
 
     /// http://d.hatena.ne.jp/edvakf/20111016/1318716097
-    /// “ñ•ª’Tõ
+    /// äºŒåˆ†æ¢ç´¢
     float Bezie::GetY(float x) const {
       float t = 0.5f;
       float a, b, c;
-      constexpr int N = 15; // ŒvZŒJ‚è•Ô‚µ‰ñ”
+      constexpr int N = 15; // è¨ˆç®—ç¹°ã‚Šè¿”ã—å›æ•°
       for (int i = 0; i < N; ++i) {
         const float s = 1 - t;
         a = s * s * t * 3.0f;
         b = s * t * t * 3.0f;
         c = t * t * t;
         float ft = static_cast<float>(a * p1.x + b * p2.x + c - x);
-        if (fabs(ft) < 1e-6) break; // Œë·‚ª’è”ˆÈ“à‚È‚çI—¹
-        if (ft > 0) { // ”ÍˆÍ‚ğ•ÏX‚µ‚ÄÄŒvZ
+        if (fabs(ft) < 1e-6) break; // èª¤å·®ãŒå®šæ•°ä»¥å†…ãªã‚‰çµ‚äº†
+        if (ft > 0) { // ç¯„å›²ã‚’å¤‰æ›´ã—ã¦å†è¨ˆç®—
           t -= 1.0f / (4 << i);
         } else {
           t += 1.0f / (4 << i);
@@ -41,14 +41,14 @@ namespace s3d_mmd {
 
     Array<uint32> m_nowFrameNumber;
     bool m_blendFlag;
-    bool m_isFrameEnd;  /// <summary> ƒtƒŒ[ƒ€‚ªI—¹‚µ‚½‚© true:I—¹ </summary>
-    bool m_isLoop;      /// <summary> ƒ‹[ƒv‚·‚é‚©‚Ç‚¤‚© </summary>
-    uint32 m_loopStart; /// <summary> ƒ‹[ƒv‚·‚éŠÔ </summary>
-    uint32 m_loopEnd;   /// <summary> ƒ‹[ƒv‚·‚éŠÔ </summary>
-    uint32 m_nowTime;   /// <summary> Œ»İ‚ÌÄ¶ŠÔ </summary>
+    bool m_isFrameEnd;  /// <summary> ãƒ•ãƒ¬ãƒ¼ãƒ ãŒçµ‚äº†ã—ãŸã‹ true:çµ‚äº† </summary>
+    bool m_isLoop;      /// <summary> ãƒ«ãƒ¼ãƒ—ã™ã‚‹ã‹ã©ã†ã‹ </summary>
+    uint32 m_loopStart; /// <summary> ãƒ«ãƒ¼ãƒ—ã™ã‚‹æ™‚é–“ </summary>
+    uint32 m_loopEnd;   /// <summary> ãƒ«ãƒ¼ãƒ—ã™ã‚‹æ™‚é–“ </summary>
+    uint32 m_nowTime;   /// <summary> ç¾åœ¨ã®å†ç”Ÿæ™‚é–“ </summary>
     Array<pmd::IkData>* m_pmdIkData;
 
-    /// ƒL[ƒtƒŒ[ƒ€ƒAƒjƒ[ƒVƒ‡ƒ“
+    /// ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³
     struct KeyFrameData {
       KeyFrameData() :m_nowFrameNum(0) {}
 
@@ -72,7 +72,7 @@ namespace s3d_mmd {
       int m_nowFrameNum;
     };
 
-    /// <summary> ƒL[ƒtƒŒ[ƒ€‚Ì–¼‘O‚Æƒf[ƒ^ </summary>
+    /// <summary> ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã®åå‰ã¨ãƒ‡ãƒ¼ã‚¿ </summary>
     std::unordered_map<std::string, KeyFrameData> m_keyFrameData;
     Array<Mat4x4> worlds;
 
@@ -95,14 +95,14 @@ namespace s3d_mmd {
     }
     Pimpl() = default;
 
-    void UpdateIK(mmd::Bones &bones) const;		// IKƒ{[ƒ“‰e‹¿‰ºƒ{[ƒ“‚Ìs—ñ‚ğXV
-    void UpdateIK(mmd::Bones &bones, const mmd::Ik &ik) const;		// IKƒ{[ƒ“‰e‹¿‰ºƒ{[ƒ“‚Ìs—ñ‚ğXV
+    void UpdateIK(mmd::Bones &bones) const;		// IKãƒœãƒ¼ãƒ³å½±éŸ¿ä¸‹ãƒœãƒ¼ãƒ³ã®è¡Œåˆ—ã‚’æ›´æ–°
+    void UpdateIK(mmd::Bones &bones, const mmd::Ik &ik) const;		// IKãƒœãƒ¼ãƒ³å½±éŸ¿ä¸‹ãƒœãƒ¼ãƒ³ã®è¡Œåˆ—ã‚’æ›´æ–°
     void UpdateBone(mmd::Bones &bons)const;
     void UpdateTime();
 
   };
 
-  // IKƒ{[ƒ“‰e‹¿‰ºƒ{[ƒ“‚Ìs—ñ‚ğXV
+  // IKãƒœãƒ¼ãƒ³å½±éŸ¿ä¸‹ãƒœãƒ¼ãƒ³ã®è¡Œåˆ—ã‚’æ›´æ–°
   void VMD::Pimpl::UpdateIK(mmd::Bones &bones) const {
     for (auto& ikData : bones.ikData())
       UpdateIK(bones, ikData);
@@ -118,25 +118,25 @@ namespace s3d_mmd {
         const Vector &targetPos = targetMat.r[3];
         XMVECTOR Determinant;
         const Mat4x4 invCoord = XMMatrixInverse(&Determinant, bones.CalcBoneMatML(attentionIdx));
-        localEffectorPos = XMVector3TransformCoord(effectorPos, invCoord); // ’–Úƒ{[ƒ“Šî€‚É•ÏŠ·
-        localTargetPos = XMVector3TransformCoord(targetPos, invCoord);     // ’–Úƒ{[ƒ“Šî€‚É•ÏŠ·
-        // ƒGƒtƒFƒNƒ^‚Ìƒ[ƒJƒ‹•ûŒüi’–Úƒ{[ƒ“Šî€j
+        localEffectorPos = XMVector3TransformCoord(effectorPos, invCoord); // æ³¨ç›®ãƒœãƒ¼ãƒ³åŸºæº–ã«å¤‰æ›
+        localTargetPos = XMVector3TransformCoord(targetPos, invCoord);     // æ³¨ç›®ãƒœãƒ¼ãƒ³åŸºæº–ã«å¤‰æ›
+        // ã‚¨ãƒ•ã‚§ã‚¯ã‚¿ã®ãƒ­ãƒ¼ã‚«ãƒ«æ–¹å‘ï¼ˆæ³¨ç›®ãƒœãƒ¼ãƒ³åŸºæº–ï¼‰
         Vector localEffectorDir = XMVector3Normalize(localEffectorPos);
-        // ƒ^[ƒQƒbƒg‚Ìƒ[ƒJƒ‹•ûŒüi’–Úƒ{[ƒ“Šî€j
+        // ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ãƒ­ãƒ¼ã‚«ãƒ«æ–¹å‘ï¼ˆæ³¨ç›®ãƒœãƒ¼ãƒ³åŸºæº–ï¼‰
         Vector localTargetDir = XMVector3Normalize(localTargetPos);
-        const auto findIt = bones[attentionIdx].name.find("‚Ğ‚´");
+        const auto findIt = bones[attentionIdx].name.find("ã²ã–");
         if (findIt != std::string::npos) {
           localEffectorDir = XMVector3Normalize(XMVectorSetX(localEffectorDir, 0));
           localTargetDir = XMVector3Normalize(XMVectorSetX(localTargetDir, 0));
         }
         float p;
         XMStoreFloat(&p, XMVector3Dot(localEffectorDir, localTargetDir));
-        if (p > 1 - 1.0e-8f) continue; // ŒvZŒë·‚É‚æ‚è1‚ğ‰z‚¦‚é‚Æacos()‚ª”­U‚·‚é‚Ì‚Å’ˆÓ!
+        if (p > 1 - 1.0e-8f) continue; // è¨ˆç®—èª¤å·®ã«ã‚ˆã‚Š1ã‚’è¶Šãˆã‚‹ã¨acos()ãŒç™ºæ•£ã™ã‚‹ã®ã§æ³¨æ„!
         float angle = acos(p);
         if (angle > 4 * ikData.control_weight)
           angle = 4.0f * ikData.control_weight;
         const Vector axis = XMVector3Cross(localEffectorDir, localTargetDir);
-        //ƒxƒNƒgƒ‹‚ªƒ[ƒ‚Ì‚Æ‚«ƒGƒ‰[‚É‚È‚é‚Ì‚ÅŠm”F‚·‚é
+        //ãƒ™ã‚¯ãƒˆãƒ«ãŒã‚¼ãƒ­ã®ã¨ãã‚¨ãƒ©ãƒ¼ã«ãªã‚‹ã®ã§ç¢ºèªã™ã‚‹
         XMMATRIX rotation = XMVector3Equal(axis, XMVectorZero()) ?
           DirectX::XMMatrixIdentity() : DirectX::XMMatrixRotationAxis(axis, angle);
         const XMMATRIX &xmboneMatBL = bones[attentionIdx].boneMat;
@@ -145,16 +145,16 @@ namespace s3d_mmd {
           const XMMATRIX def = rotation * xmboneMatBL * inv;
           Vector t = XMVector3TransformCoord(XMVectorSet(0, 0, 1, 0), def);
           if (XMVectorGetY(t) < 0) rotation = DirectX::XMMatrixRotationAxis(axis, -angle);
-          // •Gƒ{[ƒ“‚ªƒGƒtƒFƒNƒ^(ƒ^[ƒQƒbƒgƒ{[ƒ“)‚æ‚è‹ß‚¢‚Í‰ñ“]—Ê‚ğ’Ç‰Á‚·‚é
+          // è†ãƒœãƒ¼ãƒ³ãŒã‚¨ãƒ•ã‚§ã‚¯ã‚¿(ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãƒœãƒ¼ãƒ³)ã‚ˆã‚Šè¿‘ã„æ™‚ã¯å›è»¢é‡ã‚’è¿½åŠ ã™ã‚‹
           const float l = XMVectorGetY(XMVector3Length(localTargetPos)) / XMVectorGetY(XMVector3Length(localEffectorPos));
           if (fabs(angle) <= XM_PI / 2 && l < 1.0f) {
-            constexpr float a = 0.5f; // ’Ç‰Á—Ê‚Ì”ä—áŒW”
-            float diff = acosf(l) * a; // ’Ç‰Á—Ê
-            static const float diff_limit = XM_PI / 6;	// ’Ç‰Á—Ê‚Ì§ŒÀ
+            constexpr float a = 0.5f; // è¿½åŠ é‡ã®æ¯”ä¾‹ä¿‚æ•°
+            float diff = acosf(l) * a; // è¿½åŠ é‡
+            static const float diff_limit = XM_PI / 6;	// è¿½åŠ é‡ã®åˆ¶é™
             if (diff > diff_limit) {
               diff = diff_limit;
             }
-            if (fabs(angle) > 1.0e-6f) diff *= angle / fabs(angle);	// •„†‡‚í‚¹
+            if (fabs(angle) > 1.0e-6f) diff *= angle / fabs(angle);	// ç¬¦å·åˆã‚ã›
             angle += diff;
           }
         }
@@ -174,14 +174,14 @@ namespace s3d_mmd {
       auto it = m_keyFrameData.find(i.name);
       if (it == m_keyFrameData.end()) continue;
       const auto &keyData = it->second;
-      // ƒL[ƒtƒŒ[ƒ€•âŠ®
+      // ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ è£œå®Œ
       if (keyData.haveNowFrame()) {
         const auto &nowFrame = keyData.getNowFrame();
         const int t0 = nowFrame.frameNo;
         Vector boneRot = nowFrame.rotation.component;
         Vec3 bonePos = nowFrame.position;
         if (keyData.haveNextFrame()) {
-          //Ÿ‚ÌƒtƒŒ[ƒ€‚Æ‚ÌŠÔ‚ÌˆÊ’u‚ğŒvZ‚·‚é
+          //æ¬¡ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã¨ã®é–“ã®ä½ç½®ã‚’è¨ˆç®—ã™ã‚‹
           const Vec3 &p0 = bonePos;
           const vmd::KeyFrame &next = keyData.getNextFrame();
           const int t1 = next.frameNo;
@@ -192,7 +192,7 @@ namespace s3d_mmd {
           bonePos.y = p0.y + (p1.y - p0.y) * next.bezie_y.GetY(s);
           bonePos.z = p0.z + (p1.z - p0.z) * next.bezie_z.GetY(s);
         }
-        // eƒ{[ƒ“À•WŒn‚Ìƒ{[ƒ“s—ñ‚ğ‹‚ß‚é
+        // è¦ªãƒœãƒ¼ãƒ³åº§æ¨™ç³»ã®ãƒœãƒ¼ãƒ³è¡Œåˆ—ã‚’æ±‚ã‚ã‚‹
         const XMMATRIX rot = XMMatrixRotationQuaternion(boneRot);
         const Mat4x4 trans = Mat4x4::Translate(bonePos.x, bonePos.y, bonePos.z);
         i.boneMat = rot * trans * i.initMat;

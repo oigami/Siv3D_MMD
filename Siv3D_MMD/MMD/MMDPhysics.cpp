@@ -1,4 +1,4 @@
-#include "../include/MMD.h"
+ï»¿#include "../include/MMD.h"
 #ifdef USE_BULLET_PHYSICS
 #include "MmdPhysics.h"
 #include "../BulletPhysics/BulletPhysics.h"
@@ -54,9 +54,9 @@ namespace s3d_mmd {
     this->m_bones = bones;
   }
 
-  /// „‘Ì‚ğì¬
-  /// @param pmdRigidBodies Pmd„‘Ì”z—ñ
-  /// @param pmdBones Pmdƒ{[ƒ“”z—ñ
+  /// å‰›ä½“ã‚’ä½œæˆ
+  /// @param pmdRigidBodies Pmdå‰›ä½“é…åˆ—
+  /// @param pmdBones Pmdãƒœãƒ¼ãƒ³é…åˆ—
 
   inline void MmdPhysics::CreateRigid(const std::vector<s3d_mmd::pmd::RigidBody>& pmdRigidBodies) {
     const int pmdRigidBodiesSize = static_cast<int>(pmdRigidBodies.size());
@@ -80,7 +80,7 @@ namespace s3d_mmd {
       world_inv = XMMatrixInverse(nullptr, world);
       m_rigidbodyInit[i] = world;
       m_rigidbodyOffset[i] = world_inv;
-      if (pmdRigidBodies[i].shape_type == 0) {		// ‹…
+      if (pmdRigidBodies[i].shape_type == 0) {		// çƒ
         const float radius = pmdRigidBodies[i].shape_w;
         auto body = m_bulletPhysics->CreateSphere(
           radius, m_rigidbodyInit[i], pmdRigidBodies[i].rigidbody_weight, pmdRigidBodies[i].rigidbody_recoil, pmdRigidBodies[i].rigidbody_friction, pmdRigidBodies[i].rigidbody_pos_dim,
@@ -88,14 +88,14 @@ namespace s3d_mmd {
         m_rigidBodies[i] = mmd::Body(body, 1 << pmdRigidBodies[i].rigidbody_group_index, pmdRigidBodies[i].rigidbody_group_target);
         const std::uint32_t slices = 10, stacks = 5;
 
-      } else if (pmdRigidBodies[i].shape_type == 1) {	// ” 
+      } else if (pmdRigidBodies[i].shape_type == 1) {	// ç®±
         const float width = 2 * pmdRigidBodies[i].shape_w, height = 2 * pmdRigidBodies[i].shape_h, depth = 2 * pmdRigidBodies[i].shape_d;
         auto body = m_bulletPhysics->CreateBox(
           width, height, depth, m_rigidbodyInit[i], pmdRigidBodies[i].rigidbody_weight, pmdRigidBodies[i].rigidbody_recoil, pmdRigidBodies[i].rigidbody_friction, pmdRigidBodies[i].rigidbody_pos_dim,
           pmdRigidBodies[i].rigidbody_rot_dim, pmdRigidBodies[i].rigidbody_type == 0, 1 << pmdRigidBodies[i].rigidbody_group_index, pmdRigidBodies[i].rigidbody_group_target);
         m_rigidBodies[i] = mmd::Body(body, 1 << pmdRigidBodies[i].rigidbody_group_index, pmdRigidBodies[i].rigidbody_group_target);
 
-      } else if (pmdRigidBodies[i].shape_type == 2) {	// ƒJƒvƒZƒ‹
+      } else if (pmdRigidBodies[i].shape_type == 2) {	// ã‚«ãƒ—ã‚»ãƒ«
         const float radius = pmdRigidBodies[i].shape_w, height = pmdRigidBodies[i].shape_h;
         auto body = m_bulletPhysics->CreateCapsule(
           radius, height, m_rigidbodyInit[i], pmdRigidBodies[i].rigidbody_weight, pmdRigidBodies[i].rigidbody_recoil, pmdRigidBodies[i].rigidbody_friction, pmdRigidBodies[i].rigidbody_pos_dim,
@@ -127,22 +127,22 @@ namespace s3d_mmd {
       Float3 p(ConvertFloat3(joint.joint_pos));
       Float3 r(ConvertFloat3(joint.joint_rot));
       const Matrix rotation = XMMatrixRotationRollPitchYaw(r.x, r.y, r.z);
-      const Matrix world = XMMatrixTranslation(p.x, p.y, p.z) * rotation; // ƒWƒ‡ƒCƒ“ƒg‚Ìs—ñiƒ‚ƒfƒ‹ƒ[ƒJƒ‹À•WŒnj
+      const Matrix world = XMMatrixTranslation(p.x, p.y, p.z) * rotation; // ã‚¸ãƒ§ã‚¤ãƒ³ãƒˆã®è¡Œåˆ—ï¼ˆãƒ¢ãƒ‡ãƒ«ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»ï¼‰
       const auto &rigidbody_a = m_rigidBodies[joint.joint_rigidbody_a].body_;
       const auto &rigidbody_b = m_rigidBodies[joint.joint_rigidbody_b].body_;
 
-      // ƒWƒ‡ƒCƒ“ƒg‚Ìs—ñi„‘Ìƒ[ƒJƒ‹À•WŒnj
-      const Matrix aMat = bullet::ConvertMatrixBtToDx(rigidbody_a->GetWorld());
+      // ã‚¸ãƒ§ã‚¤ãƒ³ãƒˆã®è¡Œåˆ—ï¼ˆå‰›ä½“ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»ï¼‰
+      const Matrix aMat = bullet::ConvertMatrix(rigidbody_a->GetWorld());
       const Matrix aInv = XMMatrixInverse(nullptr, aMat);
       const Matrix frameInA = world * aInv;
 
-      const Matrix bMat = bullet::ConvertMatrixBtToDx(rigidbody_b->GetWorld());
+      const Matrix bMat = bullet::ConvertMatrix(rigidbody_b->GetWorld());
       const Matrix bInv = XMMatrixInverse(nullptr, bMat);
       const Matrix frameInB = world * bInv;
 
       m_bulletPhysics->Add6DofSpringConstraint(rigidbody_a, rigidbody_b,
-        bullet::ConvertMatrixDxToBt(frameInA),
-        bullet::ConvertMatrixDxToBt(frameInB),
+        bullet::ConvertMatrix(frameInA),
+        bullet::ConvertMatrix(frameInB),
         c_p1, c_p2, c_r1, c_r2, s_p, s_r);
 
       m_jointRelatedRigidIndex.push_back(joint.joint_rigidbody_a);
@@ -165,7 +165,7 @@ namespace s3d_mmd {
 
   void MmdPhysics::BoneUpdate(const Matrix &mat) {
     m_bulletPhysics->StepSimulation();
-    //if (physicsEnabled) ;	// •¨—ƒVƒ~ƒ…ƒŒ[ƒVƒ‡ƒ“
+    //if (physicsEnabled) ;	// ç‰©ç†ã‚·ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³
     const std::uint_fast32_t rigidBodiessize = static_cast<std::uint_fast32_t>(m_rigidBodies.size());
     //const MATRIX *rigidbodyoffset=&rigidbody_offset[0];
     int count = 0;
@@ -179,19 +179,22 @@ namespace s3d_mmd {
       auto &rigidBodie = m_rigidBodies[i].body_;
       using namespace DirectX;
       switch (m_rigidbodyType[i]) {
-      case 2:case 0: //bone’Ç]
+      case 0: //boneè¿½å¾“
       {
-        // ƒ{[ƒ“’Ç]ƒ^ƒCƒv‚Ì„‘Ì‚Éƒ{[ƒ“s—ñ‚ğİ’è
-        // ƒ{[ƒ“‚ÌˆÚ“®—Ê‚ğ„‘Ì‚Ì‰Šúp¨‚É“K—p‚µ‚½‚à‚Ì‚ª„‘Ì‚ÌŒ»İ‚Ìp¨
+        // ãƒœãƒ¼ãƒ³è¿½å¾“ã‚¿ã‚¤ãƒ—ã®å‰›ä½“ã«ãƒœãƒ¼ãƒ³è¡Œåˆ—ã‚’è¨­å®š
+        // ãƒœãƒ¼ãƒ³ã®ç§»å‹•é‡ã‚’å‰›ä½“ã®åˆæœŸå§¿å‹¢ã«é©ç”¨ã—ãŸã‚‚ã®ãŒå‰›ä½“ã®ç¾åœ¨ã®å§¿å‹¢
         const XMMATRIX mxm = XMMatrixMultiply(m_rigidMat[i - count], m_bones->CalcBoneMatML(m_rigidbodyRelatedBoneIndex[i]));
         m = mxm;
         mm = XMMatrixMultiply(mxm, mat);
         rigidBodie->MoveRigidBody(m);
+        bone.extraBoneControl = false;
+        continue;
         break;
       }
-       //•¨—‰‰Z(bone‡‚í‚¹)
+       //ç‰©ç†æ¼”ç®—(boneåˆã‚ã›)
+      case 2:
       {
-        // ƒ{[ƒ“ˆÊ’u‚ ‚í‚¹ƒ^ƒCƒv‚Ì„‘Ì‚ÌˆÊ’uˆÚ“®—Ê‚Éƒ{[ƒ“‚ÌˆÊ’uˆÚ“®—Ê‚ğİ’è
+        // ãƒœãƒ¼ãƒ³ä½ç½®ã‚ã‚ã›ã‚¿ã‚¤ãƒ—ã®å‰›ä½“ã®ä½ç½®ç§»å‹•é‡ã«ãƒœãƒ¼ãƒ³ã®ä½ç½®ç§»å‹•é‡ã‚’è¨­å®š
         const Vector m1 = m_bones->CalcBoneMatML(m_rigidbodyRelatedBoneIndex[i]).r[3];
         const Vector m2 = bone.initMatML.r[3];
         const Vector initMat = m_rigidbodyInit[i].r[3];
@@ -212,10 +215,10 @@ namespace s3d_mmd {
         //XMMatrixMultiply(&m_rigidMat,&bone.initMatML,&m_rigidbodyOffset[i]);
         break;
       }
-      case 1: //•¨—‰‰Z
+      case 1: //ç‰©ç†æ¼”ç®—
       {
-        m = bullet::ConvertMatrixBtToDx(rigidBodie->GetWorld());
-        ///*body‚à“®‚©‚·‚Æ‚«‚Ég‚¤‚ª‚¤‚Ü‚­‚¢‚©‚È‚¢
+        m = bullet::ConvertMatrix(rigidBodie->GetWorld());
+        ///*bodyã‚‚å‹•ã‹ã™ã¨ãã«ä½¿ã†ãŒã†ã¾ãã„ã‹ãªã„
         const XMMATRIX xmm = XMMatrixInverse(nullptr, mat);
         m = XMMatrixMultiply(m, xmm);
 
@@ -227,18 +230,18 @@ namespace s3d_mmd {
     }
   }
 
-  /// „‘ÌƒƒbƒVƒ…‚ğ•`‰æ‚·‚é
+  /// å‰›ä½“ãƒ¡ãƒƒã‚·ãƒ¥ã‚’æç”»ã™ã‚‹
 
   inline void MmdPhysics::DrawRigidMesh(const Matrix & world) {
     StartWireframe(world);
     for (unsigned int i = 0; i < m_rigidBodies.size(); ++i) {
-      Matrix w = bullet::ConvertMatrixBtToDx(m_rigidBodies[i].body_->GetWorld());
+      Matrix w = bullet::ConvertMatrix(m_rigidBodies[i].body_->GetWorld());
       using namespace DirectX;
       const XMMATRIX xmm = XMMatrixMultiply(w, world);
 
       if (m_rigidBodies[i].body_->body->getCollisionShape()->getShapeType() == CAPSULE_SHAPE_PROXYTYPE) {
         XMMATRIX r = XMMatrixRotationX(XM_PI / 2);
-        w = r * xmm;	// PMD, bullet‚ÌƒJƒvƒZƒ‹‚ÍY²’†SADirectX‚Ì‰~’ŒƒvƒŠƒ~ƒeƒBƒu‚ÍZ²’†S‚È‚Ì‚ÅX²‚ğ’†S‚É90‹‰ñ“]‚³‚¹‚é
+        w = r * xmm;	// PMD, bulletã®ã‚«ãƒ—ã‚»ãƒ«ã¯Yè»¸ä¸­å¿ƒã€DirectXã®å††æŸ±ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ã¯Zè»¸ä¸­å¿ƒãªã®ã§Xè»¸ã‚’ä¸­å¿ƒã«90Â°å›è»¢ã•ã›ã‚‹
       }
       //pDevice->SetTransform(D3DTS_WORLD, &w);
       //rigidbody_mesh[i]->DrawSubset(0);
@@ -258,17 +261,17 @@ namespace s3d_mmd {
     EndWireframe();
   }
 
-  // private : „‘Ì‚Ìƒ[ƒ‹ƒh•ÏŠ·s—ñ‚ğì¬
-  // @param pos		„‘Ì‚ÌˆÊ’u		FMmdStruct::PmdRigidBody.pos_pos[3]
-  // @param rot		„‘Ì‚Ì‰ñ“]		FMmdStruct::PmdRigidBody.pos_rot[3]
-  // @param i			ŠÖ˜Aƒ{[ƒ“”Ô†
-  // @return			ƒ[ƒ‹ƒh•ÏŠ·s—ñ
+  // private : å‰›ä½“ã®ãƒ¯ãƒ¼ãƒ«ãƒ‰å¤‰æ›è¡Œåˆ—ã‚’ä½œæˆ
+  // @param pos		å‰›ä½“ã®ä½ç½®		ï¼šMmdStruct::PmdRigidBody.pos_pos[3]
+  // @param rot		å‰›ä½“ã®å›è»¢		ï¼šMmdStruct::PmdRigidBody.pos_rot[3]
+  // @param i			é–¢é€£ãƒœãƒ¼ãƒ³ç•ªå·
+  // @return			ãƒ¯ãƒ¼ãƒ«ãƒ‰å¤‰æ›è¡Œåˆ—
   DirectX::XMMATRIX MmdPhysics::CreateRigidMatrix(const float* pos, const float* rot, int i) {
     Float3 p = Float3(pos[0], pos[1], pos[2]);
     if (i != 0xFFFF) {
       DirectX::XMFLOAT3 f;
       DirectX::XMStoreFloat3(&f, (*m_bones)[i].initMatML.r[3]);
-      // ŠÖ˜Aƒ{[ƒ“‚ª‚ ‚éê‡‚ÍAƒ{[ƒ“‘Š‘ÎÀ•W‚©‚çƒ‚ƒfƒ‹ƒ[ƒJƒ‹À•W‚É•ÏŠ·BMmdStruct::PmdRigidBody.pos_pos‚ğQÆ
+      // é–¢é€£ãƒœãƒ¼ãƒ³ãŒã‚ã‚‹å ´åˆã¯ã€ãƒœãƒ¼ãƒ³ç›¸å¯¾åº§æ¨™ã‹ã‚‰ãƒ¢ãƒ‡ãƒ«ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ã«å¤‰æ›ã€‚MmdStruct::PmdRigidBody.pos_posã‚’å‚ç…§
       p.x += f.x;
       p.y += f.y;
       p.z += f.z;
@@ -279,7 +282,7 @@ namespace s3d_mmd {
     return rotation * trans;
   }
 
-  // private: ƒƒCƒ„[ƒtƒŒ[ƒ€‚Ì•`‰æ‚ğŠJn‚·‚é
+  // private: ãƒ¯ã‚¤ãƒ¤ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã®æç”»ã‚’é–‹å§‹ã™ã‚‹
   void MmdPhysics::StartWireframe(const Matrix &world) {
     //D3DMATERIAL9 material = {{0, 0, 0, 1.0f}, color};
     Matrix view, projection;
@@ -295,11 +298,12 @@ namespace s3d_mmd {
     pDevice->SetTransform(D3DTS_PROJECTION, &projection);*/
   }
 
-  // private: ƒƒCƒ„[ƒtƒŒ[ƒ€‚Ì•`‰æ‚ğI—¹‚·‚é
+  // private: ãƒ¯ã‚¤ãƒ¤ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã®æç”»ã‚’çµ‚äº†ã™ã‚‹
   void MmdPhysics::EndWireframe() {
     //pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
     //pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
   }
+
 #endif // USE_BULLET_PHYSICS
 
 }

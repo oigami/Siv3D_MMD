@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <Siv3D.hpp>
 #include "PMDStruct.h"
 namespace s3d_mmd {

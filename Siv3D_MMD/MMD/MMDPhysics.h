@@ -1,4 +1,4 @@
-#ifndef MMDPHYSICS_H
+ï»¿#ifndef MMDPHYSICS_H
 #define MMDPHYSICS_H
 //#pragma unmanaged
 #include"../BulletPhysics/BulletPhysics.h"
@@ -31,17 +31,17 @@ namespace s3d_mmd {
   class MmdPhysics {
     typedef std::shared_ptr<s3d_bullet::BulletPhysics> BulletPhysicsPtr;
     
-    /// ‘Sƒ{[ƒ“”z—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğƒZƒbƒg
-    /// @param bones ‘Sƒ{[ƒ“”z—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+    /// å…¨ãƒœãƒ¼ãƒ³é…åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’ã‚»ãƒƒãƒˆ
+    /// @param bones å…¨ãƒœãƒ¼ãƒ³é…åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
     void SetBones(std::shared_ptr<mmd::Bones> bones);
     
-    /// „‘Ì‚ğì¬
-    /// @param pmdRigidBodies Pmd„‘Ì”z—ñ
-    /// @param pmdBones Pmdƒ{[ƒ“”z—ñ
+    /// å‰›ä½“ã‚’ä½œæˆ
+    /// @param pmdRigidBodies Pmdå‰›ä½“é…åˆ—
+    /// @param pmdBones Pmdãƒœãƒ¼ãƒ³é…åˆ—
     void CreateRigid(const std::vector<s3d_mmd::pmd::RigidBody> &pmdRigidBodies);
 
-    /// ƒWƒ‡ƒCƒ“ƒg‚ğì¬
-    /// @param pmdBones PmdƒWƒ‡ƒCƒ“ƒg”z—ñ
+    /// ã‚¸ãƒ§ã‚¤ãƒ³ãƒˆã‚’ä½œæˆ
+    /// @param pmdBones Pmdã‚¸ãƒ§ã‚¤ãƒ³ãƒˆé…åˆ—
     void CreateJoint(const std::vector<s3d_mmd::pmd::Joint> &pmdJoints);
 
   public:
@@ -57,14 +57,14 @@ namespace s3d_mmd {
 
    
    
-    /// ƒ{[ƒ“s—ñ‚ğXV
-    /// @param •¨—‰‰Zg—p‰Â”\
+    /// ãƒœãƒ¼ãƒ³è¡Œåˆ—ã‚’æ›´æ–°
+    /// @param ç‰©ç†æ¼”ç®—ä½¿ç”¨å¯èƒ½
     void BoneUpdate(const Matrix &mat);
 
-    /// „‘ÌƒƒbƒVƒ…‚ğ•`‰æ‚·‚é
+    /// å‰›ä½“ãƒ¡ãƒƒã‚·ãƒ¥ã‚’æç”»ã™ã‚‹
     void DrawRigidMesh(const Matrix &world);
 
-    /// ƒWƒ‡ƒCƒ“ƒgƒƒbƒVƒ…‚ğ•`‰æ‚·‚é
+    /// ã‚¸ãƒ§ã‚¤ãƒ³ãƒˆãƒ¡ãƒƒã‚·ãƒ¥ã‚’æç”»ã™ã‚‹
     void DrawJointMesh(const Matrix &world);
 
     /*void SetCollisionDetection(bool flag,const MATRIX &mat){
@@ -84,7 +84,7 @@ namespace s3d_mmd {
       }
       }
       }*/
-      // •â•ŠÖ”
+      // è£œåŠ©é–¢æ•°
   private:
 
     DirectX::XMMATRIX CreateRigidMatrix(const float* pos, const float* rot, int i);
@@ -93,16 +93,16 @@ namespace s3d_mmd {
 
   private:
     BulletPhysicsPtr m_bulletPhysics;
-    std::shared_ptr<mmd::Bones> m_bones;    // ‘Sƒ{[ƒ“”z—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
-    Array<mmd::Body> m_rigidBodies;         // 1ƒƒbƒVƒ…‚É‘Î‚·‚é„‘Ì”z—ñ
-    Array<int> m_rigidbodyRelatedBoneIndex; // Še„‘Ì‚ÉŠÖ˜A‚·‚éƒ{[ƒ“‚ÌƒCƒ“ƒfƒbƒNƒX
-    Array<int> m_rigidbodyType;             // Še„‘Ì‚Ìƒ^ƒCƒv
-    Array<Matrix> m_rigidbodyInit;          // Še„‘Ì‚Ì‰Šúp¨s—ñ
-    Array<Matrix> m_rigidbodyOffset;        // Še„‘Ì‚ÌƒIƒtƒZƒbƒgs—ñ
-    //vector<ID3DXMesh*> rigidbody_mesh;    // Še„‘Ì‚ÌƒƒbƒVƒ…
-    //ID3DXMesh* joint_mesh;                // ƒWƒ‡ƒCƒ“ƒg‚ÌƒƒbƒVƒ…
-    Array<int> m_jointRelatedRigidIndex;    // ŠeƒWƒ‡ƒCƒ“ƒg‚ÌŠÖ˜A„‘Ì
-    Array<Matrix> m_jointMatrix;            // ŠeƒWƒ‡ƒCƒ“ƒg‚Ìp¨s—ñ(„‘ÌAƒ[ƒJƒ‹À•WŒn)
+    std::shared_ptr<mmd::Bones> m_bones;    // å…¨ãƒœãƒ¼ãƒ³é…åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+    Array<mmd::Body> m_rigidBodies;         // 1ãƒ¡ãƒƒã‚·ãƒ¥ã«å¯¾ã™ã‚‹å‰›ä½“é…åˆ—
+    Array<int> m_rigidbodyRelatedBoneIndex; // å„å‰›ä½“ã«é–¢é€£ã™ã‚‹ãƒœãƒ¼ãƒ³ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+    Array<int> m_rigidbodyType;             // å„å‰›ä½“ã®ã‚¿ã‚¤ãƒ—
+    Array<Matrix> m_rigidbodyInit;          // å„å‰›ä½“ã®åˆæœŸå§¿å‹¢è¡Œåˆ—
+    Array<Matrix> m_rigidbodyOffset;        // å„å‰›ä½“ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆè¡Œåˆ—
+    //vector<ID3DXMesh*> rigidbody_mesh;    // å„å‰›ä½“ã®ãƒ¡ãƒƒã‚·ãƒ¥
+    //ID3DXMesh* joint_mesh;                // ã‚¸ãƒ§ã‚¤ãƒ³ãƒˆã®ãƒ¡ãƒƒã‚·ãƒ¥
+    Array<int> m_jointRelatedRigidIndex;    // å„ã‚¸ãƒ§ã‚¤ãƒ³ãƒˆã®é–¢é€£å‰›ä½“
+    Array<Matrix> m_jointMatrix;            // å„ã‚¸ãƒ§ã‚¤ãƒ³ãƒˆã®å§¿å‹¢è¡Œåˆ—(å‰›ä½“Aãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»)
     Array<Matrix> m_rigidMat;               //rigidbody_init*bones.offsetMatML
     Array<Matrix> m_initOffsetMat;          // bones.initMatML*rigidbody_offset
 

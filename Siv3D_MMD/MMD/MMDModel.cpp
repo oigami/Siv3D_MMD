@@ -1,4 +1,4 @@
-#include "../include/MMDModel.h"
+ï»¿#include "../include/MMDModel.h"
 #include "../include/PMDReader.h"
 namespace s3d_mmd {
   namespace {
@@ -16,10 +16,10 @@ namespace s3d_mmd {
         m_nowIndex = 0;
       }
       /// <summary>
-      /// ƒCƒ“ƒfƒbƒNƒX‚ğ0‚©‚çU‚è’¼‚·
+      /// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’0ã‹ã‚‰æŒ¯ã‚Šç›´ã™
       /// </summary>
       /// <param name="index"></param>
-      /// <returns> ƒCƒ“ƒfƒbƒNƒXA V‹K‘}“ü‚µ‚½‚©‚Ç‚¤‚© </returns>
+      /// <returns> ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€ æ–°è¦æŒ¿å…¥ã—ãŸã‹ã©ã†ã‹ </returns>
       std::pair<int, bool> insert(int index) {
         auto iter = m_map.insert({ index , m_nowIndex });
         if (iter.second)
@@ -48,7 +48,7 @@ namespace s3d_mmd {
     const float alpha = pmdMaterial.alpha;
     material.isCullNone = alpha + alphaEps < 1.0;
     if (pmdMaterial.texture_file_name[0] != '\0') {
-      //TODO: ƒXƒtƒBƒA‚É–¢‘Î‰
+      //TODO: ã‚¹ãƒ•ã‚£ã‚¢ã«æœªå¯¾å¿œ
       String filename = Widen({ pmdMaterial.texture_file_name,sizeof(pmdMaterial.texture_file_name) });
       const size_t pos = filename.lastIndexOf(L'*');
       if (pos != String::npos) {
@@ -66,7 +66,7 @@ namespace s3d_mmd {
     v.boneNum[0] = vertex.bone_num[0];
     v.boneNum[1] = vertex.bone_num[1];
     v.boneWeight.set(vertex.bone_weight / 100.0f, 1 - vertex.bone_weight / 100.0f, 0, 0);
-    v.isEdge = vertex.edge_flag == 0; //0‚Ìê‡—LŒø
+    v.isEdge = vertex.edge_flag == 0; //0ã®å ´åˆæœ‰åŠ¹
     v.normal.normalize();
     return v;
   }
@@ -104,7 +104,7 @@ namespace s3d_mmd {
         ++pmdFacesIter;
         const auto iter = indexMap.insert(faceIndex);
         const mmd::MeshVertex &meshVertex = meshVertices[faceIndex];
-        if (iter.second) //V‹K‚É‘}“ü‚µ‚½‚Ì‚İ’¸“_‚ğ’Ç‰Á
+        if (iter.second) //æ–°è¦ã«æŒ¿å…¥ã—ãŸæ™‚ã®ã¿é ‚ç‚¹ã‚’è¿½åŠ 
           vertices.push_back(meshVertex);
         indices[i] = iter.first;
 
@@ -148,12 +148,12 @@ namespace s3d_mmd {
       const auto &item = pmdBones[i];
       mmd::Bone &bone = bones[i];
       const uint16 parentBoneIndex = item.parent_bone_index;
-      //©•ª‚Æ“¯‚¶e‚Å©•ª‚æ‚è‚ ‚Æ‚Ìƒ{[ƒ“‚ªŒZ’í‚É‚È‚é
+      //è‡ªåˆ†ã¨åŒã˜è¦ªã§è‡ªåˆ†ã‚ˆã‚Šã‚ã¨ã®ãƒœãƒ¼ãƒ³ãŒå…„å¼Ÿã«ãªã‚‹
       for (int j = i + 1; j < size; ++j) if (parentBoneIndex == pmdBones[j].parent_bone_index) {
         bone.sibling = j;
         break;
       }
-      //©•ª‚ªe’S‚Á‚Ä‚¢‚Äˆê”Ô‘‚­Œ»‚ê‚éƒ{[ƒ“‚ªq‚É‚È‚é
+      //è‡ªåˆ†ãŒè¦ªæ‹…ã£ã¦ã„ã¦ä¸€ç•ªæ—©ãç¾ã‚Œã‚‹ãƒœãƒ¼ãƒ³ãŒå­ã«ãªã‚‹
       for (int j : step(size)) if (i == pmdBones[j].parent_bone_index) {
         bone.firstChild = j;
         break;
@@ -162,13 +162,13 @@ namespace s3d_mmd {
       if (parentBoneIndex != 0xFFFF)
         bone.parent = parentBoneIndex;
 
-      char boneName[21] = { 0 };	// ƒ{[ƒ“–¼‚ª20byte‚Ì‚Æ‚«‚Ì‚½‚ß‚ÉÅŒã‚É0‚ğ’Ç‰Á
+      char boneName[21] = { 0 };	// ãƒœãƒ¼ãƒ³åãŒ20byteã®ã¨ãã®ãŸã‚ã«æœ€å¾Œã«0ã‚’è¿½åŠ 
       memcpy(boneName, item.bone_name, 20);
       bone.name = boneName;
       bone.id = i;
       bone.type = item.bone_type;
       const Mat4x4 modelLocalInitMat = Mat4x4::Translate(item.bone_head_pos[0], item.bone_head_pos[1], item.bone_head_pos[2]);
-      bone.initMatML = bone.boneMatML = bone.initMat = modelLocalInitMat;	// ƒ‚ƒfƒ‹ƒ[ƒJƒ‹À•WŒn
+      bone.initMatML = bone.boneMatML = bone.initMat = modelLocalInitMat;	// ãƒ¢ãƒ‡ãƒ«ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»
       bone.offsetMat = XMMatrixInverse(0, modelLocalInitMat);
     }
     bones.InitMatCalc();
@@ -242,10 +242,10 @@ namespace s3d_mmd {
   }
 
   /// <summary>
-  /// ƒ‚ƒfƒ‹ƒm[ƒh‚Ìˆê——‚ğæ“¾‚µ‚Ü‚·B
+  /// ãƒ¢ãƒ‡ãƒ«ãƒãƒ¼ãƒ‰ã®ä¸€è¦§ã‚’å–å¾—ã—ã¾ã™ã€‚
   /// </summary>
   /// <returns>
-  /// ƒ‚ƒfƒ‹ƒm[ƒh‚Ìˆê——
+  /// ãƒ¢ãƒ‡ãƒ«ãƒãƒ¼ãƒ‰ã®ä¸€è¦§
   /// </returns>
   Array<mmd::ModelNode>& MMDModel::nodes() const {
     return m_handle->m_nodes;

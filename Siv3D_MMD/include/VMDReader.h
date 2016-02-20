@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <Siv3D.hpp>
 namespace s3d_mmd {
   namespace vmd {
@@ -6,7 +6,7 @@ namespace s3d_mmd {
 #pragma pack(push, 1)
     //http://harigane.at.webry.info/201103/article_1.html
 
-    /// VMD\‘¢‘Ì’è‹`
+    /// VMDæ§‹é€ ä½“å®šç¾©
     struct Header {
       char vmdHeader[30];
       char vmdModelName[20];
@@ -15,8 +15,8 @@ namespace s3d_mmd {
     struct Bone {
       char boneName[15];
       std::uint32_t frameNo;
-      float location[3]; // ˆÚ“®—Ê
-      float rotation[4]; // ƒ‚ƒfƒ‹ƒ[ƒJƒ‹À•WŒn
+      float location[3]; // ç§»å‹•é‡
+      float rotation[4]; // ãƒ¢ãƒ‡ãƒ«ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»
       std::uint8_t interpolation[64];
     };
 
@@ -27,45 +27,45 @@ namespace s3d_mmd {
     };
 
     struct Camera {
-      std::uint32_t frameNo;   // ƒtƒŒ[ƒ€”Ô†
-      float distance;          // –Ú•W“_‚ÆƒJƒƒ‰‚Ì‹——£(–Ú•W“_‚ªƒJƒƒ‰‘O–Ê‚Åƒ}ƒCƒiƒX)
-      float x;                 // –Ú•W“_‚ÌX²ˆÊ’u
-      float y;                 // –Ú•W“_‚ÌY²ˆÊ’u
-      float z;                 // –Ú•W“_‚ÌZ²ˆÊ’u
-      float rx;                // ƒJƒƒ‰‚Ìx²‰ñ“](rad)(MMD”’l“ü—Í‚Ìƒ}ƒCƒiƒX’l)
-      float ry;                // ƒJƒƒ‰‚Ìy²‰ñ“](rad)
-      float rz;                // ƒJƒƒ‰‚Ìz²‰ñ“](rad)
-      std::uint8_t bezier[24]; // •âŠÔƒpƒ‰ƒ[ƒ^
-      std::uint32_t viewAngle; // ‹–ìŠp(deg)
-      std::uint8_t parth;      // ƒp[ƒXƒyƒNƒeƒBƒu, 0:ON, 1:OFF
+      std::uint32_t frameNo;   // ãƒ•ãƒ¬ãƒ¼ãƒ ç•ªå·
+      float distance;          // ç›®æ¨™ç‚¹ã¨ã‚«ãƒ¡ãƒ©ã®è·é›¢(ç›®æ¨™ç‚¹ãŒã‚«ãƒ¡ãƒ©å‰é¢ã§ãƒã‚¤ãƒŠã‚¹)
+      float x;                 // ç›®æ¨™ç‚¹ã®Xè»¸ä½ç½®
+      float y;                 // ç›®æ¨™ç‚¹ã®Yè»¸ä½ç½®
+      float z;                 // ç›®æ¨™ç‚¹ã®Zè»¸ä½ç½®
+      float rx;                // ã‚«ãƒ¡ãƒ©ã®xè»¸å›è»¢(rad)(MMDæ•°å€¤å…¥åŠ›ã®ãƒã‚¤ãƒŠã‚¹å€¤)
+      float ry;                // ã‚«ãƒ¡ãƒ©ã®yè»¸å›è»¢(rad)
+      float rz;                // ã‚«ãƒ¡ãƒ©ã®zè»¸å›è»¢(rad)
+      std::uint8_t bezier[24]; // è£œé–“ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+      std::uint32_t viewAngle; // è¦–é‡è§’(deg)
+      std::uint8_t parth;      // ãƒ‘ãƒ¼ã‚¹ãƒšã‚¯ãƒ†ã‚£ãƒ–, 0:ON, 1:OFF
     };
 
     struct Light {
-      std::uint32_t frame; // ƒtƒŒ[ƒ€”Ô†
-      float r;             // Æ–¾FÔ(MMD“ü—Í’l‚ğ256‚ÅŠ„‚Á‚½’l)
-      float g;             // Æ–¾F—Î(MMD“ü—Í’l‚ğ256‚ÅŠ„‚Á‚½’l)
-      float b;             // Æ–¾FÂ(MMD“ü—Í’l‚ğ256‚ÅŠ„‚Á‚½’l)
-      float x;             // Æ–¾xˆÊ’u(MMD“ü—Í’l)
-      float y;             // Æ–¾yˆÊ’u(MMD“ü—Í’l)
-      float z;             // Æ–¾zˆÊ’u(MMD“ü—Í’l)
+      std::uint32_t frame; // ãƒ•ãƒ¬ãƒ¼ãƒ ç•ªå·
+      float r;             // ç…§æ˜è‰²èµ¤(MMDå…¥åŠ›å€¤ã‚’256ã§å‰²ã£ãŸå€¤)
+      float g;             // ç…§æ˜è‰²ç·‘(MMDå…¥åŠ›å€¤ã‚’256ã§å‰²ã£ãŸå€¤)
+      float b;             // ç…§æ˜è‰²é’(MMDå…¥åŠ›å€¤ã‚’256ã§å‰²ã£ãŸå€¤)
+      float x;             // ç…§æ˜xä½ç½®(MMDå…¥åŠ›å€¤)
+      float y;             // ç…§æ˜yä½ç½®(MMDå…¥åŠ›å€¤)
+      float z;             // ç…§æ˜zä½ç½®(MMDå…¥åŠ›å€¤)
     };
 
     struct SelfShadow {
-      std::uint32_t frame; // ƒtƒŒ[ƒ€”Ô†
-      std::uint8_t type;   // ƒZƒ‹ƒtƒVƒƒƒhƒEí—Ş, 0:OFF, 1:mode1, 2:mode2
-      float distance;      // ƒVƒƒƒhƒE‹——£(MMD“ü—Í’lL‚ğ(10000-L)/100000‚Æ‚µ‚½’l)
+      std::uint32_t frame; // ãƒ•ãƒ¬ãƒ¼ãƒ ç•ªå·
+      std::uint8_t type;   // ã‚»ãƒ«ãƒ•ã‚·ãƒ£ãƒ‰ã‚¦ç¨®é¡, 0:OFF, 1:mode1, 2:mode2
+      float distance;      // ã‚·ãƒ£ãƒ‰ã‚¦è·é›¢(MMDå…¥åŠ›å€¤Lã‚’(10000-L)/100000ã¨ã—ãŸå€¤)
     };
     
     struct InfoIk {
-      char name[20];       // "‰E‘«‚h‚j\0"‚È‚Ç‚ÌIKƒ{[ƒ“–¼‚Ì•¶š—ñ 20byte
-      std::uint8_t on_off; // IK‚Ìon/off, 0:OFF, 1:ON
+      char name[20];       // "å³è¶³ï¼©ï¼«\0"ãªã©ã®IKãƒœãƒ¼ãƒ³åã®æ–‡å­—åˆ— 20byte
+      std::uint8_t on_off; // IKã®on/off, 0:OFF, 1:ON
     };
 
     struct ShowIkWithoutArray {
-      std::uint32_t frame;    // ƒtƒŒ[ƒ€”Ô†
-      std::uint8_t show;      // ƒ‚ƒfƒ‹•\¦, 0:OFF, 1:ON
-      std::uint32_t ik_count; // ‹L˜^‚·‚éIK‚Ì”
-      //InfoIK ik[ik_count];  // IK on/offî•ñ”z—ñ
+      std::uint32_t frame;    // ãƒ•ãƒ¬ãƒ¼ãƒ ç•ªå·
+      std::uint8_t show;      // ãƒ¢ãƒ‡ãƒ«è¡¨ç¤º, 0:OFF, 1:ON
+      std::uint32_t ik_count; // è¨˜éŒ²ã™ã‚‹IKã®æ•°
+      //InfoIK ik[ik_count];  // IK on/offæƒ…å ±é…åˆ—
     };
 
 #pragma pack(pop)
@@ -74,31 +74,31 @@ namespace s3d_mmd {
       Array<InfoIk> ik;
     };
 
-    /// 0`1‚É‹KŠi‰»‚³‚ê‚½ƒxƒWƒF‹Èü
+    /// 0ï½1ã«è¦æ ¼åŒ–ã•ã‚ŒãŸãƒ™ã‚¸ã‚§æ›²ç·š
     class Bezie {
 
-      Vec2 p1, p2; /// §Œä“_
+      Vec2 p1, p2; /// åˆ¶å¾¡ç‚¹
 
     public:
 
       Bezie() = default;
       Bezie(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2);
-      float GetY(float x) const;	/// x‚É‚¨‚¯‚éy‚ğæ“¾
+      float GetY(float x) const;	/// xã«ãŠã‘ã‚‹yã‚’å–å¾—
 
     };
 
     struct KeyFrame {
 
-      std::string boneName; /// <summary>ƒ{[ƒ“–¼</summary>
-      int frameNo;          /// <summary>ƒtƒŒ[ƒ€”Ô†</summary>
-      Vec3 position;        /// <summary>ˆÊ’u</summary> 
-      Quaternion rotation;  /// <summary>‰ñ“]</summary>
+      std::string boneName; /// <summary>ãƒœãƒ¼ãƒ³å</summary>
+      int frameNo;          /// <summary>ãƒ•ãƒ¬ãƒ¼ãƒ ç•ªå·</summary>
+      Vec3 position;        /// <summary>ä½ç½®</summary> 
+      Quaternion rotation;  /// <summary>å›è»¢</summary>
       Bezie bezie_x;
       Bezie bezie_y;
       Bezie bezie_z;
       Bezie bezie_r;
 
-      // ƒtƒŒ[ƒ€”Ô†‚Å”äŠr
+      // ãƒ•ãƒ¬ãƒ¼ãƒ ç•ªå·ã§æ¯”è¼ƒ
       bool operator<(const KeyFrame &k) const {
         return frameNo < k.frameNo;
       }
@@ -112,24 +112,24 @@ namespace s3d_mmd {
     std::map<std::string, std::shared_ptr<Array<vmd::KeyFrame>>> keyFrames;
   public:
 
-    /// <summary>VMDƒtƒ@ƒCƒ‹‚©‚çƒf[ƒ^‚ğæ‚èo‚·</summary>
+    /// <summary>VMDãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’å–ã‚Šå‡ºã™</summary>
     /// <param name="file_name"></param>
     VMDReader(const FilePath &file_name);
 
-    /// <summary>ƒ{[ƒ“–¼‚É‰‚¶‚½ƒL[ƒtƒŒ[ƒ€‚ğ•Ô‚·</summary>
-    /// <param name="bone_name">ƒ{[ƒ“–¼</param>
-    /// <returns>ƒL[ƒtƒŒ[ƒ€</returns>
+    /// <summary>ãƒœãƒ¼ãƒ³åã«å¿œã˜ãŸã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’è¿”ã™</summary>
+    /// <param name="bone_name">ãƒœãƒ¼ãƒ³å</param>
+    /// <returns>ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ </returns>
     std::shared_ptr<Array<vmd::KeyFrame>> getKeyFrames(const std::string& bone_name);
 
-    /// <summary>ƒ{[ƒ“–¼‚É‰‚¶‚½ƒL[ƒtƒŒ[ƒ€‚ğ•Ô‚·</summary>
-    /// <param name="bone_name">ƒ{[ƒ“–¼</param>
-    /// <returns>ƒL[ƒtƒŒ[ƒ€</returns>
+    /// <summary>ãƒœãƒ¼ãƒ³åã«å¿œã˜ãŸã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’è¿”ã™</summary>
+    /// <param name="bone_name">ãƒœãƒ¼ãƒ³å</param>
+    /// <returns>ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ </returns>
     std::map<std::string, std::shared_ptr<Array<vmd::KeyFrame>>> getKeyFrames() {
       return keyFrames;
     }
 
-    /// <summary>ƒ‚[ƒVƒ‡ƒ“‚ÌÅIƒtƒŒ[ƒ€‚ğ•Ô‚·</summary>
-    /// <returns>ƒ‚[ƒVƒ‡ƒ“‚ÌÅIƒtƒŒ[ƒ€</returns>
+    /// <summary>ãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ã®æœ€çµ‚ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’è¿”ã™</summary>
+    /// <returns>ãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ã®æœ€çµ‚ãƒ•ãƒ¬ãƒ¼ãƒ </returns>
     int GetLastFrame() { return last_frame; }
 
   };

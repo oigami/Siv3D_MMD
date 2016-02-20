@@ -1,4 +1,4 @@
-#include <Siv3D.hpp>
+ï»¿#include <Siv3D.hpp>
 #include "../include/MMDBone.h"
 namespace s3d_mmd {
   namespace mmd {
@@ -39,7 +39,7 @@ namespace s3d_mmd {
       }
     }
 
-    // ƒ‚ƒfƒ‹ƒ[ƒJƒ‹À•WŒn‚Å‚Ìƒ{[ƒ“s—ñ‚ğŒvZ
+    // ãƒ¢ãƒ‡ãƒ«ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»ã§ã®ãƒœãƒ¼ãƒ³è¡Œåˆ—ã‚’è¨ˆç®—
     Mat4x4 Bones::CalcBoneMatML(int index) const {
       Mat4x4 ret = m_bones[index].boneMat;
       for (int parent = index; parent = m_bones[parent].parent, parent != -1;) {

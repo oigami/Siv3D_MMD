@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <Siv3D.hpp>
 namespace s3d_mmd {
   namespace mmd {
@@ -12,23 +12,23 @@ namespace s3d_mmd {
 
     };
 
-    // ƒ{[ƒ“
+    // ãƒœãƒ¼ãƒ³
     struct Bone {
 
       Bone();
 
-      int id;                // ƒ{[ƒ“IDi’Ê‚µ”Ô†j
-      int parent;            // eƒ{[ƒ“
-      int firstChild;        // qƒ{[ƒ“
-      int sibling;           // ŒZ’íƒ{[ƒ“
-      std::string name;      // ƒ{[ƒ“–¼
-      unsigned char type;    // ƒ{[ƒ“ƒ^ƒCƒv (MMD‚Ìê‡ 0:‰ñ“] 1:‰ñ“]‚ÆˆÚ“® 2:IK 3:•s–¾ 4:IK‰e‹¿‰º 5:‰ñ“]‰e‹¿‰º 6:IKÚ‘±æ 7:”ñ•\¦ 8:”P‚è 9:‰ñ“]‰^“® )
-      bool extraBoneControl; // ŠK‘w\‘¢‚ğg‚í‚¸’¼ÚboneMat‚ğ‘€ì
-      Mat4x4 boneMatML;   // “Æ©‚É“®‚©‚·ê‡‚Ìƒ{[ƒ“s—ñ(extraBoneControl‚ªtrue‚Ìg—p)
-      Mat4x4 initMat;        // ‰Šúp¨s—ñ(ƒ{[ƒ“ƒ[ƒJƒ‹À•WŒn)
-      Mat4x4 initMatML;      // ‰Šúp¨s—ñ(ƒ‚ƒfƒ‹ƒ[ƒJƒ‹À•WŒn)
-      Mat4x4 boneMat;        // Œ»İ‚Ìƒ{[ƒ“s—ñ(ƒ{[ƒ“ƒ[ƒJƒ‹À•WŒn)
-      Mat4x4 offsetMat;      // ƒ{[ƒ“ƒIƒtƒZƒbƒgs—ñ(ƒ‚ƒfƒ‹ƒ[ƒJƒ‹À•WŒn)
+      int id;                // ãƒœãƒ¼ãƒ³IDï¼ˆé€šã—ç•ªå·ï¼‰
+      int parent;            // è¦ªãƒœãƒ¼ãƒ³
+      int firstChild;        // å­ãƒœãƒ¼ãƒ³
+      int sibling;           // å…„å¼Ÿãƒœãƒ¼ãƒ³
+      std::string name;      // ãƒœãƒ¼ãƒ³å
+      unsigned char type;    // ãƒœãƒ¼ãƒ³ã‚¿ã‚¤ãƒ— (MMDã®å ´åˆ 0:å›è»¢ 1:å›è»¢ã¨ç§»å‹• 2:IK 3:ä¸æ˜ 4:IKå½±éŸ¿ä¸‹ 5:å›è»¢å½±éŸ¿ä¸‹ 6:IKæ¥ç¶šå…ˆ 7:éè¡¨ç¤º 8:æ»ã‚Š 9:å›è»¢é‹å‹• )
+      bool extraBoneControl; // éšå±¤æ§‹é€ ã‚’ä½¿ã‚ãšç›´æ¥boneMatã‚’æ“ä½œ
+      Mat4x4 boneMatML;   // ç‹¬è‡ªã«å‹•ã‹ã™å ´åˆã®ãƒœãƒ¼ãƒ³è¡Œåˆ—(extraBoneControlãŒtrueã®æ™‚ä½¿ç”¨)
+      Mat4x4 initMat;        // åˆæœŸå§¿å‹¢è¡Œåˆ—(ãƒœãƒ¼ãƒ³ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»)
+      Mat4x4 initMatML;      // åˆæœŸå§¿å‹¢è¡Œåˆ—(ãƒ¢ãƒ‡ãƒ«ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»)
+      Mat4x4 boneMat;        // ç¾åœ¨ã®ãƒœãƒ¼ãƒ³è¡Œåˆ—(ãƒœãƒ¼ãƒ³ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»)
+      Mat4x4 offsetMat;      // ãƒœãƒ¼ãƒ³ã‚ªãƒ•ã‚»ãƒƒãƒˆè¡Œåˆ—(ãƒ¢ãƒ‡ãƒ«ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»)
 
     };
 
@@ -50,13 +50,13 @@ namespace s3d_mmd {
       void resize(size_t size) { m_bones.resize(size); }
       const int size() const { return static_cast<int>(m_bones.size()); }
 
-      // InitMat‚ğƒ{[ƒ“ƒ[ƒJƒ‹À•WŒn‚É•ÏŠ·‚·‚éÄ‹AŠÖ”
+      // InitMatã‚’ãƒœãƒ¼ãƒ³ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»ã«å¤‰æ›ã™ã‚‹å†å¸°é–¢æ•°
       void InitMatCalc();
 
-      //ƒ[ƒ‹ƒh•ÏŠ·s—ñ‚Ì”z—ñ‚ğŒvZ‚·‚éÄ‹AŠÖ”
+      //ãƒ¯ãƒ¼ãƒ«ãƒ‰å¤‰æ›è¡Œåˆ—ã®é…åˆ—ã‚’è¨ˆç®—ã™ã‚‹å†å¸°é–¢æ•°
       void CalcWorld(const Mat4x4 &world, Array<Mat4x4> &worlds) const;
 
-      // ƒ‚ƒfƒ‹ƒ[ƒJƒ‹À•WŒn‚Å‚Ìƒ{[ƒ“s—ñ‚ğŒvZ
+      // ãƒ¢ãƒ‡ãƒ«ãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³»ã§ã®ãƒœãƒ¼ãƒ³è¡Œåˆ—ã‚’è¨ˆç®—
       Mat4x4 CalcBoneMatML(int index) const;
 
       Mat4x4 CalcParentBoneMat(int index)const {

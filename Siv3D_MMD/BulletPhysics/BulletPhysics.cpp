@@ -1,10 +1,8 @@
-/*
-bulletŠÖŒW‚Ìƒƒ‚ƒŠŠm•Û‚ÉƒAƒ‰ƒCƒƒ“ƒg‚ğ‚µ‚Á‚©‚è”cˆ¬‚µ‚Ä‚¨‚­
-ƒGƒ‰[“à—e©‘Ì‚Íƒƒ‚ƒŠƒAƒNƒZƒXˆá”½‚ÅŒ´ˆö“Á’è‚ª‚µ‚É‚­‚¢‚Ì‚Å’ˆÓ‚·‚é
-//New‚ÍƒAƒ‰ƒCƒƒ“ƒg‚É‘Î‰‚µ‚Ä‚È‚¢‚Ì‚ÅƒNƒ‰ƒbƒVƒ…‚·‚é
-//ƒXƒ^ƒbƒN‚ÉÏ‚Şê‡‚ÌƒAƒ‰ƒCƒƒ“ƒg‚Ì‚³‚ê•û‚à‚í‚©‚ç‚È‚¢‚Ì‚Å—v’²¸
-//make_shared‚ÍƒAƒ‰ƒCƒƒ“ƒg‚É‘Î‰‚µ‚Ä‚é‚İ‚½‚¢‚¾‚ª”O‚Ì‚½‚ßg‚í‚¸‚É
-//‚»‚ê‚¼‚ê‚ÌƒNƒ‰ƒX‚ÅƒI[ƒo[ƒ[ƒh‚³‚ê‚½operator new‚ğg‚¤
+ï»¿/*
+bulleté–¢ä¿‚ã®ãƒ¡ãƒ¢ãƒªç¢ºä¿æ™‚ã«ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆã‚’ã—ã£ã‹ã‚ŠæŠŠæ¡ã—ã¦ãŠã
+ã‚¨ãƒ©ãƒ¼å†…å®¹è‡ªä½“ã¯ãƒ¡ãƒ¢ãƒªã‚¢ã‚¯ã‚»ã‚¹é•åã§åŸå› ç‰¹å®šãŒã—ã«ãã„ã®ã§æ³¨æ„ã™ã‚‹
+//Newã¯ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆã«å¯¾å¿œã—ã¦ãªã„ã®ã§ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ã™ã‚‹
+//ãã‚Œãã‚Œã®ã‚¯ãƒ©ã‚¹ã§ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰ã•ã‚ŒãŸoperator newã‚’ä½¿ã†
 */
 
 #include "BulletPhysics.h"
@@ -18,60 +16,154 @@ bulletŠÖŒW‚Ìƒƒ‚ƒŠŠm•Û‚ÉƒAƒ‰ƒCƒƒ“ƒg‚ğ‚µ‚Á‚©‚è”cˆ¬‚µ‚Ä‚¨‚­
 #include "BulletCollision/CollisionShapes/btCapsuleShape.h"
 #include "BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h"
 #include "BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h"
+
 //#include"bullet/src/btBulletDynamicsCommon.h"
 namespace s3d_bullet {
+
   using namespace bullet;
-  BulletPhysics::BulletPhysics(const Vec3& gravity_DX,
-    ProcessedCallBack callback)
-    :m_collisionConfiguration(new btDefaultCollisionConfiguration()),
-    m_dispatcher(new btCollisionDispatcher(m_collisionConfiguration.get())),
-    m_overlappingPairCache(new btDbvtBroadphase()),
-    m_solver(new btSequentialImpulseConstraintSolver()),
-    m_dynamicsWorld(
-      new btDiscreteDynamicsWorld(m_dispatcher.get(), m_overlappingPairCache.get(),
+  class BulletPhysics::Pimpl {
+    std::unique_ptr<btDefaultCollisionConfiguration> m_collisionConfiguration;
+    std::unique_ptr<btCollisionDispatcher> m_dispatcher;
+    std::unique_ptr<btDbvtBroadphase> m_overlappingPairCache;
+    std::unique_ptr<btSequentialImpulseConstraintSolver> m_solver;
+    std::vector<std::shared_ptr<btTypedConstraint>> m_constraint;
+    std::shared_ptr<btDiscreteDynamicsWorld> m_dynamicsWorld;
+    s3d_bullet::DebugDraw m_debugDraw;
+  public:
+    Pimpl(const Vec3 &gravity) :m_collisionConfiguration(new btDefaultCollisionConfiguration()),
+      m_dispatcher(new btCollisionDispatcher(m_collisionConfiguration.get())),
+      m_overlappingPairCache(new btDbvtBroadphase()),
+      m_solver(new btSequentialImpulseConstraintSolver()),
+      m_dynamicsWorld(new btDiscreteDynamicsWorld(m_dispatcher.get(), m_overlappingPairCache.get(),
         m_solver.get(), m_collisionConfiguration.get())) {
-    btVector3 gravity = ConvertVectorDxToBt(gravity_DX);
-    //collisionConfiguration = new btDefaultCollisionConfiguration();
-    //dispatcher = new btCollisionDispatcher(collisionConfiguration);
-    //overlappingPairCache = new btDbvtBroadphase();
-    //solver = new btSequentialImpulseConstraintSolver;
-    //dynamicsWorld = new btDiscreteDynamicsWorld(&dispatcher,&overlappingPairCache,&solver,&collisionConfiguration);
-    m_dynamicsWorld->setGravity(gravity);
-    //debugdraw=new DebugDraw();
-    //dynamics_world_->setDebugDrawer(&debug_draw_);
-    gContactProcessedCallback = callback;
-    //mutex_ = CreateMutex(0, FALSE, 0);
+      m_dynamicsWorld->setGravity(ConvertVectorDxToBt(gravity));
+      m_dynamicsWorld->setDebugDrawer(&m_debugDraw);
+    }
+    ~Pimpl() {
+      for (int i = m_dynamicsWorld->getNumConstraints() - 1; i >= 0; --i) {
+        btTypedConstraint* constraint = m_dynamicsWorld->getConstraint(i);
+        m_dynamicsWorld->removeConstraint(constraint);
+        delete constraint;
+      }
+
+      for (int i = m_dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; --i) {
+        btCollisionObject* obj = m_dynamicsWorld->getCollisionObjectArray()[i];
+        btRigidBody* body = btRigidBody::upcast(obj);
+        if (body && body->getMotionState())
+          delete body->getMotionState();
+        m_dynamicsWorld->removeCollisionObject(obj);
+        delete obj;
+      }
+    }
+
+    void Add6DofSpringConstraint(std::shared_ptr<bullet::Data> bodyA, std::shared_ptr<bullet::Data> bodyB,
+      const btTransform & frameInA, const btTransform & frameInB,
+      const Float3 & c_p1, const Float3 & c_p2, const Float3 & c_r1, const Float3 & c_r2,
+      const Float3 & stiffnessPos, const Float3 & stiffnessRot) {
+      // ç¬¬äº”å¼•æ•°ã®åŠ¹æœã¯è¬ã€‚ã©ã¡ã‚‰ã§ã‚‚åŒã˜æ§˜ã«è¦‹ãˆã‚‹â€¦â€¦ã€‚
+      //auto constraint = make_shared<btGeneric6DofSpringConstraint>(*m_bulletdata[bodyA]->body, *m_bulletdata[bodyB]->body, frameInA, frameInB, false);
+      std::shared_ptr<btGeneric6DofSpringConstraint> constraint(
+        new btGeneric6DofSpringConstraint(*bodyA->body, *bodyB->body, frameInA, frameInB, false));
+      bodyA->Constraintnum.push_back(constraint);
+      bodyB->Constraintnum.push_back(constraint);
+      m_constraint.push_back(constraint);
+      constraint->setLinearLowerLimit(btVector3(c_p1.x, c_p1.y, c_p1.z));	// å‹ã¯ãƒ™ã‚¯ãƒˆãƒ«ã ãŒãƒ™ã‚¯ãƒˆãƒ«é‡ã§ã¯ãªã„ã®ã§Zã¯åè»¢ã—ãªã„ã€‚
+      constraint->setLinearUpperLimit(btVector3(c_p2.x, c_p2.y, c_p2.z));
+      constraint->setAngularLowerLimit(btVector3(c_r1.x, c_r1.y, c_r1.z));
+      constraint->setAngularUpperLimit(btVector3(c_r2.x, c_r2.y, c_r2.z));
+      auto set = [&](float val, int i) {
+        if (val != 0.0f) {
+          constraint->enableSpring(i, true);
+          constraint->setStiffness(i, val);
+        }
+      };
+      set(stiffnessPos.x, 0);
+      set(stiffnessPos.y, 1);
+      set(stiffnessPos.z, 2);
+      set(stiffnessRot.x, 3);
+      set(stiffnessRot.y, 4);
+      set(stiffnessRot.z, 5);
+      m_dynamicsWorld->addConstraint(constraint.get());
+    }
+    void AddPointToPointConstraint(std::shared_ptr<bullet::Data> bodyA,
+      std::shared_ptr<bullet::Data> bodyB,
+      const Vec3& pivotInADX, const Vec3& pivotInBDX) {
+      const btVector3 pivotInA = ConvertVectorDxToBt(pivotInADX);
+      const btVector3 pivotInB = ConvertVectorDxToBt(pivotInBDX);
+      std::shared_ptr<btPoint2PointConstraint> constraint(
+        new btPoint2PointConstraint(*bodyA->body, *bodyB->body, pivotInA, pivotInB));
+
+      bodyA->Constraintnum.push_back(constraint);
+      bodyB->Constraintnum.push_back(constraint);
+
+      m_constraint.push_back(constraint);
+      m_dynamicsWorld->addConstraint(constraint.get());
+    }
+    std::shared_ptr<bullet::Data> CreateShape(std::unique_ptr<btCollisionShape> shape,
+      const Matrix & world, float mass, float restitution,
+      float friction, float linear_damp, float angular_damp,
+      bool kinematic, unsigned short group, unsigned short mask) {
+      auto bulletdata = std::make_shared<bullet::Data>(m_dynamicsWorld);
+      btVector3 local_inertia(0, 0, 0);
+      if (mass != 0.f)
+        shape->calculateLocalInertia(mass, local_inertia);
+
+      btTransform btworld = ConvertMatrix(world);
+      bulletdata->motionState.reset(new btDefaultMotionState(btworld));
+      btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, bulletdata->motionState.get(), shape.get(), local_inertia);
+      bulletdata->body.reset(new btRigidBody(rbInfo));
+
+      bulletdata->body->setRestitution(restitution);
+      bulletdata->body->setFriction(friction);
+      bulletdata->body->setDamping(linear_damp, angular_damp);
+      //float linearDamp = body->getLinearDamping();
+      //float angularDamp = body->getAngularDamping();
+      if (kinematic) {
+        bulletdata->body->setCollisionFlags(bulletdata->body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+        bulletdata->body->setActivationState(DISABLE_DEACTIVATION);
+      }
+      bulletdata->shape = move(shape);
+      /*
+      group : 0x8000 å£ãªã©ã®ã‚ãŸã‚Šåˆ¤å®šç”¨ã®ç•ªå·
+      */
+      //WaitForSingleObject(mutex_, INFINITE);
+      m_dynamicsWorld->addRigidBody(bulletdata->body.get(), group, mask);
+      //ReleaseMutex(mutex_);
+
+      //unique_ptr<btRigidBody> bodyunique(btbody);
+      return bulletdata;
+    }
+    void AddPointToPointConstraint(std::shared_ptr<bullet::Data>  body, const Vec3& pivotDX) {
+      const btVector3 pivot = ConvertVectorDxToBt(pivotDX);
+      std::shared_ptr<btPoint2PointConstraint> constraint(new btPoint2PointConstraint(*body->body, pivot));
+      body->Constraintnum.push_back(constraint);
+      m_constraint.push_back(constraint);
+      m_dynamicsWorld->addConstraint(constraint.get());
+    }
+
+    void StepSimulation() {
+      m_dynamicsWorld->stepSimulation(1.0f / Profiler::FPS(), 100);
+    }
+    void DebugDraw() {
+      m_dynamicsWorld->debugDrawWorld();
+
+    }
+
+  };
+
+  BulletPhysics::BulletPhysics(const Vec3& gravity) {
+    m_pimpl = std::make_shared<Pimpl>(gravity);
   }
 
   BulletPhysics::~BulletPhysics() {
-    for (int i = m_dynamicsWorld->getNumConstraints() - 1; i >= 0; --i) {
-      btTypedConstraint* constraint = m_dynamicsWorld->getConstraint(i);
-      m_dynamicsWorld->removeConstraint(constraint);
-      delete constraint;
-    }
-
-    for (int i = m_dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; --i) {
-      btCollisionObject* obj = m_dynamicsWorld->getCollisionObjectArray()[i];
-      btRigidBody* body = btRigidBody::upcast(obj);
-      if (body && body->getMotionState()) delete body->getMotionState();
-      m_dynamicsWorld->removeCollisionObject(obj);
-      delete obj;
-    }
-
-    /*delete dynamicsWorld;
-    delete solver;
-    delete dispatcher;
-    delete collisionConfiguration;
-    delete debugdraw;*/
-
   }
 
   std::shared_ptr<bullet::Data> BulletPhysics::CreateCompoundShape(
-    null_err_unique_ptr<btCollisionShape> box, const Matrix & world, float mass,
+    std::unique_ptr<btCollisionShape> box, const Matrix & world, float mass,
     float restitution, float friction, float linear_damp, float angular_damp,
     bool kinematic, unsigned short group, unsigned short mask, const btVector3 & coord) {
 
-    null_err_unique_ptr<btCompoundShape> heroShape(new btCompoundShape());
+    std::unique_ptr<btCompoundShape> heroShape(new btCompoundShape());
 
     btTransform shift;
     shift.setIdentity();
@@ -84,51 +176,20 @@ namespace s3d_bullet {
   }
 
   std::shared_ptr<bullet::Data>
-    BulletPhysics::CreateShape(null_err_unique_ptr<btCollisionShape> shape,
+    BulletPhysics::CreateShape(std::unique_ptr<btCollisionShape> shape,
       const Matrix & world, float mass, float restitution,
       float friction, float linear_damp, float angular_damp,
       bool kinematic, unsigned short group, unsigned short mask) {
-    auto bulletdata = std::make_shared<bullet::Data>();
-    //collisionShapes.push_back(shape);
-    btVector3 local_inertia(0, 0, 0);
-    if (mass != 0) shape->calculateLocalInertia(mass, local_inertia);
-    btTransform btworld = ConvertMatrixDxToBt(world);
-    bulletdata->motionState.reset(new btDefaultMotionState(btworld));
-
-    btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, bulletdata->motionState.get(), shape.get(), local_inertia);
-    //m_motionstate.push_back(motionState);
-    bulletdata->body.reset(new btRigidBody(rbInfo));
-    //btRigidBody* btbody = new btRigidBody(rbInfo);
-
-    bulletdata->body->setRestitution(restitution);
-    bulletdata->body->setFriction(friction);
-    bulletdata->body->setDamping(linear_damp, angular_damp);
-    //float linearDamp = body->getLinearDamping();
-    //float angularDamp = body->getAngularDamping();
-    if (kinematic) {
-      bulletdata->body->setCollisionFlags(bulletdata->body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
-      bulletdata->body->setActivationState(DISABLE_DEACTIVATION);
-    }
-    bulletdata->shape = move(shape);
-    /*
-    group : 0x8000 •Ç‚È‚Ç‚Ì‚ ‚½‚è”»’è—p‚Ì”Ô†
-    */
-    //WaitForSingleObject(mutex_, INFINITE);
-    m_dynamicsWorld->addRigidBody(bulletdata->body.get(), group, mask);
-    //ReleaseMutex(mutex_);
-
-    //unique_ptr<btRigidBody> bodyunique(btbody);
-    return bulletdata;
+    return m_pimpl->CreateShape(std::move(shape), world, mass, restitution, friction, linear_damp, angular_damp, kinematic, group, mask);
   }
 
 
 
 
 
-  /// „‘ÌƒIƒuƒWƒFƒNƒg¶¬
-  /// ¿—Ê0, kinematic‚ğfalse‚É‚·‚é‚ÆA“®‚©‚È‚¢static„‘Ì‚É‚È‚éB
-  /// ¿—Ê0, kinematic‚ğtrue‚É‚·‚é‚ÆAè“®‚Å“®‚©‚¹‚é‚ªA•¨—‰‰Z‚Ì‰e‹¿‚ğó‚¯‚È‚¢Kinematic„‘Ì‚É‚È‚é
-
+  /// å‰›ä½“ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç”Ÿæˆ
+  /// è³ªé‡0, kinematicã‚’falseã«ã™ã‚‹ã¨ã€å‹•ã‹ãªã„staticå‰›ä½“ã«ãªã‚‹ã€‚
+  /// è³ªé‡0, kinematicã‚’trueã«ã™ã‚‹ã¨ã€æ‰‹å‹•ã§å‹•ã‹ã›ã‚‹ãŒã€ç‰©ç†æ¼”ç®—ã®å½±éŸ¿ã‚’å—ã‘ãªã„Kinematicå‰›ä½“ã«ãªã‚‹
   std::shared_ptr<bullet::Data> BulletPhysics::CreateBox(float width, float height, float depth, const Matrix & world,
     float mass, float restitution, float friction,
     float linear_damp, float angular_damp, bool kinematic,
@@ -137,14 +198,14 @@ namespace s3d_bullet {
     btVector3 halfExtents(width / 2, height / 2, depth / 2);
     //btCollisionShape* shape = new btBoxShape(halfExtents);
     if (kinematic) mass = 0;
-    null_err_unique_ptr<btBoxShape> temp_box(new btBoxShape(halfExtents));
+    std::unique_ptr<btBoxShape> temp_box(new btBoxShape(halfExtents));
     return CreateCompoundShape(move(temp_box), world, mass, restitution, friction, linear_damp, angular_damp, kinematic, group, mask, coord);
   }
   std::shared_ptr<bullet::Data> BulletPhysics::CreateSphere(float radius, const Matrix & world,
     float mass, float restitution, float friction, float linear_damp,
     float angular_damp, bool kinematic, unsigned short group, unsigned short mask) {
     if (kinematic) mass = 0;
-    null_err_unique_ptr<btSphereShape> shape(new btSphereShape(radius));
+    std::unique_ptr<btSphereShape> shape(new btSphereShape(radius));
     return CreateShape(move(shape), world, mass, restitution, friction, linear_damp, angular_damp, kinematic, group, mask);
   }
 
@@ -153,7 +214,7 @@ namespace s3d_bullet {
     float angular_damp, bool kinematic, unsigned short group, unsigned short mask) {
     btVector3 halfExtents(radius, radius, length / 2);
     if (kinematic) mass = 0;
-    null_err_unique_ptr<btCylinderShape> shape(new btCylinderShape(halfExtents));
+    std::unique_ptr<btCylinderShape> shape(new btCylinderShape(halfExtents));
     return CreateShape(move(shape), world, mass, restitution, friction, linear_damp, angular_damp, kinematic, group, mask);
   }
 
@@ -161,95 +222,32 @@ namespace s3d_bullet {
     float mass, float restitution, float friction, float linear_damp,
     float angular_damp, bool kinematic, unsigned short group, unsigned short mask, const btVector3 & coord) {
     if (kinematic) mass = 0;
-    null_err_unique_ptr<btCapsuleShape> shape(new btCapsuleShape(radius, height));
+    std::unique_ptr<btCapsuleShape> shape(new btCapsuleShape(radius, height));
     return CreateCompoundShape(move(shape), world, mass, restitution, friction, linear_damp, angular_damp, kinematic, group, mask, coord);
   }
 
   void BulletPhysics::AddPointToPointConstraint(std::shared_ptr<bullet::Data>  body, const Vec3& pivotDX) {
-    btVector3 pivot = ConvertVectorDxToBt(pivotDX);
-    std::shared_ptr<btPoint2PointConstraint> constraint(new btPoint2PointConstraint(*body->body, pivot));
-    body->Constraintnum.push_back(constraint);
-    m_constraint.push_back(constraint);
-    m_dynamicsWorld->addConstraint(constraint.get());
+    m_pimpl->AddPointToPointConstraint(body, pivotDX);
   }
 
-  void BulletPhysics::AddPointToPointConstraint(std::shared_ptr<bullet::Data> bodyA,
-    std::shared_ptr<bullet::Data> bodyB,
-    const Vec3& pivotInADX, const Vec3& pivotInBDX) {
-    btVector3 pivotInA = ConvertVectorDxToBt(pivotInADX);
-    btVector3 pivotInB = ConvertVectorDxToBt(pivotInBDX);
-    std::shared_ptr<btPoint2PointConstraint> constraint(
-      new btPoint2PointConstraint(*bodyA->body, *bodyB->body, pivotInA, pivotInB));
-
-    bodyA->Constraintnum.push_back(constraint);
-    bodyB->Constraintnum.push_back(constraint);
-
-    m_constraint.push_back(constraint);
-    m_dynamicsWorld->addConstraint(constraint.get());
+  void BulletPhysics::AddPointToPointConstraint(std::shared_ptr<bullet::Data> bodyA, std::shared_ptr<bullet::Data> bodyB, const Vec3 & pivotInA, const Vec3 & pivotInB) {
+    m_pimpl->AddPointToPointConstraint(bodyA, bodyB, pivotInA, pivotInB);
   }
-
-
-
-
-
-
-  /// 6²ƒWƒ‡ƒCƒ“ƒg‚ğ’Ç‰Á
-  /// @param bodyA „‘ÌA
-  /// @param bodyB „‘ÌB
-  /// @param frameInA ƒWƒ‡ƒCƒ“ƒg‚Ìƒ[ƒ‹ƒh•ÏŠ·s—ñ(„‘ÌAƒ[ƒJƒ‹À•WŒn)
-  /// @param frameInB ƒWƒ‡ƒCƒ“ƒg‚Ìƒ[ƒ‹ƒh•ÏŠ·s—ñ(„‘ÌBƒ[ƒJƒ‹À•WŒn)
-  /// @param c_p1 ˆÚ“®§ŒÀ1
-  /// @param c_p2 ˆÚ“®§ŒÀ2
-  /// @param c_r1 ‰ñ“]§ŒÀ1
-  /// @param c_r2 ‰ñ“]§ŒÀ2
-  /// @param stiffness ƒoƒl„«(•½sˆÚ“®x, y, z, ‰ñ“]ˆÚ“®x, y, z‚Ì‡‚Ì6—v‘f)
-  /// 6²ƒWƒ‡ƒCƒ“ƒg‚ğ’Ç‰Á
-  /// @param bodyA „‘ÌA
-  /// @param bodyB „‘ÌB
-  /// @param frameInA ƒWƒ‡ƒCƒ“ƒg‚Ìƒ[ƒ‹ƒh•ÏŠ·s—ñ(„‘ÌAƒ[ƒJƒ‹À•WŒn)
-  /// @param frameInB ƒWƒ‡ƒCƒ“ƒg‚Ìƒ[ƒ‹ƒh•ÏŠ·s—ñ(„‘ÌBƒ[ƒJƒ‹À•WŒn)
-  /// @param c_p1 ˆÚ“®§ŒÀ1
-  /// @param c_p2 ˆÚ“®§ŒÀ2
-  /// @param c_r1 ‰ñ“]§ŒÀ1
-  /// @param c_r2 ‰ñ“]§ŒÀ2
-  /// @param stiffnessPos ƒoƒl„«(•½sˆÚ“®x, y, z ‚Ì3—v‘f)
-  /// @param stiffnessRot ƒoƒl„«(‰ñ“]ˆÚ“®x, y, z ‚Ì3—v‘f)
 
   void BulletPhysics::Add6DofSpringConstraint(std::shared_ptr<bullet::Data> bodyA, std::shared_ptr<bullet::Data> bodyB,
     const btTransform & frameInA, const btTransform & frameInB,
     const Float3 & c_p1, const Float3 & c_p2, const Float3 & c_r1, const Float3 & c_r2,
     const Float3 & stiffnessPos, const Float3 & stiffnessRot) {
-    // ‘æŒÜˆø”‚ÌŒø‰Ê‚Í“äB‚Ç‚¿‚ç‚Å‚à“¯‚¶—l‚ÉŒ©‚¦‚éccB
-    //auto constraint = make_shared<btGeneric6DofSpringConstraint>(*m_bulletdata[bodyA]->body, *m_bulletdata[bodyB]->body, frameInA, frameInB, false);
-    std::shared_ptr<btGeneric6DofSpringConstraint> constraint(
-      new btGeneric6DofSpringConstraint(*bodyA->body, *bodyB->body, frameInA, frameInB, false));
-    bodyA->Constraintnum.push_back(constraint);
-    bodyB->Constraintnum.push_back(constraint);
-    m_constraint.push_back(constraint);
-    constraint->setLinearLowerLimit(btVector3(c_p1.x, c_p1.y, c_p1.z));	// Œ^‚ÍƒxƒNƒgƒ‹‚¾‚ªƒxƒNƒgƒ‹—Ê‚Å‚Í‚È‚¢‚Ì‚ÅZ‚Í”½“]‚µ‚È‚¢B
-    constraint->setLinearUpperLimit(btVector3(c_p2.x, c_p2.y, c_p2.z));
-    constraint->setAngularLowerLimit(btVector3(c_r1.x, c_r1.y, c_r1.z));
-    constraint->setAngularUpperLimit(btVector3(c_r2.x, c_r2.y, c_r2.z));
-    auto set = [&](float val, int i) {
-      if (val != 0.0f) {
-        constraint->enableSpring(i, true);
-        constraint->setStiffness(i, val);
-      }
-    };
-    set(stiffnessPos.x, 0);
-    set(stiffnessPos.y, 1);
-    set(stiffnessPos.z, 2);
-    set(stiffnessRot.x, 3);
-    set(stiffnessRot.y, 4);
-    set(stiffnessRot.z, 5);
-    m_dynamicsWorld->addConstraint(constraint.get());
+    m_pimpl->Add6DofSpringConstraint(bodyA, bodyB, frameInA, frameInB,
+      c_p1, c_p2, c_r1, c_r2, stiffnessPos, stiffnessRot);
   }
 
   void BulletPhysics::StepSimulation() {
-    m_dynamicsWorld->stepSimulation(1.0f / Profiler::FPS(), 100);
+    m_pimpl->StepSimulation();
   }
+
   void BulletPhysics::DebugDraw() {
-    m_dynamicsWorld->debugDrawWorld();
+    m_pimpl->DebugDraw();
   }
 
 }

@@ -1,98 +1,111 @@
-/**************************************************************************//**
-    @file       DebugDraw.h
-    @brief      DebugDrawƒNƒ‰ƒX ’è‹`
-    @author     Simplestar
-    @date       2011-08-19
-    @par
-    [à–¾]
-    DebugDrawƒNƒ‰ƒX ’è‹`ƒtƒ@ƒCƒ‹
-    @note
-    Copyright c 2011  SimpleStar Game
-    http://simplestar.syuriken.jp/
-    *//***************************************************************************/
-//#include "BulletPhysics.h"
-#ifndef BULLETDEBUG_H
-#define BULLETDEBUG_H
+ï»¿#ifndef INCLUDE_BULLET_DEBUG_H
+#define INCLUDE_BULLET_DEBUG_H
 
-#ifndef BT_VECTOR3_H
-#include"bullet/src/LinearMath/btVector3.h"
-#endif
-#ifndef BT_IDEBUG_DRAW__H
-#include"bullet/src/LinearMath/btIDebugDraw.h"
-#endif
-#include<DirectXTK/PrimitiveBatch.h>
-//------------------------------------------------------------------------
-// Type Definitions
-//------------------------------------------------------------------------
+#include "BulletPhysics.h"
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btIDebugDraw.h"
 
+namespace s3d_bullet {
 
-/**********************************************************************//**
-    @class           DebugDraw
-    @brief           ƒfƒoƒbƒO•`‰æƒNƒ‰ƒX
-    @author          Simplestar
-    @par     [à–¾]
-    Bullet Physics ‚ÌŒ‹‰Ê‚ğ•`‰æ‚µ‚Ü‚·B
-    –{”Ô‚Å•`‰æ‚ª‚¤‚Ü‚­“­‚¢‚Ä‚¢‚é‚©”äŠr‚·‚é‚½‚ß‚É—p‚¢‚Ü‚·B
-    ‚Ù‚©ABullet‘€ì‚ÌƒeƒXƒg‚È‚Ç‚ğ–Ú“I‚Ég—p‚µ‚Ü‚·B
-    *//***********************************************************************/
-class DebugDraw : public btIDebugDraw {
-  //------------------------------------------------------------------------
-  // Private Variables
-  //------------------------------------------------------------------------
-private:
-  struct LineStruct {
-    oigami::D3DVertexBuffer VertexBuffer;
-    D3DInputLayout *VertexLayout;
-    D3DVertexShader *VertexShader;
-    D3DPixelShader *PixelShader;
-    std::vector<VECTOR3> vertex;
+  class DebugDraw : public btIDebugDraw {
+    int  m_debugMode;
+
+  public:
+
+    DebugDraw();
+    virtual ~DebugDraw();
+
+    /// <summary>
+    /// ç·šã®æç”»
+    /// </summary>
+    /// <param name="from"> é–‹å§‹ç‚¹ </param>
+    /// <param name="to"> çµ‚äº†ç‚¹ </param>
+    /// <param name="color"> è‰² </param>
+    virtual void drawLine(const btVector3& from, const btVector3& to, const btVector3& color);
+
+    
+    /// <summary>
+    /// çƒã®æç”»
+    /// </summary>
+    /// <param name="radius"> åŠå¾„ </param>
+    /// <param name="transform"> åº§æ¨™ </param>
+    /// <param name="color"> è‰² </param>
+    virtual void drawSphere(btScalar radius, const btTransform& transform, const btVector3& color);
+
+    /// <summary>
+    /// ç®±ã®æç”»
+    /// </summary>
+    /// <param name="bbMin"> é–‹å§‹ç‚¹ </param>
+    /// <param name="bbMax"> çµ‚äº†ç‚¹ </param>
+    /// <param name="trans"> ? </param>
+    /// <param name="color"> è‰² </param>
+    virtual void drawBox(const btVector3& bbMin, const btVector3& bbMax, const btTransform& trans, const btVector3& color);
+
+    /// <summary>
+    /// ç®±ã®æç”»
+    /// </summary>
+    /// <param name="bbMin"> é–‹å§‹ç‚¹ </param>
+    /// <param name="bbMax"> çµ‚äº†ç‚¹ </param>
+    /// <param name="color"> è‰² </param>
+    virtual void drawBox(const btVector3& bbMin, const btVector3& bbMax, const btVector3& color);
+
+    /// <summary>
+    /// ã‚«ãƒ—ã‚»ãƒ«ã®æç”»
+    /// </summary>
+    /// <param name="radius"> åŠå¾„ </param>
+    /// <param name="halfHeight"> é«˜ã•ã®åŠåˆ† </param>
+    /// <param name="upAxis"> ä¸Šã®å‘ã(1 or -1?) </param>
+    /// <param name="transform"> ä½ç½®ã¨å›è»¢ </param>
+    /// <param name="color"> è‰² </param>
+    virtual void drawCapsule(btScalar radius, btScalar halfHeight, int upAxis, const btTransform& transform, const btVector3& color);
+
+    /// <summary>
+    /// å††æŸ±ã®æç”»
+    /// </summary>
+    /// <param name="radius"> åŠå¾„ </param>
+    /// <param name="halfHeight"> é«˜ã•ã®åŠåˆ† </param>
+    /// <param name="upAxis"> ä¸Šã®å‘ã(1 or -1?) </param>
+    /// <param name="transform"> ä½ç½®ã¨å›è»¢ </param>
+    /// <param name="color"> è‰² </param>
+    virtual void drawCylinder(btScalar radius, btScalar halfHeight, int upAxis, const btTransform& transform, const btVector3& color);
+
+    /// <summary>
+    /// è¡çªç‚¹ï¼ˆæ–¹å‘ä»˜ãï¼‰ã®æç”»
+    /// </summary>
+    /// <param name="PointOnB"> è¡çªä½ç½® </param>
+    /// <param name="normalOnB"> è¡çªæ–¹å‘ </param>
+    /// <param name="distance"> è¡çªã®å¤§ãã• </param>
+    /// <param name="lifeTime"> è¡¨ç¤ºæ™‚é–“ï¼Ÿ </param>
+    /// <param name="color"> è‰² </param>
+    virtual void drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color);
+
+    /// <summary>
+    /// è­¦å‘Šã€ã‚¨ãƒ©ãƒ¼æ–‡ã®å‡ºåŠ›
+    /// </summary>
+    /// <param name="warningString">è¡¨ç¤ºã™ã‚‹æ–‡å­—åˆ—</param>
+    virtual void reportErrorWarning(const char* warningString);
+
+    /// <summary>
+    /// 3Dæ–‡å­—ã®æç”»
+    /// </summary>
+    /// <param name="location"> æç”»ä½ç½® </param>
+    /// <param name="textString"> è¡¨ç¤ºã™ã‚‹æ–‡å­—åˆ— </param>
+    virtual void draw3dText(const btVector3& location, const char* textString);
+
+    /// <summary>
+    /// ãƒ‡ãƒãƒƒã‚°ãƒ¢ãƒ¼ãƒ‰ã®è¨­å®š
+    /// </summary>
+    /// <param name="debugMode"> ãƒ‡ãƒãƒƒã‚°ãƒ¢ãƒ¼ãƒ‰ </param>
+    virtual void setDebugMode(int debugMode);
+
+    /// <summary>
+    /// ãƒ‡ãƒãƒƒã‚°ãƒ¢ãƒ¼ãƒ‰ã®å–å¾—
+    /// </summary>
+    /// <returns> ãƒ‡ãƒãƒƒã‚°ãƒ¢ãƒ¼ãƒ‰ </returns>
+    virtual int getDebugMode() const;
+
   };
-  const ICamera *m_camera;
-  static const int MaxVertex = 128;
-  //LineStruct line;
-  int     m_debugMode;                                //!< ƒfƒoƒbƒOƒ‚[ƒh
-  RECT    m_fpsArea;                                  //!< FPS‚Ì•\¦êŠ
-  char    m_fpsString[32];                            //!< FPS‚Ì•¶š—ñ
-  unsigned int m_effectIndex;                         //!< ƒGƒtƒFƒNƒgƒCƒ“ƒfƒbƒNƒX
-  bool    m_bInitialized;                             //!< ‰Šú‰»ƒtƒ‰ƒO
 
-  RECT m_clientRect;                                  //!< ƒEƒBƒ“ƒhƒE‚Ì‹éŒ`
-  MATRIX                  m_matView;              //!< ƒrƒ…[s—ñ
-  MATRIX                  m_matProjection;        //!< ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ
-  //------------------------------------------------------------------------
-  // Private Functions
-  //------------------------------------------------------------------------
-private:
+}
 
-  VECTOR4*    _GetDXVector4(const btVector3& btVec3, VECTOR4& dxVec4);
-  XMCOLOR*      _GetDXColor(const btVector3& btVec3, XMCOLOR& dxColor);
-
-  //------------------------------------------------------------------------
-  // Public Functions
-  //------------------------------------------------------------------------
-public:
-
-  DebugDraw(const ICamera *camera);                //!< ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-  virtual ~DebugDraw();       //!< ƒfƒXƒgƒ‰ƒNƒ^
-
-  // ü‚Ì•`‰æ
-  virtual void    drawLine(const btVector3& from, const btVector3& to, const btVector3& color);
-  // Õ“Ë“_i•ûŒü•t‚«j‚Ì•`‰æ
-  virtual void    drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color);
-  // ŒxAƒGƒ‰[•¶‚Ìo—Í
-  virtual void    reportErrorWarning(const char* warningString);
-  // 3D•¶š‚Ì•`‰æ
-  virtual void    draw3dText(const btVector3& location, const char* textString);
-  // ƒfƒoƒbƒOƒ‚[ƒh‚Ìİ’è
-  virtual void    setDebugMode(int debugMode);
-  // ƒfƒoƒbƒOƒ‚[ƒh‚Ìæ“¾
-  virtual int     getDebugMode() const;
-
-  const MATRIX&   GetViewMatrix() const;
-  void                SetViewMatrix(const MATRIX& viewMatrix);
-  const MATRIX&   GetProjectionMatrix() const;
-  void                SetProjectionMatrix(const MATRIX& projectionMatirx);
-};
-
-
-#endif  // ___Bullet_HelloWorld_Bullet_HelloWorld_DebugDraw_H___
+#endif  // ___Bullet_HelloWorld_Bullet_HelloWorld_DebugDraw_H___}

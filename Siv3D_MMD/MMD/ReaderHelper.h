@@ -1,8 +1,8 @@
-#pragma once
+ï»¿#pragma once
 #include <Siv3D.hpp>
 namespace s3d_mmd {
   template<class Type>
-  bool ReadArray(IReader& reader, const size_t size, std::vector<Type> &arr) { //Array‚Åó‚¯æ‚ê‚È‚¢‚Ì‚Åvector‚É‚µ‚Ä‚¨‚­
+  bool ReadArray(IReader& reader, const size_t size, std::vector<Type> &arr) { //Arrayã§å—ã‘å–ã‚Œãªã„ã®ã§vectorã«ã—ã¦ãŠã
     arr.resize(size);
     if (size == 0 || reader.read(arr.data(), sizeof(Type) * size))
       return true;
@@ -10,17 +10,17 @@ namespace s3d_mmd {
   }
 
   /// <summary>
-  /// Å‰‚Ésizeof(SizeType)‚¾‚¯“Ç‚İ‚İ‚»‚Ì’l‚Ì”z—ñ•ª“Ç‚İ‚Ş
+  /// æœ€åˆã«sizeof(SizeType)ã ã‘èª­ã¿è¾¼ã¿ãã®å€¤ã®é…åˆ—åˆ†èª­ã¿è¾¼ã‚€
   /// </summary>
   /// <remarks>
-  /// ƒTƒCƒY0‚Ìê‡‚à³íI—¹
+  /// ã‚µã‚¤ã‚º0ã®å ´åˆã‚‚æ­£å¸¸çµ‚äº†
   /// </remarks>
   /// <returns>
-  /// empty   : ƒTƒCƒY‚Ì“Ç‚İ‚İ‚É¸”s
-  /// ‚»‚êˆÈŠO : ƒf[ƒ^‚Ì“Ç‚İ‚İ¬”Û
+  /// empty   : ã‚µã‚¤ã‚ºã®èª­ã¿è¾¼ã¿ã«å¤±æ•—
+  /// ãã‚Œä»¥å¤– : ãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿æˆå¦
   /// </returns>
   template<class SizeType, class Type>
-  Optional<bool> ReadSizeAndArray(IReader& reader, std::vector<Type> &arr) {//Array‚Åó‚¯æ‚ê‚È‚¢‚Ì‚Åvector‚É‚µ‚Ä‚¨‚­
+  Optional<bool> ReadSizeAndArray(IReader& reader, std::vector<Type> &arr) {//Arrayã§å—ã‘å–ã‚Œãªã„ã®ã§vectorã«ã—ã¦ãŠã
     SizeType num;
     if (!reader.read(num)) return{};
     return ReadArray(reader, num, arr);

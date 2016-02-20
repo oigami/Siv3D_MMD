@@ -1,19 +1,19 @@
-#include "../include/PMDReader.h"
+ï»¿#include "../include/PMDReader.h"
 #include "ReaderHelper.h"
 namespace s3d_mmd {
-  PMDReader::PMDReader(const FilePath& path) { // ƒwƒbƒ_
+  PMDReader::PMDReader(const FilePath& path) { // ãƒ˜ãƒƒãƒ€
     BinaryReader reader(path);
     if (!reader.isOpened()) return;
     pmd::Header pmdHeader;
     reader.read(pmdHeader);
     m_modelName = Widen(pmdHeader.model_name);
     m_comment = Widen(pmdHeader.comment);
-    ReadSizeAndArray<std::uint32_t>(reader, m_vertices);  // ’¸“_ƒf[ƒ^
-    ReadSizeAndArray<std::uint32_t>(reader, m_faces);     // ƒ|ƒŠƒSƒ“ƒf[ƒ^
-    ReadSizeAndArray<std::uint32_t>(reader, m_materials); // Ş—¿ƒf[ƒ^
-    ReadSizeAndArray<std::uint16_t>(reader, m_bones);     // ƒ{[ƒ“ƒf[ƒ^
+    ReadSizeAndArray<std::uint32_t>(reader, m_vertices);  // é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿
+    ReadSizeAndArray<std::uint32_t>(reader, m_faces);     // ãƒãƒªã‚´ãƒ³ãƒ‡ãƒ¼ã‚¿
+    ReadSizeAndArray<std::uint32_t>(reader, m_materials); // ææ–™ãƒ‡ãƒ¼ã‚¿
+    ReadSizeAndArray<std::uint16_t>(reader, m_bones);     // ãƒœãƒ¼ãƒ³ãƒ‡ãƒ¼ã‚¿
     const size_t numPmdBone = m_bones.size();
-    // IKƒf[ƒ^
+    // IKãƒ‡ãƒ¼ã‚¿
     std::uint16_t numPmdIkData;
     reader.read(numPmdIkData);
     m_ikData.resize(numPmdIkData);
@@ -22,7 +22,7 @@ namespace s3d_mmd {
       reader.read(*pmdIkDataWithoutArray);
       ReadArray(reader, pmdIkData.ik_child_bone_length, pmdIkData.ik_child_bone_index);
     }
-    // •\îƒf[ƒ^
+    // è¡¨æƒ…ãƒ‡ãƒ¼ã‚¿
     std::uint16_t numPmdSkin;
     reader.read(numPmdSkin);
     m_skinData.resize(numPmdSkin);
@@ -31,34 +31,34 @@ namespace s3d_mmd {
       reader.read(*pmdSkinDataWithoutArray);
       ReadArray(reader, skinData.skin_vert_count, skinData.skin_vert_data);
     }
-    // •\î—p˜g•\¦ƒŠƒXƒg
+    // è¡¨æƒ…ç”¨æ è¡¨ç¤ºãƒªã‚¹ãƒˆ
     ReadSizeAndArray<std::uint8_t>(reader, m_skinIndices);
-    // ƒ{[ƒ“˜g—p˜g–¼ƒŠƒXƒg
+    // ãƒœãƒ¼ãƒ³æ ç”¨æ åãƒªã‚¹ãƒˆ
     ReadSizeAndArray<std::uint8_t>(reader, m_boneDispNames);
     const size_t numBoneDispName = m_boneDispNames.size();
-    // ƒ{[ƒ“˜g—p•\¦ƒŠƒXƒg
+    // ãƒœãƒ¼ãƒ³æ ç”¨è¡¨ç¤ºãƒªã‚¹ãƒˆ
     ReadSizeAndArray<std::uint32_t>(reader, m_boneDisps);
-    // ‰p–¼‘Î‰
+    // è‹±åå¯¾å¿œ
     std::uint8_t english_name_compatibility = 0;
     reader.read(english_name_compatibility);
-    // Šeí‰p–¼
+    // å„ç¨®è‹±å
     if (english_name_compatibility == 1) {
       pmd::EnglishName tmp;
-      reader.read(tmp.modelName); // ƒ‚ƒfƒ‹–¼
-      reader.read(tmp.comment);   // ƒRƒƒ“ƒg
-      ReadArray(reader, numPmdBone, tmp.boneName); // ƒ{[ƒ“ƒŠƒXƒg
+      reader.read(tmp.modelName); // ãƒ¢ãƒ‡ãƒ«å
+      reader.read(tmp.comment);   // ã‚³ãƒ¡ãƒ³ãƒˆ
+      ReadArray(reader, numPmdBone, tmp.boneName); // ãƒœãƒ¼ãƒ³ãƒªã‚¹ãƒˆ
       if (numPmdSkin)
-        ReadArray(reader, numPmdSkin - 1, tmp.skinName); // •\îƒŠƒXƒg
-      ReadArray(reader, numBoneDispName, tmp.boneDispName); // ƒ{[ƒ“˜g—p˜g–¼ƒŠƒXƒg
+        ReadArray(reader, numPmdSkin - 1, tmp.skinName); // è¡¨æƒ…ãƒªã‚¹ãƒˆ
+      ReadArray(reader, numBoneDispName, tmp.boneDispName); // ãƒœãƒ¼ãƒ³æ ç”¨æ åãƒªã‚¹ãƒˆ
       m_englishName = tmp;
     }
-    // ƒgƒD[ƒ“ƒeƒNƒXƒ`ƒƒƒŠƒXƒg
+    // ãƒˆã‚¥ãƒ¼ãƒ³ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒªã‚¹ãƒˆ
     constexpr int numToonFileName = 10;
     Array<pmd::ToonTexture> toonFileName;
     ReadArray(reader, numToonFileName, toonFileName);
-    // „‘Ìƒf[ƒ^
+    // å‰›ä½“ãƒ‡ãƒ¼ã‚¿
     ReadSizeAndArray<std::uint32_t>(reader, m_rigidBodies);
-    // ƒWƒ‡ƒCƒ“ƒgƒf[ƒ^
+    // ã‚¸ãƒ§ã‚¤ãƒ³ãƒˆãƒ‡ãƒ¼ã‚¿
     ReadSizeAndArray<std::uint32_t>(reader, m_joints);
   }
 

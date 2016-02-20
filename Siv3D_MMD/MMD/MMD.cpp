@@ -1,4 +1,4 @@
-#include "../include/MMD.h"
+﻿#include "../include/MMD.h"
 #include "../include/MMDModel.h"
 #include "../ShaderAttacher.h"
 #ifdef USE_BULLET_PHYSICS
@@ -124,17 +124,6 @@ namespace s3d_mmd {
         Matrix bones[256];
       };
     }
-  }
-  namespace {
-#ifdef USE_BULLET_PHYSICS
-
-    std::shared_ptr<s3d_bullet::BulletPhysics> getBulletInstance() {
-      static std::shared_ptr<s3d_bullet::BulletPhysics> bulletPhysics =
-        std::make_shared<s3d_bullet::BulletPhysics>(Vec3(0, -9.8, 0), nullptr);
-      return bulletPhysics;
-    }
-#endif // USE_BULLET_PHYSICS
-
   }
   class MMD::Pimpl {
   public:
@@ -330,5 +319,11 @@ namespace s3d_mmd {
     {
       m_mmd.drawEdge(1.0);
     }
+  }
+
+  std::shared_ptr<s3d_bullet::BulletPhysics> getBulletInstance() {
+    static std::shared_ptr<s3d_bullet::BulletPhysics> bulletPhysics =
+      std::make_shared<s3d_bullet::BulletPhysics>(Vec3(0, -9.8, 0));
+    return bulletPhysics;
   }
 }

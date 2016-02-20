@@ -1,9 +1,9 @@
-#pragma once
+ï»¿#pragma once
 #ifndef INCLUDE_BULLET_PHYSICS_H
 #define INCLUDE_BULLET_PHYSICS_H
 #include <Siv3D.hpp>
 
-//DirectXMath‚Æ‚ÌÕ“Ë‚ğ‰ñ”ğ
+//DirectXMathã¨ã®è¡çªã‚’å›é¿
 #define BT_NO_SIMD_OPERATOR_OVERLOADS
 
 #include "BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h"
@@ -13,6 +13,8 @@
 #include "BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h"
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>
 #include "LinearMath/btDefaultMotionState.h"
+
+#include "BulletDebug.h"
 
 #ifdef _DEBUG
 
@@ -31,37 +33,14 @@
 #endif
 
 namespace s3d_bullet {
-  namespace {
-    /// <summary>null‚ÉgetA*‚ÅQÆ‚·‚é‚ÆƒGƒ‰[‚ªo‚éƒXƒ}ƒ|</summary>
-    template<class _Ty, class _Dx = std::default_delete<_Ty>> class null_err_unique_ptr;
-    /// <summary>null‚ÉgetA*‚ÅQÆ‚·‚é‚ÆƒGƒ‰[‚ªo‚éƒXƒ}ƒ|</summary>
-    template<class _Ty, class  _Dx> class null_err_unique_ptr :public std::unique_ptr<_Ty> {
-    public:
-      typedef std::unique_ptr<_Ty> Base;
-      null_err_unique_ptr(_Ty *t) : Base(t) {}
-      template<class _Ty2, class _Dx2>
-      null_err_unique_ptr(null_err_unique_ptr<_Ty2, _Dx2>&& _Right) {	// construct shared_ptr object that aliases _Right
-        Base::reset(_Right.release());
-      }
-      null_err_unique_ptr() {}
-#define _L(x)  __L(x)
-#define __L(x)  L##x
 
-#define MY_ASSERT(_Expression,msg) if(!(_Expression)){ _CrtDbgReportW(_CRT_WARN, _L(__FILE__), __LINE__, NULL, msg); _CrtDbgBreak();}
-      _Ty &operator *() { return *this->get(); }
-      _Ty *get() const {
-        _Ty *t = std::unique_ptr<_Ty>::get();
-        MY_ASSERT(t, L"null pointer have get\n");
-        return t;
-      }
-
-    };
-  }
   namespace bullet {
 
-    /// <summary>BulletŒ`®‚ÆSiv3DŒ`®‚Ì•ÏŠ·</summary>
-    /// <param name="v">•ÏŠ·‚·‚éVECTOR3</param>
-    /// <returns>pOut‚Ìƒ|ƒCƒ“ƒ^</returns>
+    /// <summary>
+    /// Bulletå½¢å¼ã¨Siv3Då½¢å¼ã®å¤‰æ› 
+    /// </summary>
+    /// <param name="v"> å¤‰æ›ã™ã‚‹VECTOR3 </param>
+    /// <returns> pOutã®ãƒã‚¤ãƒ³ã‚¿ </returns>
     inline btVector3 ConvertVectorDxToBt(const Float3 &v) {
       const float x = static_cast<float>(v.x);
       const float y = static_cast<float>(v.y);
@@ -69,19 +48,30 @@ namespace s3d_bullet {
       return btVector3(x, y, z);
     }
 
-    /// /// <summary>BulletŒ`®‚ÆDirectXŒ`®‚Ì•ÏŠ·</summary>
-    /// <param name="v">•ÏŠ·‚·‚ébtVector3</param>
-    inline Float3 ConvertVectorBtToDx(const btVector3 &v) {
+    /// <summary>
+    /// Bulletå½¢å¼ã¨DirectXå½¢å¼ã®å¤‰æ› 
+    /// </summary>
+    /// <param name="v"> å¤‰æ›ã™ã‚‹btVector3 </param>
+    inline Float3 ConvertFloat3(const btVector3 &v) {
       return Float3(v.x(), v.y(), -v.z());
     }
 
-    ///  BulletŒ`®‚ÆDirectXŒ`®‚Ì•ÏŠ·
-    /// <param name="v">•ÏŠ·‚·‚ébtVector3</param>
-    /// <returns>pOut‚Ìƒ|ƒCƒ“ƒ^</returns>
-    ///  BulletŒ`®‚ÆDirectXŒ`®‚Ì•ÏŠ·
-    inline btTransform ConvertMatrixDxToBt(const Matrix &m) {
+    inline ColorF ConvertColor(const btVector3 &btColor) {
+      return ColorF(btColor.x(), btColor.y(), btColor.z(), 1.f);
+    }
+
+    inline Quaternion ConvertQuaternion(const btQuaternion &q) {
+      return Quaternion(-q.x(), -q.y(), q.z(), q.w());
+    }
+
+    /// <summary>
+    /// Bulletå½¢å¼ã¨DirectXå½¢å¼ã®å¤‰æ› 
+    /// </summary>
+    /// <param name="v"> å¤‰æ›ã™ã‚‹btVector3 </param>
+    /// <returns> pOutã®ãƒã‚¤ãƒ³ã‚¿ </returns>
+    inline btTransform ConvertMatrix(const Matrix &m) {
       btTransform ret;
-      // ‹¾‘œ•ÏŠ·{“]’u
+      // é¡åƒå¤‰æ›ï¼‹è»¢ç½® 
 #ifndef _XM_NO_INTRINSICS_
       DirectX::XMFLOAT4 r[4];
       for (auto& i : step(4))
@@ -104,17 +94,19 @@ namespace s3d_bullet {
       return ret;
     }
 
-    /// <summary>BulletŒ`®‚ÆDirectXŒ`®‚Ì•ÏŠ·</summary>
-    /// <param name="v">•ÏŠ·‚·‚ébtTransform</param>
-    /// <returns>pOut‚Ìƒ|ƒCƒ“ƒ^</returns>
-    inline Matrix ConvertMatrixBtToDx(const btTransform &t) {
+    /// <summary>
+    /// Bulletå½¢å¼ã¨DirectXå½¢å¼ã®å¤‰æ› 
+    /// </summary>
+    /// <param name="v"> å¤‰æ›ã™ã‚‹btTransform </param>
+    /// <returns> pOutã®ãƒã‚¤ãƒ³ã‚¿ </returns>
+    inline Matrix ConvertMatrix(const btTransform &t) {
       Matrix ret;
       const btMatrix3x3 basis = t.getBasis();
       const btVector3 R = basis.getColumn(0);
       const btVector3 U = basis.getColumn(1);
       const btVector3 L = basis.getColumn(2);
       const btVector3 P = t.getOrigin();
-      // ‹¾‘œ•ÏŠ·{“]’u
+      // é¡åƒå¤‰æ›ï¼‹è»¢ç½® 
 #ifndef _XM_NO_INTRINSICS_
       ret.r[0] = DirectX::XMVectorSet(R.x(), R.y(), -R.z(), 0.f);
       ret.r[1] = DirectX::XMVectorSet(U.x(), U.y(), -U.z(), 0.f);
@@ -132,36 +124,34 @@ namespace s3d_bullet {
 
     struct Data {
 
-      Data() {
+      Data(std::shared_ptr<btDynamicsWorld> world) : m_dynamicsWorld(world) {
       }
 
       ~Data() {
-        //‚Ç‚¿‚ç‚©‚ªÁ‚¦‚½ê‡‚Í‚ ‚Á‚Ä‚àˆÓ–¡‚ª–³‚¢‚Ì‚Å’¼‚®‚Éíœ
+        //ã©ã¡ã‚‰ã‹ãŒæ¶ˆãˆãŸå ´åˆã¯ã‚ã£ã¦ã‚‚æ„å‘³ãŒç„¡ã„ã®ã§ç›´ãã«å‰Šé™¤
         for (auto &it : Constraintnum) {
-          dynamics_world_->removeConstraint(it.get());
+          m_dynamicsWorld->removeConstraint(it.get());
           it.reset();
         }
         RemoveRigidBody();
       }
 
       void RemoveRigidBody() {
-        if (body) dynamics_world_->removeRigidBody(body.get());
+        if (body) m_dynamicsWorld->removeRigidBody(body.get());
       }
 
       void AddRigidBody(std::uint16_t group, std::uint16_t mask) {
-        if (body) dynamics_world_->addRigidBody(body.get(), group, mask);
+        if (body) m_dynamicsWorld->addRigidBody(body.get(), group, mask);
       }
 
       void MoveRigidBody(const Matrix &world) {
-        btTransform trans = bullet::ConvertMatrixDxToBt(world);
+        const btTransform trans = bullet::ConvertMatrix(world);
         body->getMotionState()->setWorldTransform(trans);
-        //m_bulletdata[num]->body->setWorldTransform(trans);
       }
 
       void SetMatrixRigidBody(const Matrix &world) {
-        btTransform trans = bullet::ConvertMatrixDxToBt(world);
+        const btTransform trans = bullet::ConvertMatrix(world);
         motionState->setWorldTransform(trans);
-        //m_bulletdata[num]->body->setWorldTransform(trans);
       }
 
       btTransform GetWorld() {
@@ -170,7 +160,9 @@ namespace s3d_bullet {
         return trans;
       }
 
-      /// <summary>ƒWƒ‡ƒCƒ“ƒg</summary>
+      /// <summary>
+      /// ã‚¸ãƒ§ã‚¤ãƒ³ãƒˆ 
+      /// </summary>
       std::vector<std::shared_ptr<btTypedConstraint>> Constraintnum;
       std::unique_ptr<btRigidBody> body;
       std::unique_ptr<btCollisionShape> shape;
@@ -179,7 +171,7 @@ namespace s3d_bullet {
 
     private:
 
-      std::unique_ptr<btDynamicsWorld> dynamics_world_;
+      std::shared_ptr<btDynamicsWorld> m_dynamicsWorld;
 
     };
 
@@ -196,34 +188,45 @@ namespace s3d_bullet {
 
   }
 
-  /// /// •¨—‰‰ZBullet‚Ìƒ‰ƒbƒp[ƒNƒ‰ƒX
   class BulletPhysics final {
 
-    std::shared_ptr<btDefaultCollisionConfiguration> m_collisionConfiguration;
-    std::shared_ptr<btCollisionDispatcher> m_dispatcher;
-    std::shared_ptr<btDbvtBroadphase> m_overlappingPairCache;
-    std::shared_ptr<btSequentialImpulseConstraintSolver> m_solver;
-    std::vector<std::shared_ptr<btTypedConstraint>> m_constraint;
+    class Pimpl;
+
+    std::shared_ptr<Pimpl> m_pimpl;
 
   public:
 
-    std::shared_ptr<btDiscreteDynamicsWorld> m_dynamicsWorld;
+    BulletPhysics(const Vec3& gravity);
+    ~BulletPhysics();
 
-    std::shared_ptr<bullet::Data> CreateCompoundShape(null_err_unique_ptr<btCollisionShape> box, const Matrix &world,
+    std::shared_ptr<bullet::Data> CreateCompoundShape(std::unique_ptr<btCollisionShape> box, const Matrix &world,
       float mass, float restitution, float friction, float linear_damp, float angular_damp, bool kinematic, unsigned short group, unsigned short mask, const btVector3 &coord);
 
-    std::shared_ptr<bullet::Data> CreateShape(null_err_unique_ptr<btCollisionShape> shape, const Matrix &world,
+    std::shared_ptr<bullet::Data> CreateShape(std::unique_ptr<btCollisionShape> shape, const Matrix &world,
       float mass, float restitution, float friction, float linear_damp,
       float angular_damp, bool kinematic, unsigned short group, unsigned short mask);
 
-    typedef bool(*ProcessedCallBack)(btManifoldPoint& p, void* a, void* b);
-
-    BulletPhysics(const Vec3& gravity, ProcessedCallBack callback = nullptr);
-    ~BulletPhysics();
-
-    /// „‘ÌƒIƒuƒWƒFƒNƒg¶¬
-    /// ¿—Ê0, kinematic‚ğfalse‚É‚·‚é‚ÆA“®‚©‚È‚¢static„‘Ì‚É‚È‚éB
-    /// ¿—Ê0, kinematic‚ğtrue‚É‚·‚é‚ÆAè“®‚Å“®‚©‚¹‚é‚ªA•¨—‰‰Z‚Ì‰e‹¿‚ğó‚¯‚È‚¢Kinematic„‘Ì‚É‚È‚é
+    /// <summary>
+    /// å‰›ä½“ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç”Ÿæˆ
+    /// </summary>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <param name="depth"></param>
+    /// <param name="world"></param>
+    /// <param name="mass"></param>
+    /// <param name="restitution"></param>
+    /// <param name="friction"></param>
+    /// <param name="linear_damp"></param>
+    /// <param name="angular_damp"></param>
+    /// <param name="kinematic"></param>
+    /// <param name="group"></param>
+    /// <param name="mask"></param>
+    /// <param name="coord"></param>
+    /// <remarks>
+    /// è³ªé‡0, kinematicã‚’falseã«ã™ã‚‹ã¨ã€å‹•ã‹ãªã„staticå‰›ä½“ã«ãªã‚‹ã€‚
+    /// è³ªé‡0, kinematicã‚’trueã«ã™ã‚‹ã¨ã€æ‰‹å‹•ã§å‹•ã‹ã›ã‚‹ãŒã€ç‰©ç†æ¼”ç®—ã®å½±éŸ¿ã‚’å—ã‘ãªã„Kinematicå‰›ä½“ã«ãªã‚‹ 
+    /// </remarks>
+    /// <returns></returns>
     std::shared_ptr<bullet::Data> CreateBox(float width, float height, float depth, const Matrix &world,
       float mass = 0, float restitution = 0, float friction = 0.5f,
       float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
@@ -235,60 +238,56 @@ namespace s3d_bullet {
       float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
       unsigned short group = 1, unsigned short mask = 0xFFFF);
 
-    std::shared_ptr<bullet::Data> CreateCylinder(float radius, float length, const Matrix &world, // ’†S²‚ÍZ²
+    std::shared_ptr<bullet::Data> CreateCylinder(float radius, float length, const Matrix &world, // ä¸­å¿ƒè»¸ã¯Zè»¸
       float mass = 0, float restitution = 0, float friction = 0.5f,
       float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
       unsigned short group = 1, unsigned short mask = 0xFFFF);
 
-    std::shared_ptr<bullet::Data> CreateCapsule(float radius, float height, const Matrix &world, // ’†S²‚ÍZ². height‚Í‹…‚Ì’†SŠÔ‚Ì‹——£
+    std::shared_ptr<bullet::Data> CreateCapsule(float radius, float height, const Matrix &world, // ä¸­å¿ƒè»¸ã¯Zè»¸. heightã¯çƒã®ä¸­å¿ƒé–“ã®è·é›¢
       float mass = 0, float restitution = 0, float friction = 0.5f,
       float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
       unsigned short group = 1, unsigned short mask = 0xFFFF,
       const btVector3 &coord = btVector3(0.0f, 0.0f, 0.0f));
 
-    // S‘©ğŒ’Ç‰Á
+    // æ‹˜æŸæ¡ä»¶è¿½åŠ  
     void AddPointToPointConstraint(std::shared_ptr<bullet::Data> body, const Vec3& pivot);
 
     void AddPointToPointConstraint(std::shared_ptr<bullet::Data> bodyA,
       std::shared_ptr<bullet::Data> bodyB,
       const Vec3& pivotInA, const Vec3& pivotInB);
 
-    /// 6²ƒWƒ‡ƒCƒ“ƒg‚ğ’Ç‰Á
-    /// @param bodyA „‘ÌA
-    /// @param bodyB „‘ÌB
-    /// @param frameInA ƒWƒ‡ƒCƒ“ƒg‚Ìƒ[ƒ‹ƒh•ÏŠ·s—ñ(„‘ÌAƒ[ƒJƒ‹À•WŒn)
-    /// @param frameInB ƒWƒ‡ƒCƒ“ƒg‚Ìƒ[ƒ‹ƒh•ÏŠ·s—ñ(„‘ÌBƒ[ƒJƒ‹À•WŒn)
-    /// @param c_p1 ˆÚ“®§ŒÀ1
-    /// @param c_p2 ˆÚ“®§ŒÀ2
-    /// @param c_r1 ‰ñ“]§ŒÀ1
-    /// @param c_r2 ‰ñ“]§ŒÀ2
-    /// @param stiffness ƒoƒl„«(•½sˆÚ“®x, y, z, ‰ñ“]ˆÚ“®x, y, z‚Ì‡‚Ì6—v‘f)
-    /// 6²ƒWƒ‡ƒCƒ“ƒg‚ğ’Ç‰Á
-    /// @param bodyA „‘ÌA
-    /// @param bodyB „‘ÌB
-    /// @param frameInA ƒWƒ‡ƒCƒ“ƒg‚Ìƒ[ƒ‹ƒh•ÏŠ·s—ñ(„‘ÌAƒ[ƒJƒ‹À•WŒn)
-    /// @param frameInB ƒWƒ‡ƒCƒ“ƒg‚Ìƒ[ƒ‹ƒh•ÏŠ·s—ñ(„‘ÌBƒ[ƒJƒ‹À•WŒn)
-    /// @param c_p1 ˆÚ“®§ŒÀ1
-    /// @param c_p2 ˆÚ“®§ŒÀ2
-    /// @param c_r1 ‰ñ“]§ŒÀ1
-    /// @param c_r2 ‰ñ“]§ŒÀ2
-    /// @param stiffnessPos ƒoƒl„«(•½sˆÚ“®x, y, z ‚Ì3—v‘f)
-    /// @param stiffnessRot ƒoƒl„«(‰ñ“]ˆÚ“®x, y, z ‚Ì3—v‘f)
+    /// <summary>
+    /// 6è»¸ã‚¸ãƒ§ã‚¤ãƒ³ãƒˆã‚’è¿½åŠ  
+    /// </summary>
+    /// <param name="bodyA"> å‰›ä½“A </param>
+    /// <param name="bodyB"> å‰›ä½“B </param>
+    /// <param name="frameInA"> ã‚¸ãƒ§ã‚¤ãƒ³ãƒˆã®ãƒ¯ãƒ¼ãƒ«ãƒ‰å¤‰æ›è¡Œåˆ—(å‰›ä½“Aãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³») </param>
+    /// <param name="frameInB"> ã‚¸ãƒ§ã‚¤ãƒ³ãƒˆã®ãƒ¯ãƒ¼ãƒ«ãƒ‰å¤‰æ›è¡Œåˆ—(å‰›ä½“Bãƒ­ãƒ¼ã‚«ãƒ«åº§æ¨™ç³») </param>
+    /// <param name="c_p1"> ç§»å‹•åˆ¶é™1 </param>
+    /// <param name="c_p2"> ç§»å‹•åˆ¶é™2 </param>
+    /// <param name="c_r1"> å›è»¢åˆ¶é™1 </param>
+    /// <param name="c_r2"> å›è»¢åˆ¶é™2 </param>
+    /// <param name="stiffnessPos"> ãƒãƒå‰›æ€§(å¹³è¡Œç§»å‹•3è¦ç´ ) </param>
+    /// <param name="stiffnessRot"> ãƒãƒå‰›æ€§(å›è»¢ç§»å‹•3è¦ç´ ) </param>
     void Add6DofSpringConstraint(std::shared_ptr<bullet::Data> bodyA, std::shared_ptr<bullet::Data> bodyB,
       const btTransform& frameInA, const btTransform& frameInB,
       const Float3& c_p1, const Float3& c_p2,
       const Float3& c_r1, const Float3& c_r2,
       const Float3 &stiffnessPos, const Float3 &stiffnessRot);
 
-    // „‘Ì‚ğˆÚ“®
+    // å‰›ä½“ã‚’ç§»å‹• 
     void MoveRigidBody(int num, const Matrix &world);
+
     void SetMatrixRigidBody(int num, const Matrix &world);
-    // •¨—‰‰Z‚Ì¢ŠE‚ÌŠÔ‚ğ1/60•bi‚ß‚é
+
+    /// <summary>
+    /// ç‰©ç†æ¼”ç®—ã®ä¸–ç•Œã®æ™‚é–“ã‚’é€²ã‚ã‚‹ 
+    /// </summary>
     void StepSimulation();
+
     void DebugDraw();
 
   };
 }
 
 #endif
-

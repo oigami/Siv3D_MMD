@@ -1,13 +1,13 @@
-#include "../../include/VMDReader.h"
+ï»¿#include "../../include/VMDReader.h"
 #include "../ReaderHelper.h"
 namespace s3d_mmd {
 
-  /// <summary>VMDƒtƒ@ƒCƒ‹‚©‚çƒf[ƒ^‚ğæ‚èo‚·</summary>
+  /// <summary>VMDãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’å–ã‚Šå‡ºã™</summary>
   /// <param name="file_name"></param>
   VMDReader::VMDReader(const FilePath & file_name) {
-    constexpr int frame_rate = 60;     // –{ƒvƒƒOƒ‰ƒ€‚ÌƒtƒŒ[ƒ€ƒŒ[ƒg
-    constexpr int mmd_frame_rate = 30; // MMD‚ÌƒtƒŒ[ƒ€ƒŒ[ƒg
-                                       // VMDƒtƒ@ƒCƒ‹‚©‚çVMDƒf[ƒ^‚ğ’Šo
+    constexpr int frame_rate = 60;     // æœ¬ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆ
+    constexpr int mmd_frame_rate = 30; // MMDã®ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆ
+                                       // VMDãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰VMDãƒ‡ãƒ¼ã‚¿ã‚’æŠ½å‡º
     BinaryReader ifs(file_name);
     if (!ifs.isOpened())
       return;
@@ -16,7 +16,7 @@ namespace s3d_mmd {
 
     Array<vmd::Bone> vmdMotions;
     ReadSizeAndArray<uint32>(ifs, vmdMotions);
-    // KeyFrames‚ÉŠi”[
+    // KeyFramesã«æ ¼ç´
     last_frame = 0;
     for (const auto& i : vmdMotions) {
       vmd::KeyFrame keyFrame;
@@ -39,9 +39,9 @@ namespace s3d_mmd {
     }
   }
 
-  /// <summary>ƒ{[ƒ“–¼‚É‰‚¶‚½ƒL[ƒtƒŒ[ƒ€‚ğ•Ô‚·</summary>
-  /// <param name="bone_name">ƒ{[ƒ“–¼</param>
-  /// <returns>ƒL[ƒtƒŒ[ƒ€</returns>
+  /// <summary>ãƒœãƒ¼ãƒ³åã«å¿œã˜ãŸã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’è¿”ã™</summary>
+  /// <param name="bone_name">ãƒœãƒ¼ãƒ³å</param>
+  /// <returns>ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ </returns>
   std::shared_ptr<Array<vmd::KeyFrame>> VMDReader::getKeyFrames(const std::string & bone_name) {
     auto &frame = keyFrames[bone_name];
     if (frame == nullptr) {
