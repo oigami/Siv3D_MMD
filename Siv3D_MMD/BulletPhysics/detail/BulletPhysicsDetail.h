@@ -120,48 +120,11 @@ namespace s3d_bullet {
         float mass, float restitution, float friction, float linear_damp,
         float angular_damp, bool kinematic, unsigned short group, unsigned short mask);
 
-      /// <summary>
-      /// 剛体オブジェクト生成
-      /// </summary>
-      /// <param name="width"></param>
-      /// <param name="height"></param>
-      /// <param name="depth"></param>
-      /// <param name="world"></param>
-      /// <param name="mass"></param>
-      /// <param name="restitution"></param>
-      /// <param name="friction"></param>
-      /// <param name="linear_damp"></param>
-      /// <param name="angular_damp"></param>
-      /// <param name="kinematic"></param>
-      /// <param name="group"></param>
-      /// <param name="mask"></param>
-      /// <param name="coord"></param>
-      /// <remarks>
-      /// 質量0, kinematicをfalseにすると、動かないstatic剛体になる。
-      /// 質量0, kinematicをtrueにすると、手動で動かせるが、物理演算の影響を受けないKinematic剛体になる 
-      /// </remarks>
-      /// <returns></returns>
-      std::shared_ptr<bullet::detail::Data> CreateBox(float width, float height, float depth, const btTransform &world,
-        float mass = 0, float restitution = 0, float friction = 0.5f,
-        float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
-        unsigned short group = 1, unsigned short mask = 0xFFFF,
-        const btVector3 &coord = btVector3(0.0f, 0.0f, 0.0f));
-
-      std::shared_ptr<bullet::detail::Data> CreateSphere(float radius, const btTransform &world,
-        float mass = 0, float restitution = 0, float friction = 0.5f,
-        float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
-        unsigned short group = 1, unsigned short mask = 0xFFFF);
 
       std::shared_ptr<bullet::detail::Data> CreateCylinder(float radius, float length, const btTransform &world, // 中心軸はZ軸
         float mass = 0, float restitution = 0, float friction = 0.5f,
         float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
         unsigned short group = 1, unsigned short mask = 0xFFFF);
-
-      std::shared_ptr<bullet::detail::Data> CreateCapsule(float radius, float height, const btTransform &world, // 中心軸はZ軸. heightは球の中心間の距離
-        float mass = 0, float restitution = 0, float friction = 0.5f,
-        float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
-        unsigned short group = 1, unsigned short mask = 0xFFFF,
-        const btVector3 &coord = btVector3(0.0f, 0.0f, 0.0f));
 
       // 拘束条件追加 
       void AddPointToPointConstraint(std::shared_ptr<bullet::detail::Data> body, const btVector3& pivot);
@@ -183,7 +146,7 @@ namespace s3d_bullet {
       /// <param name="c_r2"> 回転制限2 </param>
       /// <param name="stiffnessPos"> バネ剛性(平行移動3要素) </param>
       /// <param name="stiffnessRot"> バネ剛性(回転移動3要素) </param>
-      void Add6DofSpringConstraint(std::shared_ptr<bullet::detail::Data> bodyA, std::shared_ptr<bullet::detail::Data> bodyB,
+      std::shared_ptr<btGeneric6DofSpringConstraint> Add6DofSpringConstraint(btRigidBody& bodyA, btRigidBody& bodyB,
         const btTransform& frameInA, const btTransform& frameInB,
         const std::array<float, 3>& c_p1, const std::array<float, 3>& c_p2,
         const std::array<float, 3>& c_r1, const std::array<float, 3>& c_r2,

@@ -61,17 +61,15 @@ namespace s3d_bullet {
       }
 
 
-      void Add6DofSpringConstraint(std::shared_ptr<bullet::detail::Data> bodyA, std::shared_ptr<bullet::detail::Data> bodyB,
+      std::shared_ptr<btGeneric6DofSpringConstraint>
+        Add6DofSpringConstraint(btRigidBody& bodyA, btRigidBody& bodyB,
         const btTransform & frameInA, const btTransform & frameInB,
         const std::array<float, 3> & c_p1, const std::array<float, 3> & c_p2,
         const std::array<float, 3> & c_r1, const std::array<float, 3> & c_r2,
         const btVector3 & stiffnessPos, const btVector3 & stiffnessRot) {
         // 第五引数の効果は謎。どちらでも同じ様に見える……。
         std::shared_ptr<btGeneric6DofSpringConstraint> constraint(
-          new btGeneric6DofSpringConstraint(*bodyA->body, *bodyB->body, frameInA, frameInB, false));
-        bodyA->Constraintnum.push_back(constraint);
-        bodyB->Constraintnum.push_back(constraint);
-        m_constraint.push_back(constraint);
+          new btGeneric6DofSpringConstraint(bodyA, bodyB, frameInA, frameInB, false));
 
         // 型はベクトルだがベクトル量ではないのでZは反転しない。
         // それを明示するためにstd::arrayを使用
@@ -92,7 +90,9 @@ namespace s3d_bullet {
         set(stiffnessRot.y(), 4);
         set(stiffnessRot.z(), 5);
         m_dynamicsWorld->addConstraint(constraint.get());
+        return constraint;
       }
+
       void AddPointToPointConstraint(std::shared_ptr<bullet::detail::Data> bodyA,
         std::shared_ptr<bullet::detail::Data> bodyB,
         const btVector3& pivotInA, const btVector3& pivotInB) {
@@ -139,6 +139,7 @@ namespace s3d_bullet {
         //unique_ptr<btRigidBody> bodyunique(btbody);
         return bulletdata;
       }
+
       void AddPointToPointConstraint(std::shared_ptr<bullet::detail::Data>  body, const btVector3& pivot) {
         std::shared_ptr<btPoint2PointConstraint> constraint(new btPoint2PointConstraint(*body->body, pivot));
         body->Constraintnum.push_back(constraint);
@@ -194,29 +195,6 @@ namespace s3d_bullet {
 
 
 
-    /// 剛体オブジェクト生成
-    /// 質量0, kinematicをfalseにすると、動かないstatic剛体になる。
-    /// 質量0, kinematicをtrueにすると、手動で動かせるが、物理演算の影響を受けないKinematic剛体になる
-    std::shared_ptr<bullet::detail::Data> BulletPhysicsDetail::CreateBox(float width, float height, float depth,
-      const btTransform & world,
-      float mass, float restitution, float friction,
-      float linear_damp, float angular_damp, bool kinematic,
-      unsigned short group, unsigned short mask,
-      const btVector3 & coord) {
-      btVector3 halfExtents(width / 2, height / 2, depth / 2);
-      //btCollisionShape* shape = new btBoxShape(halfExtents);
-      if (kinematic) mass = 0;
-      std::unique_ptr<btBoxShape> temp_box(new btBoxShape(halfExtents));
-      return CreateCompoundShape(move(temp_box), world, mass, restitution, friction, linear_damp, angular_damp, kinematic, group, mask, coord);
-    }
-    std::shared_ptr<bullet::detail::Data> BulletPhysicsDetail::CreateSphere(float radius, const btTransform & world,
-      float mass, float restitution, float friction, float linear_damp,
-      float angular_damp, bool kinematic, unsigned short group, unsigned short mask) {
-      if (kinematic) mass = 0;
-      std::unique_ptr<btSphereShape> shape(new btSphereShape(radius));
-      return CreateShape(move(shape), world, mass, restitution, friction, linear_damp, angular_damp, kinematic, group, mask);
-    }
-
     std::shared_ptr<bullet::detail::Data> BulletPhysicsDetail::CreateCylinder(float radius, float length, const btTransform & world,
       float mass, float restitution, float friction, float linear_damp,
       float angular_damp, bool kinematic, unsigned short group, unsigned short mask) {
@@ -224,14 +202,6 @@ namespace s3d_bullet {
       if (kinematic) mass = 0;
       std::unique_ptr<btCylinderShape> shape(new btCylinderShape(halfExtents));
       return CreateShape(move(shape), world, mass, restitution, friction, linear_damp, angular_damp, kinematic, group, mask);
-    }
-
-    std::shared_ptr<bullet::detail::Data> BulletPhysicsDetail::CreateCapsule(float radius, float height, const btTransform & world,
-      float mass, float restitution, float friction, float linear_damp,
-      float angular_damp, bool kinematic, unsigned short group, unsigned short mask, const btVector3 & coord) {
-      if (kinematic) mass = 0;
-      std::unique_ptr<btCapsuleShape> shape(new btCapsuleShape(radius, height));
-      return CreateCompoundShape(move(shape), world, mass, restitution, friction, linear_damp, angular_damp, kinematic, group, mask, coord);
     }
 
     void BulletPhysicsDetail::AddPointToPointConstraint(std::shared_ptr<bullet::detail::Data>  body,
@@ -244,12 +214,12 @@ namespace s3d_bullet {
       m_pimpl->AddPointToPointConstraint(bodyA, bodyB, pivotInA, pivotInB);
     }
 
-    void BulletPhysicsDetail::Add6DofSpringConstraint(std::shared_ptr<bullet::detail::Data> bodyA, std::shared_ptr<bullet::detail::Data> bodyB,
+    std::shared_ptr<btGeneric6DofSpringConstraint> BulletPhysicsDetail::Add6DofSpringConstraint(btRigidBody& bodyA, btRigidBody& bodyB,
       const btTransform & frameInA, const btTransform & frameInB,
       const std::array<float, 3> & c_p1, const std::array<float, 3> & c_p2,
       const std::array<float, 3> & c_r1, const std::array<float, 3> & c_r2,
       const btVector3 & stiffnessPos, const btVector3 & stiffnessRot) {
-      m_pimpl->Add6DofSpringConstraint(bodyA, bodyB, frameInA, frameInB,
+      return m_pimpl->Add6DofSpringConstraint(bodyA, bodyB, frameInA, frameInB,
         c_p1, c_p2, c_r1, c_r2, stiffnessPos, stiffnessRot);
     }
 
