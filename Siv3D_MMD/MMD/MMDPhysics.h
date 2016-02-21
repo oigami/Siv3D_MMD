@@ -6,7 +6,6 @@
 #include<memory>
 #include "../include/PMDStruct.h"
 #include "../include/MMDBone.h"
-#include "../BulletPhysics/BulletRigidBody.h"
 
 //#include"VmdMotionController.h"
 namespace s3d_mmd {

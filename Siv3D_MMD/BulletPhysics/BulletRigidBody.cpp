@@ -3,7 +3,7 @@
 #include "detail/Siv3DBulletConverter.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 #include "../include/BulletPhysics.h"
-#include "BulletRigidBody.h"
+#include "../include/BulletRigidBody.h"
 namespace s3d_bullet {
   namespace bullet {
     RigidBody::RigidBody(const Shape & shape, const Mat4x4& world) {

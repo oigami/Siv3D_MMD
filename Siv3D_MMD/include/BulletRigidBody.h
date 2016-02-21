@@ -3,11 +3,12 @@
 #define INCLUDE_BULLET_RIGIDBODY_H
 
 #include <memory>
-#include "detail/BulletPhysicsDetail.h"
-#include "BulletCollision/CollisionShapes/btBoxShape.h"
-
 #include "../include/BulletPhysics.h"
 #include <Siv3D.hpp>
+class btCollisionShape;
+class btRigidBody;
+struct btDefaultMotionState;
+class btGeneric6DofSpringConstraint;
 namespace s3d_bullet {
   class BulletPhysics;
   namespace bullet {

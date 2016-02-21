@@ -2,10 +2,9 @@
 #ifdef USE_BULLET_PHYSICS
 #include "MmdPhysics.h"
 #include "../BulletPhysics/detail/Siv3DBulletConverter.h"
-#include "../BulletPhysics/BulletRigidBody.h"
-#include "../BulletPhysics/BulletBox.h"
-#include "../BulletPhysics/BulletSphere.h"
-#include "../BulletPhysics/BulletCapsule.h"
+#include "../include/BulletBox.h"
+#include "../include/BulletSphere.h"
+#include "../include/BulletCapsule.h"
 #endif
 #include <DirectXMath.h>
 namespace s3d_mmd {

@@ -2,7 +2,7 @@
 
 #include "../BulletPhysics/detail/Siv3DBulletConverter.h"
 #include "../BulletPhysics/detail/BulletPhysicsDetail.h"
-#include "../BulletPhysics/BulletRigidBody.h"
+#include "../include/BulletRigidBody.h"
 namespace s3d_bullet {
   namespace bullet {
     class Data::Pimpl {

@@ -211,10 +211,10 @@
     <Font Include="Example\YomogiFont.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BulletPhysics\BulletBox.h" />
-    <ClInclude Include="BulletPhysics\BulletCapsule.h" />
-    <ClInclude Include="BulletPhysics\BulletRigidBody.h" />
-    <ClInclude Include="BulletPhysics\BulletSphere.h" />
+    <ClInclude Include="include\BulletBox.h" />
+    <ClInclude Include="include\BulletCapsule.h" />
+    <ClInclude Include="include\BulletRigidBody.h" />
+    <ClInclude Include="include\BulletSphere.h" />
     <ClInclude Include="BulletPhysics\detail\BulletDebug.h" />
     <ClInclude Include="BulletPhysics\detail\BulletPhysicsDetail.h" />
     <ClInclude Include="BulletPhysics\detail\Siv3DBulletConverter.h" />

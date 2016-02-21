@@ -1,4 +1,4 @@
-﻿#include "BulletSphere.h"
+﻿#include "../include/BulletSphere.h"
 #include "BulletCollision/CollisionShapes/btSphereShape.h"
 
 namespace s3d_bullet {
