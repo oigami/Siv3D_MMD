@@ -94,6 +94,7 @@
   <ItemGroup>
     <ClCompile Include="BulletPhysics\BulletPhysics.cpp" />
     <ClCompile Include="BulletPhysics\BulletPhysicsSinglton.cpp" />
+    <ClCompile Include="BulletPhysics\BulletRigidBody.cpp" />
     <ClCompile Include="BulletPhysics\detail\BulletDebug.cpp" />
     <ClCompile Include="BulletPhysics\detail\BulletPhysicsDetail.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -207,6 +208,7 @@
     <Font Include="Example\YomogiFont.ttf" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BulletPhysics\BulletRigidBody.h" />
     <ClInclude Include="BulletPhysics\detail\BulletDebug.h" />
     <ClInclude Include="BulletPhysics\detail\BulletPhysicsDetail.h" />
     <ClInclude Include="BulletPhysics\detail\Siv3DBulletConverter.h" />
