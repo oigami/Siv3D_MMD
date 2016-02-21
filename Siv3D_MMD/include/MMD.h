@@ -5,14 +5,12 @@
 #include "MMDModel.h"
 #include "MMDBone.h"
 #include "VMDController.h"
-#include "../BulletPhysics/BulletPhysics.h"
+#include "BulletPhysics.h"
 namespace s3d_mmd {
 
 #ifdef USE_BULLET_PHYSICS
-
-  std::shared_ptr<s3d_bullet::BulletPhysics> getBulletInstance();
+  s3d_bullet::BulletPhysics getBulletInstance();
 #endif // USE_BULLET_PHYSICS
-
 
   class MMD {
     class Pimpl;

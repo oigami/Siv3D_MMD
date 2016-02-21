@@ -1,7 +1,8 @@
 ﻿#ifndef INCLUDE_BULLET_DEBUG_H
 #define INCLUDE_BULLET_DEBUG_H
 
-#include "BulletPhysics.h"
+
+#include "BulletPhysicsDetail.h"
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btIDebugDraw.h"
 

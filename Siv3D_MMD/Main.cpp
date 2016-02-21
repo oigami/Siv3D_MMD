@@ -1,6 +1,6 @@
 ﻿# include <Siv3D.hpp>
 #include "include/MMD.h"
-#include "BulletPhysics/BulletPhysics.h"
+#include "include/BulletPhysics.h"
 using namespace s3d_mmd;
 #include <iostream>
 
@@ -25,6 +25,8 @@ void Main() {
     meshGround.draw(textureGround);
     //bone10.extraBoneMat *= Quaternion(10_deg, 0, 0, 1).toMatrix();
     model.draw(vmd);
-    bulletPtr->DebugDraw();
+    bulletPtr.StepSimulation();
+
+    bulletPtr.DebugDraw();
   }
 }

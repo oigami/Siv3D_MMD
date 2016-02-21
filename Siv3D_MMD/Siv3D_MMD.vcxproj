@@ -92,8 +92,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BulletPhysics\BulletDebug.cpp" />
     <ClCompile Include="BulletPhysics\BulletPhysics.cpp" />
+    <ClCompile Include="BulletPhysics\detail\BulletDebug.cpp" />
+    <ClCompile Include="BulletPhysics\detail\BulletPhysicsDetail.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MMD\MMD.cpp" />
     <ClCompile Include="MMD\MMDBone.cpp" />
@@ -205,8 +206,10 @@
     <Font Include="Example\YomogiFont.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BulletPhysics\BulletDebug.h" />
-    <ClInclude Include="BulletPhysics\BulletPhysics.h" />
+    <ClInclude Include="BulletPhysics\detail\BulletDebug.h" />
+    <ClInclude Include="BulletPhysics\detail\BulletPhysicsDetail.h" />
+    <ClInclude Include="BulletPhysics\detail\Siv3DBulletConverter.h" />
+    <ClInclude Include="include\BulletPhysics.h" />
     <ClInclude Include="include\MMD.h" />
     <ClInclude Include="include\MMDModel.h" />
     <ClInclude Include="include\MMDBone.h" />

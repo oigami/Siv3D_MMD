@@ -321,9 +321,8 @@ namespace s3d_mmd {
     }
   }
 
-  std::shared_ptr<s3d_bullet::BulletPhysics> getBulletInstance() {
-    static std::shared_ptr<s3d_bullet::BulletPhysics> bulletPhysics =
-      std::make_shared<s3d_bullet::BulletPhysics>(Vec3(0, -9.8, 0));
+  s3d_bullet::BulletPhysics getBulletInstance() {
+    static s3d_bullet::BulletPhysics bulletPhysics(Float3(0, -9.8, 0));
     return bulletPhysics;
   }
 }

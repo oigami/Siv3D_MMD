@@ -1,7 +1,7 @@
 ﻿#ifndef MMDPHYSICS_H
 #define MMDPHYSICS_H
 //#pragma unmanaged
-#include"../BulletPhysics/BulletPhysics.h"
+#include"../include/BulletPhysics.h"
 #include<vector>
 #include<memory>
 #include "../include/PMDStruct.h"
@@ -12,24 +12,22 @@ namespace s3d_mmd {
 
     struct Body {
 
-      Body(std::shared_ptr<s3d_bullet::bullet::Data> body, short group, short mask) {
+      Body(s3d_bullet::bullet::Data body, short group, short mask) :body_(body){
         group_ = group;
-        body_ = body;
         mask_ = mask;
       }
 
-      Body() {};
+      Body() :body_(){};
 
       short group_;
       short mask_;
-      std::shared_ptr<s3d_bullet::bullet::Data> body_;
+      s3d_bullet::bullet::Data body_;
 
     };
 
   }
 
   class MmdPhysics {
-    typedef std::shared_ptr<s3d_bullet::BulletPhysics> BulletPhysicsPtr;
     
     /// 全ボーン配列へのポインタをセット
     /// @param bones 全ボーン配列へのポインタ
@@ -46,7 +44,7 @@ namespace s3d_mmd {
 
   public:
 
-    MmdPhysics(BulletPhysicsPtr bulletPhysics);
+    MmdPhysics(s3d_bullet::BulletPhysics bulletPhysics);
     ~MmdPhysics();
 
     void Create(std::shared_ptr<mmd::Bones> bones,
@@ -92,7 +90,7 @@ namespace s3d_mmd {
     void EndWireframe();
 
   private:
-    BulletPhysicsPtr m_bulletPhysics;
+    s3d_bullet::BulletPhysics m_bulletPhysics;
     std::shared_ptr<mmd::Bones> m_bones;    // 全ボーン配列へのポインタ
     Array<mmd::Body> m_rigidBodies;         // 1メッシュに対する剛体配列
     Array<int> m_rigidbodyRelatedBoneIndex; // 各剛体に関連するボーンのインデックス
