@@ -1,4 +1,4 @@
-#include <memory>
+﻿#include <memory>
 #include "detail/BulletPhysicsDetail.h"
 #include "detail/Siv3DBulletConverter.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
@@ -6,9 +6,9 @@
 #include "BulletRigidBody.h"
 namespace s3d_bullet {
   namespace bullet {
-    RigidBody::RigidBody(const Shape & shape) {
+    RigidBody::RigidBody(const Shape & shape, const Mat4x4& world) {
       m_shape = shape;
-      m_motionState.reset(new btDefaultMotionState(ConvertMatrix(Mat4x4::Identity())));
+      m_motionState.reset(new btDefaultMotionState(ConvertMatrix(world)));
       float mass = shape.mass();
       btVector3 localInertia(0.f, 0.f, 0.f);
       shape.get()->calculateLocalInertia(mass, localInertia);
@@ -51,5 +51,13 @@ namespace s3d_bullet {
     void RigidBody::removeWorld() {
 
     }
+    Mat4x4 RigidBody::getWorld() const {
+      return ConvertMatrix(m_rigidBody->getWorldTransform());
+    }
+
+    void RigidBody::MoveRigidBody(const Mat4x4& world) {
+      m_rigidBody->getMotionState()->setWorldTransform(bullet::ConvertMatrix(world));
+    }
+
   }
 }

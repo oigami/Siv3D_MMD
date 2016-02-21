@@ -1,8 +1,13 @@
-#pragma once
+﻿#pragma once
+#ifndef INCLUDE_BULLET_RIGIDBODY_H
+#define INCLUDE_BULLET_RIGIDBODY_H
+
 #include <memory>
 #include "detail/BulletPhysicsDetail.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 
+#include "../include/BulletPhysics.h"
+#include <Siv3D.hpp>
 namespace s3d_bullet {
   class BulletPhysics;
   namespace bullet {
@@ -21,12 +26,14 @@ namespace s3d_bullet {
     class RigidBody {
       friend BulletPhysics;
       std::unique_ptr<btDefaultMotionState> m_motionState;
+      Array<std::shared_ptr<btGeneric6DofSpringConstraint>> m_constraint;
       Shape m_shape;
 
     public:
-      std::unique_ptr<btRigidBody> m_rigidBody;
+      std::shared_ptr<btRigidBody> m_rigidBody;
       RigidBody() = default;
-      RigidBody(const Shape& shape);
+
+      RigidBody(const Shape& shape, const Mat4x4& world);
 
       RigidBody& setRestitution(float restitution);
 
@@ -39,8 +46,13 @@ namespace s3d_bullet {
       void addWorld(std::uint_fast16_t group, std::uint_fast16_t mask);
 
       void removeWorld();
+
+      Mat4x4 getWorld()const;
+
+      void MoveRigidBody(const Mat4x4& world);
     };
 
 
   }
 }
+#endif // !INCLUDE_BULLET_RIGIDBODY_H
