@@ -1,5 +1,6 @@
-#pragma once
+﻿#pragma once
 #include <Siv3D.hpp>
+#include "BulletRigidBody.h"
 namespace s3d_bullet {
   namespace bullet {
     class RigidBody;
@@ -10,13 +11,12 @@ namespace s3d_bullet {
       std::shared_ptr<Pimpl> m_pimpl;
     public:
       Box() = default;
-      Box(const Float3& pos, const Float3& size);
+      Box(const Float3& size);
       Box::Box(float width, float height, float depth);
 
-      void calculateLocalInertia(float mass);
+      void setMass(float mass);
 
       float mass() const;
-      Float3 localInertia() const;
       operator Shape() const;
     };
 

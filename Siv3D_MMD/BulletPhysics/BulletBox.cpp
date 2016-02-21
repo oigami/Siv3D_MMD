@@ -1,4 +1,4 @@
-#include "../include/BulletPhysics.h"
+﻿#include "../include/BulletPhysics.h"
 #include "detail/BulletPhysicsDetail.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 #include "detail/Siv3DBulletConverter.h"
@@ -12,31 +12,25 @@ namespace s3d_bullet {
     public:
       bullet::Data data;
       std::shared_ptr<btBoxShape> box;
-      float mass;
-      Float3 localInertia;
+      float m_mass;
     };
-    Box::Box(const Float3 & pos, const Float3 & size) {
-      auto bullet = getBulletPhysics();
-
+    Box::Box(const Float3 & size) :Box(size.x, size.y, size.z) {
     }
 
     Box::Box(float width, float height, float depth) {
       m_pimpl = std::make_shared<Pimpl>();
       btVector3 halfExtents(width / 2, height / 2, depth / 2);
       m_pimpl->box = std::make_shared<btBoxShape>(halfExtents);
+      m_pimpl->m_mass = 0;
 
     }
 
-    void Box::calculateLocalInertia(float mass) {
-      m_pimpl->mass = mass;
-      m_pimpl->box->calculateLocalInertia(mass, bullet::ConvertVector(m_pimpl->localInertia));
+    void Box::setMass(float mass) {
+      m_pimpl->m_mass = mass;
     }
 
     float Box::mass() const {
-      return m_pimpl->mass;
-    }
-    Float3 Box::localInertia() const {
-      return m_pimpl->localInertia;
+      return m_pimpl->m_mass;
     }
 
     Box::operator Shape() const {
