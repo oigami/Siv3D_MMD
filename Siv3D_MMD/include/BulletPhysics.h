@@ -127,6 +127,8 @@ namespace s3d_bullet {
     void DebugDraw();
 
   };
+  BulletPhysics getBulletPhysics();
+
 }
 
 #endif

@@ -144,7 +144,7 @@ namespace s3d_mmd {
 
     Pimpl(const MMDModel& model) 
 #ifdef USE_BULLET_PHYSICS
-      : m_mmdPhysics(getBulletInstance()) 
+      : m_mmdPhysics(s3d_bullet::getBulletPhysics()) 
 #endif
     {
       m_bones = model.bones();
@@ -321,8 +321,4 @@ namespace s3d_mmd {
     }
   }
 
-  s3d_bullet::BulletPhysics getBulletInstance() {
-    static s3d_bullet::BulletPhysics bulletPhysics(Float3(0, -9.8, 0));
-    return bulletPhysics;
-  }
 }

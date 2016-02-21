@@ -8,10 +8,6 @@
 #include "BulletPhysics.h"
 namespace s3d_mmd {
 
-#ifdef USE_BULLET_PHYSICS
-  s3d_bullet::BulletPhysics getBulletInstance();
-#endif // USE_BULLET_PHYSICS
-
   class MMD {
     class Pimpl;
     std::shared_ptr<Pimpl> m_handle;

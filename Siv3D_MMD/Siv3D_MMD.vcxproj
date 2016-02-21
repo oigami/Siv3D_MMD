@@ -93,6 +93,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BulletPhysics\BulletPhysics.cpp" />
+    <ClCompile Include="BulletPhysics\BulletPhysicsSinglton.cpp" />
     <ClCompile Include="BulletPhysics\detail\BulletDebug.cpp" />
     <ClCompile Include="BulletPhysics\detail\BulletPhysicsDetail.cpp" />
     <ClCompile Include="Main.cpp" />

@@ -17,7 +17,7 @@ void Main() {
   //Bone &bone10 = model.bones()->get(10);
   //bone10.extraBoneControl = true;
   const Font font(30);
-  auto bulletPtr = getBulletInstance();
+  auto bulletPtr = getBulletPhysics();
   while (System::Update()) {
     font(Profiler::FPS(), L"fps").draw();
     vmd.UpdateTime();
