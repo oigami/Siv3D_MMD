@@ -4,6 +4,7 @@
 
 #include <Siv3D.hpp>
 
+#include "../BulletPhysics/BulletRigidBody.h"
 namespace s3d_bullet {
   class BulletPhysics;
   namespace bullet {
@@ -125,6 +126,10 @@ namespace s3d_bullet {
     void StepSimulation();
 
     void DebugDraw();
+
+    void addRigidBody(const bullet::RigidBody& body, std::uint_fast16_t group, std::uint_fast16_t mask);
+
+    void removeRigidBody();
 
   };
   BulletPhysics getBulletPhysics();

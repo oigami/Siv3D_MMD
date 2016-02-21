@@ -108,5 +108,12 @@ namespace s3d_bullet {
     m_pimpl->bulletDatail.DebugDraw();
   }
 
+  void BulletPhysics::addRigidBody(const bullet::RigidBody& body, std::uint_fast16_t group, std::uint_fast16_t mask) {
+    m_pimpl->bulletDatail.addRigidBody(body.m_rigidBody.get(), group, mask);
+  }
+
+  void BulletPhysics::removeRigidBody() {
+  }
+
 }
 

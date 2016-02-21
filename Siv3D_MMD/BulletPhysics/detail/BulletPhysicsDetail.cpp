@@ -50,14 +50,14 @@ namespace s3d_bullet {
           delete constraint;
         }
 
-        for (int i = m_dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; --i) {
-          btCollisionObject* obj = m_dynamicsWorld->getCollisionObjectArray()[i];
-          btRigidBody* body = btRigidBody::upcast(obj);
-          if (body && body->getMotionState())
-            delete body->getMotionState();
-          m_dynamicsWorld->removeCollisionObject(obj);
-          delete obj;
-        }
+        //for (int i = m_dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; --i) {
+        //  btCollisionObject* obj = m_dynamicsWorld->getCollisionObjectArray()[i];
+        //  btRigidBody* body = btRigidBody::upcast(obj);
+        //  if (body && body->getMotionState())
+        //    delete body->getMotionState();
+        //  m_dynamicsWorld->removeCollisionObject(obj);
+        //  delete obj;
+        //}
       }
 
 
@@ -153,7 +153,9 @@ namespace s3d_bullet {
         m_dynamicsWorld->debugDrawWorld();
 
       }
-
+      void addRigidBody(btRigidBody* body, std::uint_fast16_t group, std::uint_fast16_t mask) {
+        m_dynamicsWorld->addRigidBody(body, static_cast<short>(group), static_cast<short>(mask));
+      }
     };
 
     BulletPhysicsDetail::BulletPhysicsDetail(const btVector3& gravity) {
@@ -257,6 +259,10 @@ namespace s3d_bullet {
 
     void BulletPhysicsDetail::DebugDraw() {
       m_pimpl->DebugDraw();
+    }
+
+    void BulletPhysicsDetail::addRigidBody(btRigidBody * body, std::uint_fast16_t group, std::uint_fast16_t mask) {
+      m_pimpl->addRigidBody(body, group, mask);
     }
 
   }

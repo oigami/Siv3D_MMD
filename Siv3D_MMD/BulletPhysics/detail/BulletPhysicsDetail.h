@@ -201,6 +201,8 @@ namespace s3d_bullet {
 
       void DebugDraw();
 
+
+      void addRigidBody(btRigidBody* body, std::uint_fast16_t group, std::uint_fast16_t mask);
     };
   }
 }
