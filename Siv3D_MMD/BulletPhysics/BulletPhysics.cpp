@@ -1,7 +1,8 @@
-#include "../include/BulletPhysics.h"
+﻿#include "../include/BulletPhysics.h"
 
 #include "../BulletPhysics/detail/Siv3DBulletConverter.h"
 #include "../BulletPhysics/detail/BulletPhysicsDetail.h"
+#include "../BulletPhysics/BulletRigidBody.h"
 namespace s3d_bullet {
   namespace bullet {
     class Data::Pimpl {
@@ -53,37 +54,11 @@ namespace s3d_bullet {
     m_pimpl = std::make_shared<Pimpl>(bullet::ConvertVector(gravity));
   }
 
-  bullet::Data BulletPhysics::CreateBox(float width, float height, float depth, const Mat4x4 & world, float mass,
-    float restitution, float friction, float linear_damp, float angular_damp, bool kinematic,
-    unsigned short group, unsigned short mask, const Float3 & coord) {
-
-    auto data = m_pimpl->bulletDatail.CreateBox(width, height, depth, bullet::ConvertMatrix(world), mass,
-      restitution, restitution, linear_damp, angular_damp, kinematic, group, mask, bullet::ConvertVector(coord));
-    return bullet::Data(data);
-  }
-
-  bullet::Data BulletPhysics::CreateSphere(float radius, const Mat4x4 & world, float mass, float restitution,
-    float friction, float linear_damp, float angular_damp, bool kinematic, unsigned short group, unsigned short mask) {
-
-    auto data = m_pimpl->bulletDatail.CreateSphere(radius, bullet::ConvertMatrix(world), mass, restitution, friction,
-      linear_damp, angular_damp, kinematic, group, mask);
-    return bullet::Data(data);
-  }
-
   bullet::Data BulletPhysics::CreateCylinder(float radius, float length, const Mat4x4 & world, float mass, float restitution,
     float friction, float linear_damp, float angular_damp, bool kinematic, unsigned short group, unsigned short mask) {
 
     auto data = m_pimpl->bulletDatail.CreateCylinder(radius, length, bullet::ConvertMatrix(world), mass, restitution, friction,
       linear_damp, angular_damp, kinematic, group, mask);
-    return bullet::Data(data);
-  }
-
-  bullet::Data BulletPhysics::CreateCapsule(float radius, float height, const Mat4x4 & world, float mass, float restitution,
-    float friction, float linear_damp, float angular_damp, bool kinematic,
-    unsigned short group, unsigned short mask, const Float3 & coord) {
-
-    auto data = m_pimpl->bulletDatail.CreateCapsule(radius, height, bullet::ConvertMatrix(world),
-      mass, restitution, friction, linear_damp, angular_damp, kinematic, group, mask, bullet::ConvertVector(coord));
     return bullet::Data(data);
   }
 

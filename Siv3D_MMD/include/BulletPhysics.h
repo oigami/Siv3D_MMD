@@ -4,9 +4,9 @@
 
 #include <Siv3D.hpp>
 
-#include "../BulletPhysics/BulletRigidBody.h"
 namespace s3d_bullet {
   class BulletPhysics;
+
   namespace bullet {
     class RigidBody;
     namespace detail {
@@ -48,48 +48,11 @@ namespace s3d_bullet {
     BulletPhysics() = default;
     ~BulletPhysics() = default;
 
-    /// <summary>
-    /// 剛体オブジェクト生成
-    /// </summary>
-    /// <param name="width"></param>
-    /// <param name="height"></param>
-    /// <param name="depth"></param>
-    /// <param name="world"></param>
-    /// <param name="mass"></param>
-    /// <param name="restitution"></param>
-    /// <param name="friction"></param>
-    /// <param name="linear_damp"></param>
-    /// <param name="angular_damp"></param>
-    /// <param name="kinematic"></param>
-    /// <param name="group"></param>
-    /// <param name="mask"></param>
-    /// <param name="coord"></param>
-    /// <remarks>
-    /// 質量0, kinematicをfalseにすると、動かないstatic剛体になる。
-    /// 質量0, kinematicをtrueにすると、手動で動かせるが、物理演算の影響を受けないKinematic剛体になる 
-    /// </remarks>
-    /// <returns></returns>
-    bullet::Data CreateBox(float width, float height, float depth, const Mat4x4 &world,
-      float mass = 0, float restitution = 0, float friction = 0.5f,
-      float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
-      unsigned short group = 1, unsigned short mask = 0xFFFF,
-      const Float3 &coord = Float3(0.0f, 0.0f, 0.0f));
-
-    bullet::Data CreateSphere(float radius, const Mat4x4 &world,
-      float mass = 0, float restitution = 0, float friction = 0.5f,
-      float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
-      unsigned short group = 1, unsigned short mask = 0xFFFF);
 
     bullet::Data CreateCylinder(float radius, float length, const Mat4x4 &world, // 中心軸はZ軸
       float mass = 0, float restitution = 0, float friction = 0.5f,
       float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
       unsigned short group = 1, unsigned short mask = 0xFFFF);
-
-    bullet::Data CreateCapsule(float radius, float height, const Mat4x4 &world, // 中心軸はZ軸. heightは球の中心間の距離
-      float mass = 0, float restitution = 0, float friction = 0.5f,
-      float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
-      unsigned short group = 1, unsigned short mask = 0xFFFF,
-      const Float3 &coord = Float3(0.0f, 0.0f, 0.0f));
 
     // 拘束条件追加 
     void AddPointToPointConstraint(bullet::Data body, const Vec3& pivot);
