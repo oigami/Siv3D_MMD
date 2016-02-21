@@ -88,16 +88,18 @@ namespace s3d_bullet {
   }
 
 
-  void BulletPhysics::Add6DofSpringConstraint(bullet::Data bodyA, bullet::Data bodyB,
-    const Mat4x4 & frameInA, const Mat4x4 & frameInB,
-    const std::array<float, 3> & c_p1, const std::array<float, 3> & c_p2,
-    const std::array<float, 3> & c_r1, const std::array<float, 3> & c_r2,
+  void BulletPhysics::Add6DofSpringConstraint(bullet::RigidBody & bodyA, bullet::RigidBody & bodyB, 
+    const Mat4x4 & frameInA, const Mat4x4 & frameInB, 
+    const std::array<float, 3>& c_p1, const std::array<float, 3>& c_p2, 
+    const std::array<float, 3>& c_r1, const std::array<float, 3>& c_r2, 
     const Float3 & stiffnessPos, const Float3 & stiffnessRot) {
 
-    m_pimpl->bulletDatail.Add6DofSpringConstraint(bodyA.m_pimpl->m_data, bodyB.m_pimpl->m_data,
+    auto constraint = m_pimpl->bulletDatail.Add6DofSpringConstraint(*bodyA.m_rigidBody, *bodyB.m_rigidBody,
       bullet::ConvertMatrix(frameInA), bullet::ConvertMatrix(frameInB),
       c_p1, c_p2, c_r1, c_r2,
       bullet::ConvertVector(stiffnessPos), bullet::ConvertVector(stiffnessRot));
+    bodyA.m_constraint.push_back(constraint);
+    bodyA.m_constraint.push_back(constraint);
   }
 
   void BulletPhysics::StepSimulation() {

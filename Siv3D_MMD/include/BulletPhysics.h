@@ -8,6 +8,7 @@
 namespace s3d_bullet {
   class BulletPhysics;
   namespace bullet {
+    class RigidBody;
     namespace detail {
       class Data;
     }
@@ -44,6 +45,7 @@ namespace s3d_bullet {
   public:
 
     BulletPhysics(const Float3& gravity);
+    BulletPhysics() = default;
     ~BulletPhysics() = default;
 
     /// <summary>
@@ -109,7 +111,7 @@ namespace s3d_bullet {
     /// <param name="c_r2"> 回転制限2(x,y,z) </param>
     /// <param name="stiffnessPos"> バネ剛性(平行移動) </param>
     /// <param name="stiffnessRot"> バネ剛性(回転移動) </param>
-    void Add6DofSpringConstraint(bullet::Data bodyA, bullet::Data bodyB,
+    void Add6DofSpringConstraint(bullet::RigidBody& bodyA, bullet::RigidBody& bodyB,
       const Mat4x4& frameInA, const Mat4x4& frameInB,
       const std::array<float, 3>& c_p1, const std::array<float, 3>& c_p2,
       const std::array<float, 3>& c_r1, const std::array<float, 3>& c_r2,
