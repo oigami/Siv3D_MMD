@@ -93,6 +93,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BulletPhysics\BulletBox.cpp" />
+    <ClCompile Include="BulletPhysics\BulletCapsule.cpp" />
     <ClCompile Include="BulletPhysics\BulletPhysics.cpp" />
     <ClCompile Include="BulletPhysics\BulletPhysicsSinglton.cpp" />
     <ClCompile Include="BulletPhysics\BulletRigidBody.cpp" />
@@ -211,6 +212,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BulletPhysics\BulletBox.h" />
+    <ClInclude Include="BulletPhysics\BulletCapsule.h" />
     <ClInclude Include="BulletPhysics\BulletRigidBody.h" />
     <ClInclude Include="BulletPhysics\BulletSphere.h" />
     <ClInclude Include="BulletPhysics\detail\BulletDebug.h" />
