@@ -7,15 +7,12 @@
 //DirectXMathとの衝突を回避
 #define BT_NO_SIMD_OPERATOR_OVERLOADS
 
-#include "BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h"
-#include "BulletCollision/BroadphaseCollision/btDbvtBroadphase.h"
-#include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h"
-#include "BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h"
-#include "BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h"
+#include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
+#include <BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h>
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>
-#include "LinearMath/btDefaultMotionState.h"
-
-#include "BulletDebug.h"
+#include <LinearMath/btDefaultMotionState.h>
+#include <LinearMath/btTransform.h>
+#include <LinearMath/btVector3.h>
 
 #ifdef _DEBUG
 
@@ -52,27 +49,15 @@ namespace s3d_bullet {
           RemoveRigidBody();
         }
 
-        void RemoveRigidBody() {
-          if (body) m_dynamicsWorld->removeRigidBody(body.get());
-        }
+        void RemoveRigidBody();
 
-        void AddRigidBody(std::uint16_t group, std::uint16_t mask) {
-          if (body) m_dynamicsWorld->addRigidBody(body.get(), group, mask);
-        }
+        void AddRigidBody(std::uint16_t group, std::uint16_t mask);
 
-        void MoveRigidBody(const btTransform &trans) {
-          body->getMotionState()->setWorldTransform(trans);
-        }
+        void MoveRigidBody(const btTransform &trans);
 
-        void SetMatrixRigidBody(const btTransform &trans) {
-          motionState->setWorldTransform(trans);
-        }
+        void SetMatrixRigidBody(const btTransform &trans);
 
-        btTransform GetWorld() {
-          btTransform trans;
-          body->getMotionState()->getWorldTransform(trans);
-          return trans;
-        }
+        btTransform GetWorld();
 
         /// <summary>
         /// ジョイント 

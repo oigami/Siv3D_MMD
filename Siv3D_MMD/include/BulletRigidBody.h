@@ -3,7 +3,6 @@
 #define INCLUDE_BULLET_RIGIDBODY_H
 
 #include <memory>
-#include "../include/BulletPhysics.h"
 #include <Siv3D.hpp>
 class btCollisionShape;
 class btRigidBody;

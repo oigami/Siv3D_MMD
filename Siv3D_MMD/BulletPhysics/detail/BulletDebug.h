@@ -1,10 +1,7 @@
 ﻿#ifndef INCLUDE_BULLET_DEBUG_H
 #define INCLUDE_BULLET_DEBUG_H
 
-
-#include "BulletPhysicsDetail.h"
-#include "LinearMath/btVector3.h"
-#include "LinearMath/btIDebugDraw.h"
+#include <LinearMath/btIDebugDraw.h>
 
 namespace s3d_bullet {
 

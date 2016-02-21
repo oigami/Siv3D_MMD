@@ -1,4 +1,5 @@
-﻿#include "BulletDebug.h"
+﻿#include "BulletPhysicsDetail.h"
+#include "BulletDebug.h"
 #include "Siv3DBulletConverter.h"
 namespace s3d_bullet {
 

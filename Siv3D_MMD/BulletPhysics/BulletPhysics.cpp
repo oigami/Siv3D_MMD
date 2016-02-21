@@ -1,8 +1,8 @@
 ﻿#include "../include/BulletPhysics.h"
-
-#include "../BulletPhysics/detail/Siv3DBulletConverter.h"
-#include "../BulletPhysics/detail/BulletPhysicsDetail.h"
 #include "../include/BulletRigidBody.h"
+#include "detail/Siv3DBulletConverter.h"
+#include "detail/BulletPhysicsDetail.h"
+
 namespace s3d_bullet {
 
 

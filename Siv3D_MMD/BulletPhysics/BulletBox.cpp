@@ -1,8 +1,5 @@
-﻿#include "../include/BulletPhysics.h"
-#include "detail/BulletPhysicsDetail.h"
-#include "BulletCollision/CollisionShapes/btBoxShape.h"
-#include "detail/Siv3DBulletConverter.h"
-#include "../include/BulletBox.h"
+﻿#include "../include/BulletBox.h"
+#include <BulletCollision/CollisionShapes/btBoxShape.h>
 
 namespace s3d_bullet {
 

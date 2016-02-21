@@ -4,22 +4,45 @@ bullet関係のメモリ確保時にアライメントをしっかり把握し�
 //Newはアライメントに対応してないのでクラッシュする
 //それぞれのクラスでオーバーロードされたoperator newを使う
 */
-
 #include "BulletPhysicsDetail.h"
+#include "BulletDebug.h"
 #include "Siv3DBulletConverter.h"
-#include "LinearMath/btDefaultMotionState.h"
-#include "BulletCollision/CollisionShapes/btCollisionShape.h"
-#include "BulletCollision/CollisionShapes/btCompoundShape.h"
-#include "BulletCollision/CollisionShapes/btBoxShape.h"
-#include "BulletCollision/CollisionShapes/btSphereShape.h"
-#include "BulletCollision/CollisionShapes/btCylinderShape.h"
-#include "BulletCollision/CollisionShapes/btCapsuleShape.h"
-#include "BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h"
-#include "BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h"
+#include <LinearMath/btDefaultMotionState.h>
+#include <BulletCollision/CollisionShapes/btCompoundShape.h>
+#include <BulletCollision/CollisionShapes/btCylinderShape.h>
+#include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
+#include <BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
+#include <BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h>
+#include <BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
 
-//#include"bullet/src/btBulletDynamicsCommon.h"
 namespace s3d_bullet {
+  namespace bullet {
+    namespace detail {
 
+      void Data::RemoveRigidBody() {
+        if (body) m_dynamicsWorld->removeRigidBody(body.get());
+      }
+
+      void Data::AddRigidBody(std::uint16_t group, std::uint16_t mask) {
+        if (body) m_dynamicsWorld->addRigidBody(body.get(), group, mask);
+      }
+
+      void Data::MoveRigidBody(const btTransform & trans) {
+        body->getMotionState()->setWorldTransform(trans);
+      }
+
+      void Data::SetMatrixRigidBody(const btTransform & trans) {
+        motionState->setWorldTransform(trans);
+      }
+
+      btTransform Data::GetWorld() {
+        btTransform trans;
+        body->getMotionState()->getWorldTransform(trans);
+        return trans;
+      }
+
+    }
+  }
   using namespace bullet;
   namespace detail {
     class BulletPhysicsDetail::Pimpl {
@@ -63,10 +86,10 @@ namespace s3d_bullet {
 
       std::shared_ptr<btGeneric6DofSpringConstraint>
         Add6DofSpringConstraint(btRigidBody& bodyA, btRigidBody& bodyB,
-        const btTransform & frameInA, const btTransform & frameInB,
-        const std::array<float, 3> & c_p1, const std::array<float, 3> & c_p2,
-        const std::array<float, 3> & c_r1, const std::array<float, 3> & c_r2,
-        const btVector3 & stiffnessPos, const btVector3 & stiffnessRot) {
+          const btTransform & frameInA, const btTransform & frameInB,
+          const std::array<float, 3> & c_p1, const std::array<float, 3> & c_p2,
+          const std::array<float, 3> & c_r1, const std::array<float, 3> & c_r2,
+          const btVector3 & stiffnessPos, const btVector3 & stiffnessRot) {
         // 第五引数の効果は謎。どちらでも同じ様に見える……。
         std::shared_ptr<btGeneric6DofSpringConstraint> constraint(
           new btGeneric6DofSpringConstraint(bodyA, bodyB, frameInA, frameInB, false));
@@ -237,3 +260,4 @@ namespace s3d_bullet {
 
   }
 }
+

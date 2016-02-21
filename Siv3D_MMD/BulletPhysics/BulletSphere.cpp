@@ -1,5 +1,5 @@
 ﻿#include "../include/BulletSphere.h"
-#include "BulletCollision/CollisionShapes/btSphereShape.h"
+#include <BulletCollision/CollisionShapes/btSphereShape.h>
 
 namespace s3d_bullet {
   namespace bullet {
