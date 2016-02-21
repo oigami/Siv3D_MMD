@@ -2,6 +2,10 @@
 #ifdef USE_BULLET_PHYSICS
 #include "MmdPhysics.h"
 #include "../BulletPhysics/detail/Siv3DBulletConverter.h"
+#include "../BulletPhysics/BulletRigidBody.h"
+#include "../BulletPhysics/BulletBox.h"
+#include "../BulletPhysics/BulletSphere.h"
+#include "../BulletPhysics/BulletCapsule.h"
 #endif
 #include <DirectXMath.h>
 namespace s3d_mmd {
@@ -32,10 +36,10 @@ namespace s3d_mmd {
   }
 
   void MmdPhysics::Destroy() {
-    for (auto &it : m_rigidBodies) {
+    /*for (auto &it : m_rigidBodies) {
       it.body_.RemoveRigidBody();
       it.body_.release();
-    }
+    }*/
     m_bones = nullptr;
     m_rigidBodies.clear();
     m_rigidbodyRelatedBoneIndex.clear();
@@ -77,29 +81,39 @@ namespace s3d_mmd {
       world_inv = XMMatrixInverse(nullptr, world);
       m_rigidbodyInit[i] = world;
       m_rigidbodyOffset[i] = world_inv;
+      s3d_bullet::bullet::RigidBody rigidBody;
+      const bool isKinematic = pmdRigidBodies[i].rigidbody_type == 0;
       if (pmdRigidBodies[i].shape_type == 0) {		// 球
         const float radius = pmdRigidBodies[i].shape_w;
-        auto body = m_bulletPhysics.CreateSphere(
-          radius, m_rigidbodyInit[i], pmdRigidBodies[i].rigidbody_weight, pmdRigidBodies[i].rigidbody_recoil, pmdRigidBodies[i].rigidbody_friction, pmdRigidBodies[i].rigidbody_pos_dim,
-          pmdRigidBodies[i].rigidbody_rot_dim, pmdRigidBodies[i].rigidbody_type == 0, 1 << pmdRigidBodies[i].rigidbody_group_index, pmdRigidBodies[i].rigidbody_group_target);
-        m_rigidBodies[i] = mmd::Body(body, 1 << pmdRigidBodies[i].rigidbody_group_index, pmdRigidBodies[i].rigidbody_group_target);
-        const std::uint32_t slices = 10, stacks = 5;
+
+        s3d_bullet::bullet::Sphere sphere(radius);
+        if (!isKinematic) sphere.setMass(pmdRigidBodies[i].rigidbody_weight);
+        rigidBody = std::move(s3d_bullet::bullet::RigidBody{ sphere, m_rigidbodyInit[i] });
 
       } else if (pmdRigidBodies[i].shape_type == 1) {	// 箱
-        const float width = 2 * pmdRigidBodies[i].shape_w, height = 2 * pmdRigidBodies[i].shape_h, depth = 2 * pmdRigidBodies[i].shape_d;
-        auto body = m_bulletPhysics.CreateBox(
-          width, height, depth, m_rigidbodyInit[i], pmdRigidBodies[i].rigidbody_weight, pmdRigidBodies[i].rigidbody_recoil, pmdRigidBodies[i].rigidbody_friction, pmdRigidBodies[i].rigidbody_pos_dim,
-          pmdRigidBodies[i].rigidbody_rot_dim, pmdRigidBodies[i].rigidbody_type == 0, 1 << pmdRigidBodies[i].rigidbody_group_index, pmdRigidBodies[i].rigidbody_group_target);
-        m_rigidBodies[i] = mmd::Body(body, 1 << pmdRigidBodies[i].rigidbody_group_index, pmdRigidBodies[i].rigidbody_group_target);
+        const float width = 2 * pmdRigidBodies[i].shape_w;
+        const float height = 2 * pmdRigidBodies[i].shape_h;
+        const float depth = 2 * pmdRigidBodies[i].shape_d;
+
+        s3d_bullet::bullet::Box box(width, height, depth);
+        if (!isKinematic) box.setMass(pmdRigidBodies[i].rigidbody_weight);
+        rigidBody = { box, m_rigidbodyInit[i] };
 
       } else if (pmdRigidBodies[i].shape_type == 2) {	// カプセル
         const float radius = pmdRigidBodies[i].shape_w, height = pmdRigidBodies[i].shape_h;
-        auto body = m_bulletPhysics.CreateCapsule(
-          radius, height, m_rigidbodyInit[i], pmdRigidBodies[i].rigidbody_weight, pmdRigidBodies[i].rigidbody_recoil, pmdRigidBodies[i].rigidbody_friction, pmdRigidBodies[i].rigidbody_pos_dim,
-          pmdRigidBodies[i].rigidbody_rot_dim, (pmdRigidBodies[i].rigidbody_type == 0), 0x1 << (pmdRigidBodies[i].rigidbody_group_index), pmdRigidBodies[i].rigidbody_group_target);
-        m_rigidBodies[i] = mmd::Body(body, 1 << pmdRigidBodies[i].rigidbody_group_index, pmdRigidBodies[i].rigidbody_group_target);
-        //const UINT slices = 10, stacks = 5;
+
+        s3d_bullet::bullet::Capsule capsule(radius, height);
+        if (!isKinematic) capsule.setMass(pmdRigidBodies[i].rigidbody_weight);
+        rigidBody = { capsule, m_rigidbodyInit[i] };
       }
+
+      rigidBody.setDamping(pmdRigidBodies[i].rigidbody_pos_dim, pmdRigidBodies[i].rigidbody_rot_dim)
+        .setFriction(pmdRigidBodies[i].rigidbody_friction)
+        .setKinematic(isKinematic)
+        .setRestitution(pmdRigidBodies[i].rigidbody_recoil)
+        .addWorld(1 << pmdRigidBodies[i].rigidbody_group_index, pmdRigidBodies[i].rigidbody_group_target);
+
+      m_rigidBodies[i] = std::move(rigidBody);
     }
   }
 
@@ -120,25 +134,25 @@ namespace s3d_mmd {
 
     for (auto &joint : pmdJoints) {
       using namespace DirectX;
-      std::array<float,3> c_p1(ConvertArray(joint.constrain_pos_1));
-      std::array<float,3> c_p2(ConvertArray(joint.constrain_pos_2));
-      std::array<float,3> c_r1(ConvertArray(joint.constrain_rot_1));
-      std::array<float,3> c_r2(ConvertArray(joint.constrain_rot_2));
+      std::array<float, 3> c_p1(ConvertArray(joint.constrain_pos_1));
+      std::array<float, 3> c_p2(ConvertArray(joint.constrain_pos_2));
+      std::array<float, 3> c_r1(ConvertArray(joint.constrain_rot_1));
+      std::array<float, 3> c_r2(ConvertArray(joint.constrain_rot_2));
       Float3 s_p(ConvertFloat(joint.spring_pos));
       Float3 s_r(ConvertFloat(joint.spring_rot));
       Float3 p(ConvertFloat(joint.joint_pos));
       Float3 r(ConvertFloat(joint.joint_rot));
       const Matrix rotation = XMMatrixRotationRollPitchYaw(r.x, r.y, r.z);
       const Matrix world = XMMatrixTranslation(p.x, p.y, p.z) * rotation; // ジョイントの行列（モデルローカル座標系）
-      const auto &rigidbody_a = m_rigidBodies[joint.joint_rigidbody_a].body_;
-      const auto &rigidbody_b = m_rigidBodies[joint.joint_rigidbody_b].body_;
+      auto &rigidbody_a = m_rigidBodies[joint.joint_rigidbody_a];
+      auto &rigidbody_b = m_rigidBodies[joint.joint_rigidbody_b];
 
       // ジョイントの行列（剛体ローカル座標系）
-      const Matrix aMat = rigidbody_a.GetWorld();
+      const Matrix aMat = rigidbody_a.getWorld();
       const Matrix aInv = XMMatrixInverse(nullptr, aMat);
       const Matrix frameInA = world * aInv;
 
-      const Matrix bMat = rigidbody_b.GetWorld();
+      const Matrix bMat = rigidbody_b.getWorld();
       const Matrix bInv = XMMatrixInverse(nullptr, bMat);
       const Matrix frameInB = world * bInv;
 
@@ -177,7 +191,7 @@ namespace s3d_mmd {
       }
       Matrix m, mm;
       mmd::Bone& bone = (*m_bones)[m_rigidbodyRelatedBoneIndex[i]];
-      auto &rigidBodie = m_rigidBodies[i].body_;
+      auto &rigidBodie = m_rigidBodies[i];
       using namespace DirectX;
       switch (m_rigidbodyType[i]) {
       case 0: //bone追従
@@ -218,7 +232,7 @@ namespace s3d_mmd {
       }
       case 1: //物理演算
       {
-        m = rigidBodie.GetWorld();
+        m = rigidBodie.getWorld();
         ///*bodyも動かすときに使うがうまくいかない
         const XMMATRIX xmm = XMMatrixInverse(nullptr, mat);
         m = XMMatrixMultiply(m, xmm);
@@ -235,7 +249,7 @@ namespace s3d_mmd {
   inline void MmdPhysics::DrawRigidMesh(const Matrix & world) {
     StartWireframe(world);
     for (unsigned int i = 0; i < m_rigidBodies.size(); ++i) {
-      Matrix w = m_rigidBodies[i].body_.GetWorld();
+      Matrix w = m_rigidBodies[i].getWorld();
       using namespace DirectX;
       const XMMATRIX xmm = XMMatrixMultiply(w, world);
 

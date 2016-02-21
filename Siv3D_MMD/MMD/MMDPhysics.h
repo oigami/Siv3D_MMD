@@ -6,6 +6,8 @@
 #include<memory>
 #include "../include/PMDStruct.h"
 #include "../include/MMDBone.h"
+#include "../BulletPhysics/BulletRigidBody.h"
+
 //#include"VmdMotionController.h"
 namespace s3d_mmd {
   namespace mmd {
@@ -92,7 +94,7 @@ namespace s3d_mmd {
   private:
     s3d_bullet::BulletPhysics m_bulletPhysics;
     std::shared_ptr<mmd::Bones> m_bones;    // 全ボーン配列へのポインタ
-    Array<mmd::Body> m_rigidBodies;         // 1メッシュに対する剛体配列
+    Array<s3d_bullet::bullet::RigidBody> m_rigidBodies;         // 1メッシュに対する剛体配列
     Array<int> m_rigidbodyRelatedBoneIndex; // 各剛体に関連するボーンのインデックス
     Array<int> m_rigidbodyType;             // 各剛体のタイプ
     Array<Matrix> m_rigidbodyInit;          // 各剛体の初期姿勢行列
