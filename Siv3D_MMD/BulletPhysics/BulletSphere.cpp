@@ -10,6 +10,7 @@ namespace s3d_bullet {
 
       Pimpl(float radius) {
         shape = std::make_shared<btSphereShape>(radius);
+        m_mass = 0.f;
       }
     };
 

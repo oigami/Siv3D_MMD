@@ -10,6 +10,7 @@ namespace s3d_bullet {
 
       Pimpl(float radius, float height) {
         shape = std::make_shared<btCapsuleShape>(radius, height);
+        m_mass = 0.f;
       }
     };
 
