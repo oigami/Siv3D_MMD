@@ -1,40 +1,40 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Siv3D.hpp>
 #include "BulletPhysicsDetail.h"
-#include "LinearMath/btVector3.h"
-#include "LinearMath/btTransform.h"
+#include <LinearMath/btVector3.h>
+#include <LinearMath/btTransform.h>
 namespace s3d_bullet {
   namespace bullet {
     namespace {
 
       /// <summary>
-      /// BulletŒ`®‚ÆSiv3DŒ`®‚Ì•ÏŠ· 
+      /// Bulletå½¢å¼ã¨Siv3Då½¢å¼ã®å¤‰æ› 
       /// </summary>
-      /// <param name="v"> •ÏŠ·‚·‚éVECTOR3 </param>
+      /// <param name="v"> å¤‰æ›ã™ã‚‹VECTOR3 </param>
       /// <remarks>
-      /// z²‚ğ”½“]‚µ‚È‚¢
+      /// zè»¸ã‚’åè»¢ã—ãªã„
       /// </remarks>
       inline btVector3 ConvertFloat(const Float3 &v) {
         return btVector3(v.x, v.y, v.z);
       }
 
       /// <summary>
-      /// BulletŒ`®‚ÆSiv3DŒ`®‚Ì•ÏŠ· 
+      /// Bulletå½¢å¼ã¨Siv3Då½¢å¼ã®å¤‰æ› 
       /// </summary>
-      /// <param name="v"> •ÏŠ·‚·‚éarray </param>
+      /// <param name="v"> å¤‰æ›ã™ã‚‹array </param>
       /// <remarks>
-      /// z²‚ğ”½“]‚µ‚È‚¢
+      /// zè»¸ã‚’åè»¢ã—ãªã„
       /// </remarks>
       inline btVector3 ConvertFloat(const std::array<float, 3> &v) {
         return btVector3(v[0], v[1], v[2]);
       };
 
       ///       /// <summary>
-      /// BulletŒ`®‚ÆSiv3DŒ`®‚Ì•ÏŠ· 
+      /// Bulletå½¢å¼ã¨Siv3Då½¢å¼ã®å¤‰æ› 
       /// </summary>
-      /// <param name="v"> •ÏŠ·‚·‚éVECTOR3 </param>
-      /// <returns> pOut‚Ìƒ|ƒCƒ“ƒ^ </returns>
+      /// <param name="v"> å¤‰æ›ã™ã‚‹VECTOR3 </param>
+      /// <returns> pOutã®ãƒã‚¤ãƒ³ã‚¿ </returns>
       inline btVector3 ConvertVector(const Float3 &v) {
         const float x = static_cast<float>(v.x);
         const float y = static_cast<float>(v.y);
@@ -43,9 +43,9 @@ namespace s3d_bullet {
       }
 
       /// <summary>
-      /// BulletŒ`®‚ÆDirectXŒ`®‚Ì•ÏŠ· 
+      /// Bulletå½¢å¼ã¨DirectXå½¢å¼ã®å¤‰æ› 
       /// </summary>
-      /// <param name="v"> •ÏŠ·‚·‚ébtVector3 </param>
+      /// <param name="v"> å¤‰æ›ã™ã‚‹btVector3 </param>
       inline Float3 ConvertVector(const btVector3 &v) {
         return Float3(v.x(), v.y(), -v.z());
       }
@@ -59,13 +59,13 @@ namespace s3d_bullet {
       }
 
       /// <summary>
-      /// BulletŒ`®‚ÆDirectXŒ`®‚Ì•ÏŠ· 
+      /// Bulletå½¢å¼ã¨DirectXå½¢å¼ã®å¤‰æ› 
       /// </summary>
-      /// <param name="v"> •ÏŠ·‚·‚ébtVector3 </param>
-      /// <returns> pOut‚Ìƒ|ƒCƒ“ƒ^ </returns>
+      /// <param name="v"> å¤‰æ›ã™ã‚‹btVector3 </param>
+      /// <returns> pOutã®ãƒã‚¤ãƒ³ã‚¿ </returns>
       inline btTransform ConvertMatrix(const Matrix &m) {
         btTransform ret;
-        // ‹¾‘œ•ÏŠ·{“]’u 
+        // é¡åƒå¤‰æ›ï¼‹è»¢ç½® 
 #ifndef _XM_NO_INTRINSICS_
         DirectX::XMFLOAT4 r[4];
         for (auto& i : step(4))
@@ -89,10 +89,10 @@ namespace s3d_bullet {
       }
 
       /// <summary>
-      /// BulletŒ`®‚ÆDirectXŒ`®‚Ì•ÏŠ· 
+      /// Bulletå½¢å¼ã¨DirectXå½¢å¼ã®å¤‰æ› 
       /// </summary>
-      /// <param name="v"> •ÏŠ·‚·‚ébtTransform </param>
-      /// <returns> pOut‚Ìƒ|ƒCƒ“ƒ^ </returns>
+      /// <param name="v"> å¤‰æ›ã™ã‚‹btTransform </param>
+      /// <returns> pOutã®ãƒã‚¤ãƒ³ã‚¿ </returns>
       inline Matrix ConvertMatrix(const btTransform &t) {
         Matrix ret;
         const btMatrix3x3 basis = t.getBasis();
@@ -100,7 +100,7 @@ namespace s3d_bullet {
         const btVector3 U = basis.getColumn(1);
         const btVector3 L = basis.getColumn(2);
         const btVector3 P = t.getOrigin();
-        // ‹¾‘œ•ÏŠ·{“]’u 
+        // é¡åƒå¤‰æ›ï¼‹è»¢ç½® 
 #ifndef _XM_NO_INTRINSICS_
         ret.r[0] = DirectX::XMVectorSet(R.x(), R.y(), -R.z(), 0.f);
         ret.r[1] = DirectX::XMVectorSet(U.x(), U.y(), -U.z(), 0.f);

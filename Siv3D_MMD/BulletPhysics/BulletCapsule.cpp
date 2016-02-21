@@ -1,4 +1,4 @@
-#include "BulletCapsule.h"
+﻿#include "BulletCapsule.h"
 #include "BulletCollision/CollisionShapes/btCapsuleShape.h"
 
 namespace s3d_bullet {
