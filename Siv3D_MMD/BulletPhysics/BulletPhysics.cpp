@@ -4,43 +4,7 @@
 #include "../BulletPhysics/detail/BulletPhysicsDetail.h"
 #include "../include/BulletRigidBody.h"
 namespace s3d_bullet {
-  namespace bullet {
-    class Data::Pimpl {
-    public:
-      std::shared_ptr<bullet::detail::Data> m_data;
 
-    };
-
-    Data::Data(std::shared_ptr<detail::Data> data) {
-      m_pimpl = std::make_shared<Pimpl>();
-      m_pimpl->m_data = data;
-    }
-
-    Data::~Data() {
-    }
-
-    void Data::RemoveRigidBody() {
-      m_pimpl->m_data->RemoveRigidBody();
-    }
-
-    void Data::AddRigidBody(std::uint16_t group, std::uint16_t mask) {
-      m_pimpl->m_data->AddRigidBody(group, mask);
-    }
-
-    void Data::MoveRigidBody(const Mat4x4 & trans) {
-      m_pimpl->m_data->MoveRigidBody(ConvertMatrix(trans));
-    }
-
-    void Data::SetMatrixRigidBody(const Mat4x4 & trans) {
-      m_pimpl->m_data->SetMatrixRigidBody(ConvertMatrix(trans));
-    }
-
-    Mat4x4 Data::GetWorld() const {
-      btTransform trans;
-      m_pimpl->m_data->body->getMotionState()->getWorldTransform(trans);
-      return ConvertMatrix(trans);
-    }
-  }
 
   class BulletPhysics::Pimpl {
   public:
@@ -54,13 +18,13 @@ namespace s3d_bullet {
     m_pimpl = std::make_shared<Pimpl>(bullet::ConvertVector(gravity));
   }
 
-  bullet::Data BulletPhysics::CreateCylinder(float radius, float length, const Mat4x4 & world, float mass, float restitution,
+  /*bullet::Data BulletPhysics::CreateCylinder(float radius, float length, const Mat4x4 & world, float mass, float restitution,
     float friction, float linear_damp, float angular_damp, bool kinematic, unsigned short group, unsigned short mask) {
 
     auto data = m_pimpl->bulletDatail.CreateCylinder(radius, length, bullet::ConvertMatrix(world), mass, restitution, friction,
       linear_damp, angular_damp, kinematic, group, mask);
     return bullet::Data(data);
-  }
+  }*/
 
 
   void BulletPhysics::Add6DofSpringConstraint(bullet::RigidBody & bodyA, bullet::RigidBody & bodyB, 

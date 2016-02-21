@@ -1,32 +1,12 @@
 ﻿#ifndef MMDPHYSICS_H
 #define MMDPHYSICS_H
-//#pragma unmanaged
 #include"../include/BulletPhysics.h"
 #include<vector>
 #include<memory>
 #include "../include/PMDStruct.h"
 #include "../include/MMDBone.h"
 
-//#include"VmdMotionController.h"
 namespace s3d_mmd {
-  namespace mmd {
-
-    struct Body {
-
-      Body(s3d_bullet::bullet::Data body, short group, short mask) :body_(body){
-        group_ = group;
-        mask_ = mask;
-      }
-
-      Body() :body_(){};
-
-      short group_;
-      short mask_;
-      s3d_bullet::bullet::Data body_;
-
-    };
-
-  }
 
   class MmdPhysics {
     
@@ -54,41 +34,13 @@ namespace s3d_mmd {
 
     void Destroy();
 
-   
-   
     /// ボーン行列を更新
     /// @param 物理演算使用可能
     void BoneUpdate(const Matrix &mat);
 
-    /// 剛体メッシュを描画する
-    void DrawRigidMesh(const Matrix &world);
-
-    /// ジョイントメッシュを描画する
-    void DrawJointMesh(const Matrix &world);
-
-    /*void SetCollisionDetection(bool flag,const MATRIX &mat){
-      if(flag){
-      btTransform btrans;
-      MATRIX m;int i=0;
-      for(auto it=rigidBodies.begin(); it!=rigidBodies.end(); it++,i++){
-      XMStoreFloat4x4(&m,XMMatrixMultiply(XMLoadFloat4x4(&rigidbody_init[i]),XMLoadFloat4x4(&mat)));
-      bulletPhysics->ConvertMatrixDxToBt(&btrans,m);
-      bulletPhysics->GetbtRigidBody(it->body)->setWorldTransform(btrans);
-      bulletPhysics->AddRigidBody(it->body,it->group,it->mask);
-      }
-      }
-      else{
-      for(auto it=rigidBodies.begin(); it!=rigidBodies.end(); it++){
-      bulletPhysics->RemoveRigidBody(it->body);
-      }
-      }
-      }*/
-      // 補助関数
   private:
 
     DirectX::XMMATRIX CreateRigidMatrix(const float* pos, const float* rot, int i);
-    void StartWireframe(const Matrix &world);
-    void EndWireframe();
 
   private:
     s3d_bullet::BulletPhysics m_bulletPhysics;

@@ -12,27 +12,6 @@ namespace s3d_bullet {
     namespace detail {
       class Data;
     }
-    struct Data {
-
-      class Pimpl;
-      std::shared_ptr<Pimpl> m_pimpl;
-
-      Data(std::shared_ptr<detail::Data> data);
-      Data() = default;
-      ~Data();
-
-      void RemoveRigidBody();
-
-      void AddRigidBody(std::uint16_t group, std::uint16_t mask);
-
-      void MoveRigidBody(const Mat4x4 &trans);
-
-      void SetMatrixRigidBody(const Mat4x4 &trans);
-
-      Mat4x4 GetWorld() const;
-
-      void release() {}
-    };
 
   }
 
@@ -49,17 +28,10 @@ namespace s3d_bullet {
     ~BulletPhysics() = default;
 
 
-    bullet::Data CreateCylinder(float radius, float length, const Mat4x4 &world, // 中心軸はZ軸
-      float mass = 0, float restitution = 0, float friction = 0.5f,
-      float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
-      unsigned short group = 1, unsigned short mask = 0xFFFF);
-
-    // 拘束条件追加 
-    void AddPointToPointConstraint(bullet::Data body, const Vec3& pivot);
-
-    void AddPointToPointConstraint(bullet::Data bodyA,
-      bullet::Data bodyB,
-      const Vec3& pivotInA, const Vec3& pivotInB);
+    //bullet::Data CreateCylinder(float radius, float length, const Mat4x4 &world, // 中心軸はZ軸
+    //  float mass = 0, float restitution = 0, float friction = 0.5f,
+    //  float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
+    //  unsigned short group = 1, unsigned short mask = 0xFFFF);
 
     /// <summary>
     /// 6軸ジョイントを追加 
@@ -79,11 +51,6 @@ namespace s3d_bullet {
       const std::array<float, 3>& c_p1, const std::array<float, 3>& c_p2,
       const std::array<float, 3>& c_r1, const std::array<float, 3>& c_r2,
       const Float3 &stiffnessPos, const Float3 &stiffnessRot);
-
-    // 剛体を移動 
-    void MoveRigidBody(int num, const Matrix &world);
-
-    void SetMatrixRigidBody(int num, const Matrix &world);
 
     /// <summary>
     /// 物理演算の世界の時間を進める 

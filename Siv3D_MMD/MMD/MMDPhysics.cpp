@@ -244,36 +244,6 @@ namespace s3d_mmd {
     }
   }
 
-  /// 剛体メッシュを描画する
-  inline void MmdPhysics::DrawRigidMesh(const Matrix & world) {
-    StartWireframe(world);
-    for (unsigned int i = 0; i < m_rigidBodies.size(); ++i) {
-      Matrix w = m_rigidBodies[i].getWorld();
-      using namespace DirectX;
-      const XMMATRIX xmm = XMMatrixMultiply(w, world);
-
-      //if (m_rigidBodies[i].body_.body->getCollisionShape()->getShapeType() == CAPSULE_SHAPE_PROXYTYPE) {
-      //  XMMATRIX r = XMMatrixRotationX(XM_PI / 2);
-      //  w = r * xmm;	// PMD, bulletのカプセルはY軸中心、DirectXの円柱プリミティブはZ軸中心なのでX軸を中心に90°回転させる
-      //}
-      //pDevice->SetTransform(D3DTS_WORLD, &w);
-      //rigidbody_mesh[i]->DrawSubset(0);
-    }
-    EndWireframe();
-  }
-
-  void MmdPhysics::DrawJointMesh(const Matrix &world) {
-    StartWireframe(world);
-    for (unsigned int i = 0; i < m_jointRelatedRigidIndex.size(); ++i) {
-      Matrix w = m_jointMatrix[i], m;
-      ///w*=*bulletPhysics->GetWorld(&m, rigidBodies[joint_relatedRigidIndex[i]].body);
-      //w*=(*world);
-      //pDevice->SetTransform(D3DTS_WORLD, &w);
-      //joint_mesh->DrawSubset(0);
-    }
-    EndWireframe();
-  }
-
   // private : 剛体のワールド変換行列を作成
   // @param pos		剛体の位置		：MmdStruct::PmdRigidBody.pos_pos[3]
   // @param rot		剛体の回転		：MmdStruct::PmdRigidBody.pos_rot[3]
@@ -293,28 +263,6 @@ namespace s3d_mmd {
     const DirectX::XMMATRIX trans = DirectX::XMMatrixTranslation(p.x, p.y, p.z);
     const DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationRollPitchYaw(rot[0], rot[1], rot[2]);
     return rotation * trans;
-  }
-
-  // private: ワイヤーフレームの描画を開始する
-  void MmdPhysics::StartWireframe(const Matrix &world) {
-    //D3DMATERIAL9 material = {{0, 0, 0, 1.0f}, color};
-    Matrix view, projection;
-    //camera->GetMatrix(&view, &projection);
-    /*pDevice->SetLight(0, light);
-    pDevice->LightEnable(0, TRUE) ;
-    pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-    pDevice->SetMaterial(&material);
-    pDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
-    pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-    pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-    pDevice->SetTransform(D3DTS_VIEW, &view);
-    pDevice->SetTransform(D3DTS_PROJECTION, &projection);*/
-  }
-
-  // private: ワイヤーフレームの描画を終了する
-  void MmdPhysics::EndWireframe() {
-    //pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-    //pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
   }
 
 #endif // USE_BULLET_PHYSICS

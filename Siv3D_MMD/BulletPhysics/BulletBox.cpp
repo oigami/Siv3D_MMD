@@ -10,7 +10,6 @@ namespace s3d_bullet {
 
     class Box::Pimpl {
     public:
-      bullet::Data data;
       std::shared_ptr<btBoxShape> box;
       float m_mass;
     };
