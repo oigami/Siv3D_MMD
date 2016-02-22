@@ -45,8 +45,8 @@ namespace s3d_bullet {
   }
 
   void DebugDraw::drawBox(const btVector3 & bbMin, const btVector3 & bbMax, const btTransform& trans, const btVector3 & color) {
-    const Vec3 from = bullet::ConvertVector(bbMin);
-    const Vec3 to = bullet::ConvertVector(bbMax);
+    const Vec3 from = bullet::ConvertVector(trans.getOrigin() - bbMin);
+    const Vec3 to = bullet::ConvertVector(bbMax - bbMin);
     const auto rot = bullet::ConvertQuaternion(trans.getRotation());
     SetRasterizerState(RasterizerState::WireframeCullBack, [&]() {
       Box(from, to, rot).draw(bullet::ConvertColor(color));
