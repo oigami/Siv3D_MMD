@@ -211,5 +211,5 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 *.opendb
-*/lib/
+*/lib/*/*.bat
 ExampleA/

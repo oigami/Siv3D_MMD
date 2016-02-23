@@ -16,17 +16,17 @@
 
 #ifdef _DEBUG
 
-#pragma comment(lib, "BulletCollision_Debug.lib")
-#pragma comment(lib, "BulletDynamics_Debug.lib")
-#pragma comment(lib, "BulletSoftBody_Debug.lib")
-#pragma comment(lib, "LinearMath_Debug.lib")
+#pragma comment(lib, "x64/bullet/BulletCollision_d")
+#pragma comment(lib, "x64/bullet/BulletDynamics_d")
+//#pragma comment(lib, "x64/bullet/BulletSoftBody_d.lib")
+#pragma comment(lib, "x64/bullet/LinearMath_d")
 
 #else
 
-#pragma comment(lib, "release/BulletCollision.lib")
-#pragma comment(lib, "release/BulletDynamics.lib")
-#pragma comment(lib, "release/BulletSoftBody.lib")
-#pragma comment(lib, "release/LinearMath.lib")
+#pragma comment(lib, "x64/bullet/BulletCollision")
+#pragma comment(lib, "x64/bullet/BulletDynamics")
+//#pragma comment(lib, "x64/bullet/BulletSoftBody.lib")
+#pragma comment(lib, "x64/bullet/LinearMath")
 
 #endif
 
