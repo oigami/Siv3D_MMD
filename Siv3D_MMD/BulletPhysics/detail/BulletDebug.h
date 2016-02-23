@@ -37,7 +37,7 @@ namespace s3d_bullet {
     /// <param name="bbMax"> 終了点 </param>
     /// <param name="trans"> ? </param>
     /// <param name="color"> 色 </param>
-    virtual void drawBox(const btVector3& bbMin, const btVector3& bbMax, const btTransform& trans, const btVector3& color);
+    //virtual void drawBox(const btVector3& bbMin, const btVector3& bbMax, const btTransform& trans, const btVector3& color);
 
     /// <summary>
     /// 箱の描画
