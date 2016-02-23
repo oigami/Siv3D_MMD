@@ -38,7 +38,7 @@ namespace s3d_mmd {
       Array<mmd::Ik> m_ikData;
       void InitMatCalc(mmd::Bone* me, const Matrix &parentoffsetMat);
 
-      void CalcWorld(const mmd::Bone* me, const Mat4x4 &parentWorldMat, Array<Mat4x4> *worlds) const;
+      void CalcWorld(const mmd::Bone& me, const Mat4x4 &parentWorldMat, Array<Mat4x4> &worlds) const;
 
     public:
 
@@ -58,7 +58,7 @@ namespace s3d_mmd {
 
       // モデルローカル座標系でのボーン行列を計算
       Mat4x4 CalcBoneMatML(int index) const;
-
+      
       Mat4x4 CalcParentBoneMat(int index)const {
         if (m_bones[index].parent == -1) return Mat4x4::Identity();
         return CalcBoneMatML(m_bones[index].parent);
