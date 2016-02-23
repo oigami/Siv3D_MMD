@@ -144,7 +144,8 @@ namespace s3d_mmd {
           const XMMATRIX inv = XMMatrixInverse(&Determinant, bones[attentionIdx].initMat);
           const XMMATRIX def = rotation * xmboneMatBL * inv;
           Vector t = XMVector3TransformCoord(XMVectorSet(0, 0, 1, 0), def);
-          if (XMVectorGetY(t) < 0) rotation = DirectX::XMMatrixRotationAxis(axis, -angle);
+          if (XMVectorGetY(t) < 0) rotation = XMVector3Equal(axis, XMVectorZero()) ?
+            DirectX::XMMatrixIdentity() : DirectX::XMMatrixRotationAxis(axis, -angle);
           // 膝ボーンがエフェクタ(ターゲットボーン)より近い時は回転量を追加する
           const float l = XMVectorGetY(XMVector3Length(localTargetPos)) / XMVectorGetY(XMVector3Length(localEffectorPos));
           if (fabs(angle) <= XM_PI / 2 && l < 1.0f) {

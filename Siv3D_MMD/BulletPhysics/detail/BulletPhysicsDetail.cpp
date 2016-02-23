@@ -92,7 +92,7 @@ namespace s3d_bullet {
           const btVector3 & stiffnessPos, const btVector3 & stiffnessRot) {
         // 第五引数の効果は謎。どちらでも同じ様に見える……。
         std::shared_ptr<btGeneric6DofSpringConstraint> constraint(
-          new btGeneric6DofSpringConstraint(bodyA, bodyB, frameInA, frameInB, false));
+          new btGeneric6DofSpringConstraint(bodyA, bodyB, frameInA, frameInB, true));
 
         // 型はベクトルだがベクトル量ではないのでZは反転しない。
         // それを明示するためにstd::arrayを使用

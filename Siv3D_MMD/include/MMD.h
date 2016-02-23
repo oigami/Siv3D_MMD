@@ -19,6 +19,8 @@ namespace s3d_mmd {
     MMD(const FilePath &filename) :MMD(MMDModel(filename)) {}
     ~MMD();
 
+    void PhysicsUpdate(Array<Mat4x4> &boneWorld) const ;
+
     void draw() const;
     void draw(const VMD &vmd) const;
     void draw(double edgeSize) const;

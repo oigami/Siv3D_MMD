@@ -23,10 +23,10 @@
 
 #else
 
-#pragma comment(lib, "BulletCollision_vs2010.lib")
-#pragma comment(lib, "BulletDynamics_vs2010.lib")
-#pragma comment(lib, "BulletSoftBody_vs2010.lib")
-#pragma comment(lib, "LinearMath_vs2010.lib")
+#pragma comment(lib, "release/BulletCollision.lib")
+#pragma comment(lib, "release/BulletDynamics.lib")
+#pragma comment(lib, "release/BulletSoftBody.lib")
+#pragma comment(lib, "release/LinearMath.lib")
 
 #endif
 

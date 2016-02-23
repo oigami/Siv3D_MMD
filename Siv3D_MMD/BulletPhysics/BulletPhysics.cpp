@@ -36,7 +36,7 @@ namespace s3d_bullet {
     auto constraint = m_pimpl->bulletDatail.Add6DofSpringConstraint(*bodyA.m_rigidBody, *bodyB.m_rigidBody,
       bullet::ConvertMatrix(frameInA), bullet::ConvertMatrix(frameInB),
       c_p1, c_p2, c_r1, c_r2,
-      bullet::ConvertVector(stiffnessPos), bullet::ConvertVector(stiffnessRot));
+      bullet::ConvertFloat(stiffnessPos), bullet::ConvertFloat(stiffnessRot));
     bodyA.m_constraint.push_back(constraint);
     bodyA.m_constraint.push_back(constraint);
   }

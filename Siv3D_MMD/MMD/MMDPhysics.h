@@ -36,7 +36,7 @@ namespace s3d_mmd {
 
     /// ボーン行列を更新
     /// @param 物理演算使用可能
-    void BoneUpdate(const Matrix &mat);
+    void BoneUpdate(const Matrix &mat, Array<Mat4x4> &boneWorld);
 
   private:
 

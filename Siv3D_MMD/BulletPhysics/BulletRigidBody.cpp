@@ -10,7 +10,7 @@ namespace s3d_bullet {
       m_motionState.reset(new btDefaultMotionState(ConvertMatrix(world)));
       float mass = shape.mass();
       btVector3 localInertia(0.f, 0.f, 0.f);
-      shape.get()->calculateLocalInertia(mass, localInertia);
+      if (mass != 0) shape.get()->calculateLocalInertia(mass, localInertia);
       btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,
         m_motionState.get(), shape.get(), localInertia);
       m_rigidBody.reset(new btRigidBody(rbInfo));
@@ -36,8 +36,8 @@ namespace s3d_bullet {
         m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
         m_rigidBody->setActivationState(DISABLE_DEACTIVATION);
       } else {
-        m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() & ~btCollisionObject::CF_KINEMATIC_OBJECT);
-        m_rigidBody->setActivationState(ACTIVE_TAG);
+        /*  m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() & ~btCollisionObject::CF_KINEMATIC_OBJECT);
+          m_rigidBody->setActivationState(ACTIVE_TAG);*/
       }
       return *this;
     }
@@ -51,9 +51,15 @@ namespace s3d_bullet {
 
     }
     Mat4x4 RigidBody::getWorld() const {
-      return ConvertMatrix(m_rigidBody->getWorldTransform());
+      btTransform trans;
+      m_rigidBody->getMotionState()->getWorldTransform(trans);
+      return ConvertMatrix(trans);
     }
-
+    Quaternion RigidBody::getRot() const {
+      btTransform trans;
+      m_rigidBody->getMotionState()->getWorldTransform(trans);
+      return ConvertQuaternion(trans.getRotation());
+    }
     void RigidBody::MoveRigidBody(const Mat4x4& world) {
       m_rigidBody->getMotionState()->setWorldTransform(bullet::ConvertMatrix(world));
     }

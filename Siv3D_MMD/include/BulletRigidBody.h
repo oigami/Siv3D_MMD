@@ -48,6 +48,7 @@ namespace s3d_bullet {
       void removeWorld();
 
       Mat4x4 getWorld()const;
+      Quaternion getRot() const;
 
       void MoveRigidBody(const Mat4x4& world);
     };

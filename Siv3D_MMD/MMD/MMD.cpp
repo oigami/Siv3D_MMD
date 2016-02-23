@@ -215,9 +215,7 @@ namespace s3d_mmd {
     }
 
     void draw() {
-#ifdef USE_BULLET_PHYSICS
-      m_mmdPhysics.BoneUpdate(Mat4x4::Identity());
-#endif
+
       const auto rasterizerState = Graphics3D::GetRasterizerState();
       const auto rasterizerStateForawrt = Graphics3D::GetRasterizerStateForward();
       draw(m_nodes.nodeCullBack, RasterizerState::SolidCullBack);
@@ -241,6 +239,9 @@ namespace s3d_mmd {
     }
 #ifdef USE_BULLET_PHYSICS
     MmdPhysics m_mmdPhysics;
+    void PhysicsUpdate(Array<Mat4x4> &boneWorld) {
+      m_mmdPhysics.BoneUpdate(Mat4x4::Identity(), boneWorld);
+    }
 #endif
     mmd::AllNode m_nodes;
     Array<mmd::Node> m_edges;
@@ -256,7 +257,10 @@ namespace s3d_mmd {
 
   MMD::~MMD() {
   }
+  void MMD::PhysicsUpdate(Array<Mat4x4> &boneWorld) const {
+    m_handle->PhysicsUpdate(boneWorld);
 
+  }
   void MMD::draw(double edgeSize) const {
     drawEdge(edgeSize);
     draw();
@@ -306,8 +310,7 @@ namespace s3d_mmd {
       ConstantBuffer<mmd::ConstantBoneData> data;
       auto bones = m_mmd.bones();
       m_vmd.UpdateBone(*bones);
-      Mat4x4 world = Mat4x4::Identity();
-      bones->CalcWorld(world, worlds);
+      m_mmd.PhysicsUpdate(worlds);
       for (auto& i : step(static_cast<int>(worlds.size()))) {
         data->bones[i] = worlds[i];
       }

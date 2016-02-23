@@ -178,7 +178,7 @@ namespace s3d_mmd {
 
   }
 
-  void MmdPhysics::BoneUpdate(const Matrix &mat) {
+  void MmdPhysics::BoneUpdate(const Matrix &mat, Array<Mat4x4> &boneWorld) {
     //if (physicsEnabled) ;	// 物理シミュレーション
     const std::uint_fast32_t rigidBodiessize = static_cast<std::uint_fast32_t>(m_rigidBodies.size());
     //const MATRIX *rigidbodyoffset=&rigidbody_offset[0];
@@ -188,7 +188,6 @@ namespace s3d_mmd {
         count++;
         continue;
       }
-      Matrix m, mm;
       mmd::Bone& bone = (*m_bones)[m_rigidbodyRelatedBoneIndex[i]];
       auto &rigidBodie = m_rigidBodies[i];
       using namespace DirectX;
@@ -198,50 +197,42 @@ namespace s3d_mmd {
         // ボーン追従タイプの剛体にボーン行列を設定
         // ボーンの移動量を剛体の初期姿勢に適用したものが剛体の現在の姿勢
         const XMMATRIX mxm = XMMatrixMultiply(m_rigidMat[i - count], m_bones->CalcBoneMatML(m_rigidbodyRelatedBoneIndex[i]));
-        m = mxm;
-        mm = XMMatrixMultiply(mxm, mat);
-        rigidBodie.MoveRigidBody(m);
+        rigidBodie.MoveRigidBody(mxm);
         bone.extraBoneControl = false;
-        continue;
+        break;
+      }
+      case 1: //物理演算
+      {
+        Matrix m = rigidBodie.getWorld();
+        const XMMATRIX xmm = XMMatrixInverse(nullptr, mat);
+        m = XMMatrixMultiply(m, xmm);
+        bone.boneMatML = XMMatrixMultiply(m_initOffsetMat[i - count], m);
         break;
       }
       //物理演算(bone合わせ)
       case 2:
       {
+        //うまく動いてるか不明
+        bone.extraBoneControl = false;
+        Matrix rigidWorld = m_initOffsetMat[i - count] * rigidBodie.getWorld();
         // ボーン位置あわせタイプの剛体の位置移動量にボーンの位置移動量を設定
-        const Vector m1 = m_bones->CalcBoneMatML(m_rigidbodyRelatedBoneIndex[i]).r[3];
-        const Vector m2 = bone.initMatML.r[3];
-        const Vector initMat = m_rigidbodyInit[i].r[3];
-        m = m_rigidbodyInit[i];
-#ifndef _XM_NO_INTRINSICS_
-        const float w = DirectX::XMVectorGetW(m.r[3]);
-        const Vector v = initMat + m1 - m2;
-        m.r[3] = DirectX::XMVectorSetW(v, w);
-#else
-        m._41 = initm[0] + m1[0] - m2[0];
-        m._42 = initm[1] + m1[1] - m2[1];
-        m._43 = initm[2] + m1[2] - m2[2];
-#endif // !_XM_NO_INTRINSICS_
+        Matrix boneParentMat = m_bones->CalcParentBoneMat(m_rigidbodyRelatedBoneIndex[i]);
+        const Matrix boneMat = bone.boneMat * boneParentMat;
+        rigidWorld.r[3] = boneMat.r[3];
+        Matrix inv = XMMatrixInverse(nullptr, boneParentMat);
+        rigidWorld = rigidWorld * inv;
+        bone.boneMat = rigidWorld;
 
-        mm = XMMatrixMultiply(m, mat);
-        rigidBodie.MoveRigidBody(m);
-        //m_bulletPhysics->MoveRigidBody(rigidBodie, mm);
-        //XMMatrixMultiply(&m_rigidMat,&bone.initMatML,&m_rigidbodyOffset[i]);
+        //剛体の位置更新
+        rigidWorld = rigidBodie.getWorld();
+        //rigidWorld.r[3] = boneMat.r[3];
+        rigidBodie.MoveRigidBody(rigidWorld);
         break;
       }
-      case 1: //物理演算
-      {
-        m = rigidBodie.getWorld();
-        ///*bodyも動かすときに使うがうまくいかない
-        const XMMATRIX xmm = XMMatrixInverse(nullptr, mat);
-        m = XMMatrixMultiply(m, xmm);
 
-        mm = m_rigidMat[i - count];
-        break;
       }
-      }
-      bone.boneMatML = XMMatrixMultiply(m_initOffsetMat[i - count], m);
     }
+    m_bones->CalcWorld(mat, boneWorld);
   }
 
   // private : 剛体のワールド変換行列を作成
@@ -251,15 +242,16 @@ namespace s3d_mmd {
   // @return			ワールド変換行列
   DirectX::XMMATRIX MmdPhysics::CreateRigidMatrix(const float* pos, const float* rot, int i) {
     Float3 p = Float3(pos[0], pos[1], pos[2]);
-    if (i != 0xFFFF) {
-      DirectX::XMFLOAT3 f;
-      DirectX::XMStoreFloat3(&f, (*m_bones)[i].initMatML.r[3]);
-      // 関連ボーンがある場合は、ボーン相対座標からモデルローカル座標に変換。MmdStruct::PmdRigidBody.pos_posを参照
-      p.x += f.x;
-      p.y += f.y;
-      p.z += f.z;
-      (*m_bones)[i].extraBoneControl = true;
+    if (i == 0xffff) {
+      i = 0; //関連ボーンがない場合は0のセンターボーンが基準
     }
+    DirectX::XMFLOAT3 f;
+    DirectX::XMStoreFloat3(&f, (*m_bones)[i].initMatML.r[3]);
+    // 関連ボーンがある場合は、ボーン相対座標からモデルローカル座標に変換。MmdStruct::PmdRigidBody.pos_posを参照
+    p.x += f.x;
+    p.y += f.y;
+    p.z += f.z;
+    (*m_bones)[i].extraBoneControl = true;
     const DirectX::XMMATRIX trans = DirectX::XMMatrixTranslation(p.x, p.y, p.z);
     const DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationRollPitchYaw(rot[0], rot[1], rot[2]);
     return rotation * trans;
