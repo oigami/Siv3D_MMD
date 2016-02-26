@@ -17,12 +17,12 @@ namespace s3d_mmd {
     void Bones::InitMatCalc(Bone * me, const Matrix & parentoffsetMat) {
       if (me->firstChild != -1) InitMatCalc(&m_bones[me->firstChild], me->offsetMat);
       if (me->sibling != -1) InitMatCalc(&m_bones[me->sibling], parentoffsetMat);
-      me->initMat = XMMatrixMultiply(me->initMatML, parentoffsetMat);
+      me->initMat = me->initMatML * parentoffsetMat;
     }
 
     void Bones::CalcWorld(const Bone &me, const Mat4x4 & parentWorldMat, Array<Mat4x4>& worlds) const {
-      const DirectX::XMMATRIX m = XMMatrixMultiply(me.boneMat, parentWorldMat);
-      worlds[me.id] = XMMatrixMultiply(me.offsetMat, m);
+      const Mat4x4 m = me.boneMat * parentWorldMat;
+      worlds[me.id] = me.offsetMat * m;
       if (me.firstChild != -1) CalcWorld(m_bones[me.firstChild], m, worlds);
       if (me.sibling != -1) CalcWorld(m_bones[me.sibling], parentWorldMat, worlds);
     }
@@ -33,8 +33,7 @@ namespace s3d_mmd {
       CalcWorld(m_bones[0], world, worlds);
       for (int i : step(bonsSize)) {
         if (m_bones[i].extraBoneControl) {
-          const DirectX::XMMATRIX temp = XMMatrixMultiply(m_bones[i].offsetMat, m_bones[i].boneMatML);
-          worlds[i] = XMMatrixMultiply(temp, world);
+          worlds[i] = m_bones[i].offsetMat * m_bones[i].boneMatML * world;
         }
       }
     }

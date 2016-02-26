@@ -116,8 +116,7 @@ namespace s3d_mmd {
         Mat4x4 targetMat = bones.CalcBoneMatML(ikData.ik_bone_index);
         const Vector &effectorPos = effectorMat.r[3];
         const Vector &targetPos = targetMat.r[3];
-        XMVECTOR Determinant;
-        const Mat4x4 invCoord = XMMatrixInverse(&Determinant, bones.CalcBoneMatML(attentionIdx));
+        const Mat4x4 invCoord = bones.CalcBoneMatML(attentionIdx).inverse();
         localEffectorPos = XMVector3TransformCoord(effectorPos, invCoord); // 注目ボーン基準に変換
         localTargetPos = XMVector3TransformCoord(targetPos, invCoord);     // 注目ボーン基準に変換
         // エフェクタのローカル方向（注目ボーン基準）
@@ -137,12 +136,12 @@ namespace s3d_mmd {
           angle = 4.0f * ikData.control_weight;
         const Vector axis = XMVector3Cross(localEffectorDir, localTargetDir);
         //ベクトルがゼロのときエラーになるので確認する
-        XMMATRIX rotation = XMVector3Equal(axis, XMVectorZero()) ?
+        Mat4x4 rotation = XMVector3Equal(axis, XMVectorZero()) ?
           DirectX::XMMatrixIdentity() : DirectX::XMMatrixRotationAxis(axis, angle);
-        const XMMATRIX &xmboneMatBL = bones[attentionIdx].boneMat;
+        const Mat4x4 &xmboneMatBL = bones[attentionIdx].boneMat;
         if (findIt != std::string::npos) {
-          const XMMATRIX inv = XMMatrixInverse(&Determinant, bones[attentionIdx].initMat);
-          const XMMATRIX def = rotation * xmboneMatBL * inv;
+          const Mat4x4 inv = bones[attentionIdx].initMat.inverse();
+          const Mat4x4 def = rotation * xmboneMatBL * inv;
           Vector t = XMVector3TransformCoord(XMVectorSet(0, 0, 1, 0), def);
           if (XMVectorGetY(t) < 0) rotation = XMVector3Equal(axis, XMVectorZero()) ?
             DirectX::XMMatrixIdentity() : DirectX::XMMatrixRotationAxis(axis, -angle);
@@ -179,7 +178,7 @@ namespace s3d_mmd {
       if (keyData.haveNowFrame()) {
         const auto &nowFrame = keyData.getNowFrame();
         const int t0 = nowFrame.frameNo;
-        Vector boneRot = nowFrame.rotation.component;
+        Quaternion boneRot = nowFrame.rotation;
         Vec3 bonePos = nowFrame.position;
         if (keyData.haveNextFrame()) {
           //次のフレームとの間の位置を計算する
@@ -188,13 +187,13 @@ namespace s3d_mmd {
           const int t1 = next.frameNo;
           const Vec3 &p1 = next.position;
           float s = (float)(m_nowTime - t0) / float(t1 - t0);
-          boneRot = XMQuaternionSlerp(boneRot, next.rotation.component, next.bezie_r.GetY(s));
+          boneRot = Math::Slerp(boneRot, next.rotation, next.bezie_r.GetY(s));
           bonePos.x = p0.x + (p1.x - p0.x) * next.bezie_x.GetY(s);
           bonePos.y = p0.y + (p1.y - p0.y) * next.bezie_y.GetY(s);
           bonePos.z = p0.z + (p1.z - p0.z) * next.bezie_z.GetY(s);
         }
         // 親ボーン座標系のボーン行列を求める
-        const XMMATRIX rot = XMMatrixRotationQuaternion(boneRot);
+        const XMMATRIX rot = boneRot.toMatrix();
         const Mat4x4 trans = Mat4x4::Translate(bonePos.x, bonePos.y, bonePos.z);
         i.boneMat = rot * trans * i.initMat;
       }

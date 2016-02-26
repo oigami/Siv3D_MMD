@@ -75,9 +75,9 @@ namespace s3d_mmd {
       using namespace DirectX;
       m_rigidbodyRelatedBoneIndex[i] = (pmdRigidBodies[i].rigidbody_rel_bone_index);
       m_rigidbodyType[i] = (pmdRigidBodies[i].rigidbody_type);
-      XMMATRIX world, world_inv;
+      Mat4x4 world, world_inv;
       world = CreateRigidMatrix(pmdRigidBodies[i].pos_pos, pmdRigidBodies[i].pos_rot, pmdRigidBodies[i].rigidbody_rel_bone_index);
-      world_inv = XMMatrixInverse(nullptr, world);
+      world_inv = world.inverse();
       m_rigidbodyInit[i] = world;
       m_rigidbodyOffset[i] = world_inv;
       s3d_bullet::bullet::RigidBody rigidBody;
@@ -141,19 +141,20 @@ namespace s3d_mmd {
       Float3 s_r(ConvertFloat(joint.spring_rot));
       Float3 p(ConvertFloat(joint.joint_pos));
       Float3 r(ConvertFloat(joint.joint_rot));
-      const Matrix rotation = XMMatrixRotationRollPitchYaw(r.x, r.y, r.z);
-      const Matrix world = XMMatrixTranslation(p.x, p.y, p.z) * rotation; // ジョイントの行列（モデルローカル座標系）
+
+      const Mat4x4 rotation = Quaternion::RollPitchYaw(r.z, r.x, r.y).toMatrix();
+      const Mat4x4 world = Mat4x4::Translate(p.x, p.y, p.z) * rotation; // ジョイントの行列（モデルローカル座標系）
       auto &rigidbody_a = m_rigidBodies[joint.joint_rigidbody_a];
       auto &rigidbody_b = m_rigidBodies[joint.joint_rigidbody_b];
 
       // ジョイントの行列（剛体ローカル座標系）
-      const Matrix aMat = rigidbody_a.getWorld();
-      const Matrix aInv = XMMatrixInverse(nullptr, aMat);
-      const Matrix frameInA = world * aInv;
+      const Mat4x4 aMat = rigidbody_a.getWorld();
+      const Mat4x4 aInv = aMat.inverse();
+      const Mat4x4 frameInA = world * aInv;
 
-      const Matrix bMat = rigidbody_b.getWorld();
-      const Matrix bInv = XMMatrixInverse(nullptr, bMat);
-      const Matrix frameInB = world * bInv;
+      const Mat4x4 bMat = rigidbody_b.getWorld();
+      const Mat4x4 bInv = bMat.inverse();
+      const Mat4x4 frameInB = world * bInv;
 
       m_bulletPhysics.Add6DofSpringConstraint(rigidbody_a, rigidbody_b,
         frameInA,
@@ -170,15 +171,15 @@ namespace s3d_mmd {
       if (m_rigidbodyRelatedBoneIndex[i] == 0xFFFF)
         continue;
       const mmd::Bone &bone = (*m_bones)[m_rigidbodyRelatedBoneIndex[i]];
-      const Matrix m = XMMatrixMultiply(m_rigidbodyInit[i], bone.offsetMat);
+      const Matrix m = m_rigidbodyInit[i] * bone.offsetMat;
       m_rigidMat.push_back(m);
-      const Matrix tempInitOffsetMat = XMMatrixMultiply(bone.initMatML, m_rigidbodyOffset[i]);
+      const Matrix tempInitOffsetMat = bone.initMatML * m_rigidbodyOffset[i];
       m_initOffsetMat.push_back(tempInitOffsetMat);
     }
 
   }
 
-  void MmdPhysics::BoneUpdate(const Matrix &mat, Array<Mat4x4> &boneWorld) {
+  void MmdPhysics::BoneUpdate(const Mat4x4 &mat, Array<Mat4x4> &boneWorld) {
     //if (physicsEnabled) ;	// 物理シミュレーション
     const std::uint_fast32_t rigidBodiessize = static_cast<std::uint_fast32_t>(m_rigidBodies.size());
     //const MATRIX *rigidbodyoffset=&rigidbody_offset[0];
@@ -196,17 +197,17 @@ namespace s3d_mmd {
       {
         // ボーン追従タイプの剛体にボーン行列を設定
         // ボーンの移動量を剛体の初期姿勢に適用したものが剛体の現在の姿勢
-        const XMMATRIX mxm = XMMatrixMultiply(m_rigidMat[i - count], m_bones->CalcBoneMatML(m_rigidbodyRelatedBoneIndex[i]));
+        const XMMATRIX mxm = m_rigidMat[i - count] * m_bones->CalcBoneMatML(m_rigidbodyRelatedBoneIndex[i]);
         rigidBodie.MoveRigidBody(mxm);
         bone.extraBoneControl = false;
         break;
       }
       case 1: //物理演算
       {
-        Matrix m = rigidBodie.getWorld();
-        const XMMATRIX xmm = XMMatrixInverse(nullptr, mat);
-        m = XMMatrixMultiply(m, xmm);
-        bone.boneMatML = XMMatrixMultiply(m_initOffsetMat[i - count], m);
+        Mat4x4 m = rigidBodie.getWorld();
+        const XMMATRIX xmm = mat.inverse();
+        m = m * xmm;
+        bone.boneMatML = m_initOffsetMat[i - count] * m;
         break;
       }
       //物理演算(bone合わせ)
@@ -214,18 +215,18 @@ namespace s3d_mmd {
       {
         //うまく動いてるか不明
         bone.extraBoneControl = false;
-        Matrix rigidWorld = m_initOffsetMat[i - count] * rigidBodie.getWorld();
+        Mat4x4 rigidWorld = m_initOffsetMat[i - count] * rigidBodie.getWorld();
         // ボーン位置あわせタイプの剛体の位置移動量にボーンの位置移動量を設定
-        Matrix boneParentMat = m_bones->CalcParentBoneMat(m_rigidbodyRelatedBoneIndex[i]);
-        const Matrix boneMat = bone.boneMat * boneParentMat;
+        Mat4x4 boneParentMat = m_bones->CalcParentBoneMat(m_rigidbodyRelatedBoneIndex[i]);
+        const Mat4x4 boneMat = bone.boneMat * boneParentMat;
         rigidWorld.r[3] = boneMat.r[3];
-        Matrix inv = XMMatrixInverse(nullptr, boneParentMat);
+        Mat4x4 inv = boneParentMat.inverse();
         rigidWorld = rigidWorld * inv;
         bone.boneMat = rigidWorld;
 
         //剛体の位置更新
         rigidWorld = rigidBodie.getWorld();
-        //rigidWorld.r[3] = boneMat.r[3];
+        rigidWorld.r[3] = boneMat.r[3];
         rigidBodie.MoveRigidBody(rigidWorld);
         break;
       }
@@ -240,7 +241,7 @@ namespace s3d_mmd {
   // @param rot		剛体の回転		：MmdStruct::PmdRigidBody.pos_rot[3]
   // @param i			関連ボーン番号
   // @return			ワールド変換行列
-  DirectX::XMMATRIX MmdPhysics::CreateRigidMatrix(const float* pos, const float* rot, int i) {
+  Mat4x4 MmdPhysics::CreateRigidMatrix(const float* pos, const float* rot, int i) {
     Float3 p = Float3(pos[0], pos[1], pos[2]);
     if (i == 0xffff) {
       i = 0; //関連ボーンがない場合は0のセンターボーンが基準
@@ -252,9 +253,9 @@ namespace s3d_mmd {
     p.y += f.y;
     p.z += f.z;
     (*m_bones)[i].extraBoneControl = true;
-    const DirectX::XMMATRIX trans = DirectX::XMMatrixTranslation(p.x, p.y, p.z);
-    const DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationRollPitchYaw(rot[0], rot[1], rot[2]);
-    return rotation * trans;
+    const Mat4x4 trans = Mat4x4::Translate(p.x, p.y, p.z);
+    const Quaternion rotation = Quaternion::RollPitchYaw(rot[2], rot[0], rot[1]);
+    return rotation.toMatrix() * trans;
   }
 
 #endif // USE_BULLET_PHYSICS

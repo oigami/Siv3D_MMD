@@ -36,11 +36,11 @@ namespace s3d_mmd {
 
     /// ボーン行列を更新
     /// @param 物理演算使用可能
-    void BoneUpdate(const Matrix &mat, Array<Mat4x4> &boneWorld);
+    void BoneUpdate(const Mat4x4 &mat, Array<Mat4x4> &boneWorld);
 
   private:
 
-    DirectX::XMMATRIX CreateRigidMatrix(const float* pos, const float* rot, int i);
+    Mat4x4 CreateRigidMatrix(const float* pos, const float* rot, int i);
 
   private:
     s3d_bullet::BulletPhysics m_bulletPhysics;
