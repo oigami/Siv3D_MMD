@@ -1,4 +1,5 @@
-﻿# include <Siv3D.hpp>
+﻿#ifndef LIB_COMPILE
+# include <Siv3D.hpp>
 #include "include/MMD.h"
 #include "include/BulletPhysics.h"
 using namespace s3d_mmd;
@@ -41,3 +42,4 @@ void Main() {
     //bulletPtr.DebugDraw();
   }
 }
+#endif
