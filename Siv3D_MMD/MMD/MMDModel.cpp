@@ -129,7 +129,7 @@ namespace s3d_mmd {
   Array<mmd::Ik> CreateIkData(const pmd::IkData & ikData) {
     Array<mmd::Ik> newIkData(ikData.size());
     for (auto& i : step(static_cast<int>(ikData.size()))) {
-      newIkData[i].control_weight = ikData[i].control_weight;
+      newIkData[i].control_weight = ikData[i].control_weight * 4.0f;
       newIkData[i].ik_bone_index = ikData[i].ik_bone_index;
       newIkData[i].ik_child_bone_index.reserve(ikData[i].ik_child_bone_length);
       for (auto& j : ikData[i].ik_child_bone_index) {

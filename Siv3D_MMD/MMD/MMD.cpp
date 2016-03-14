@@ -215,7 +215,20 @@ namespace s3d_mmd {
     }
 
     void draw() {
-
+      mmd::Shader::init();
+      auto vsAttach = ShaderAttach(mmd::Shader::vsInstance());
+      if (!vsAttach) return;
+      auto vsForwardAttach = ShaderForwardAttach(mmd::Shader::vsInstance());
+      if (!vsForwardAttach) return;
+      ConstantBuffer<mmd::ConstantBoneData> data;
+      PhysicsUpdate(worlds);
+      m_bones->CalcWorld(Mat4x4::Identity(), worlds);
+      for (auto& i : step(static_cast<int>(worlds.size()))) {
+        data->bones[i] = worlds[i];
+      }
+      Graphics3D::SetConstant(ShaderStage::Vertex, 1, data);
+      Graphics3D::SetConstantForward(ShaderStage::Vertex, 1, data);
+      Graphics3D::SetTexture(ShaderStage::Vertex, 1, m_vertexTexture);
       const auto rasterizerState = Graphics3D::GetRasterizerState();
       const auto rasterizerStateForawrt = Graphics3D::GetRasterizerStateForward();
       draw(m_nodes.nodeCullBack, RasterizerState::SolidCullBack);
@@ -239,16 +252,21 @@ namespace s3d_mmd {
     }
 #ifdef USE_BULLET_PHYSICS
     MmdPhysics m_mmdPhysics;
-    void PhysicsUpdate(Array<Mat4x4> &boneWorld) {
-      m_mmdPhysics.BoneUpdate(Mat4x4::Identity(), boneWorld);
-    }
+    
 #endif
+    void PhysicsUpdate(Array<Mat4x4> &boneWorld) {
+#ifdef USE_BULLET_PHYSICS
+      m_mmdPhysics.BoneUpdate(Mat4x4::Identity(), boneWorld);
+#endif
+    }
     mmd::AllNode m_nodes;
     Array<mmd::Node> m_edges;
     String m_name;
     String m_comment;
     std::shared_ptr<mmd::Bones> m_bones;
     Texture m_vertexTexture;
+    Array<Mat4x4> worlds;
+
   };
 
   MMD::MMD(const MMDModel &model) {
@@ -262,8 +280,8 @@ namespace s3d_mmd {
 
   }
   void MMD::draw(double edgeSize) const {
-    drawEdge(edgeSize);
     draw();
+    drawEdge(edgeSize);
   }
 
   void MMD::drawEdge(double edgeSize) const {
@@ -297,26 +315,10 @@ namespace s3d_mmd {
   DrawableVMD::DrawableVMD(const MMD &mmd, const VMD &vmd) :m_mmd(mmd), m_vmd(vmd) {
   }
 
-  Array<Mat4x4> worlds;
   void DrawableVMD::draw() const {
-    mmd::Shader::init();
-    /*auto psAttach = ShaderAttach(MMDShader::psInstance());
-    if (!psAttach) return;*/
+    auto bones = m_mmd.bones();
+    m_vmd.UpdateBone(*bones);
     {
-      auto vsAttach = ShaderAttach(mmd::Shader::vsInstance());
-      if (!vsAttach) return;
-      auto vsForwardAttach = ShaderForwardAttach(mmd::Shader::vsInstance());
-      if (!vsForwardAttach) return;
-      ConstantBuffer<mmd::ConstantBoneData> data;
-      auto bones = m_mmd.bones();
-      m_vmd.UpdateBone(*bones);
-      m_mmd.PhysicsUpdate(worlds);
-      for (auto& i : step(static_cast<int>(worlds.size()))) {
-        data->bones[i] = worlds[i];
-      }
-      Graphics3D::SetConstant(ShaderStage::Vertex, 1, data);
-      Graphics3D::SetConstantForward(ShaderStage::Vertex, 1, data);
-      Graphics3D::SetTexture(ShaderStage::Vertex, 1, m_mmd.vertexTexture());
       m_mmd.draw();
     }
     {
