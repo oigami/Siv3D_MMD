@@ -3,8 +3,25 @@
 #include "../../include/PMDStruct.h"
 #include "../../include/VMDController.h"
 #include "../ReaderHelper.h"
-namespace s3d_mmd {
 
+namespace s3d_mmd {
+  namespace detail {
+
+    //https://github.com/mmd-for-unity-proj/mmd-for-unity/blob/master/.MMDIKBaker/MMDIKBakerLibrary/Misc/DefaultIKLimitter.cs#L204
+    float IKRotateLimit(float val, float min, float max) {
+      if (min == max) return min;
+      if (max < val) {
+        return max * 2.f - val;
+      } else if (val < min) {
+        return min * 2.f - val;
+      }
+      return val;
+    }
+
+    float Clamp(float val, float min, float max) {
+      return std::min(std::max(min, val), max);
+    }
+  }
   namespace vmd {
     Bezie::Bezie(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2) {
       p1.x = x1 / 127.0f;
@@ -88,6 +105,7 @@ namespace s3d_mmd {
       for (auto& i : data.getKeyFrames()) {
         m_keyFrameData[i.first].m_keyFrames = i.second;
       }
+
       //m_bones.m_bones = std::move(*bone);
 
       m_isFrameEnd = true;
@@ -100,6 +118,9 @@ namespace s3d_mmd {
     void UpdateBone(mmd::Bones &bons)const;
     void UpdateTime();
 
+    void setTime(int frameCount) {
+      m_nowTime = frameCount;
+    }
   };
 
   // IKボーン影響下ボーンの行列を更新
@@ -107,58 +128,127 @@ namespace s3d_mmd {
     for (auto& ikData : bones.ikData())
       UpdateIK(bones, ikData);
   }
+  class EulerAngles {
+    enum class Type {
+      XYZ, YZX, ZXY
+    };
+    static bool IsGimballock(float val) {
+      constexpr float eps = 1.0e-4f;
+      if (val < -1 + eps || 1 - eps < val) {
+        return true;
+      }
+      return false;
+    }
+    bool CreateXYZ(const Mat4x4 &rot) {
+      using namespace DirectX;
+      y = -asinf(XMVectorGetZ(rot.r[0]));
+      if (IsGimballock(y)) return false;
+      x = atan2f(XMVectorGetZ(rot.r[1]), XMVectorGetZ(rot.r[2]));
+      z = atan2f(XMVectorGetY(rot.r[0]), XMVectorGetX(rot.r[0]));
+      type = Type::XYZ;
+      return true;
+    }
+    bool CreateYZX(const Mat4x4 &rot) {
+      using namespace DirectX;
+      z = -asinf(XMVectorGetX(rot.r[1]));
+      if (IsGimballock(z)) return false;
+      x = atan2f(XMVectorGetX(rot.r[2]), XMVectorGetX(rot.r[0]));
+      y = atan2f(XMVectorGetZ(rot.r[1]), XMVectorGetY(rot.r[1]));
+      type = Type::YZX;
+      return true;
+    }
+    bool CreateZXY(const Mat4x4 &rot) {
+      using namespace DirectX;
+      x = -asinf(XMVectorGetY(rot.r[2]));
+      if (IsGimballock(x)) return false;
+      y = atan2f(XMVectorGetX(rot.r[2]), XMVectorGetZ(rot.r[2]));
+      z = atan2f(XMVectorGetY(rot.r[0]), XMVectorGetY(rot.r[1]));
+      type = Type::ZXY;
+      return true;
+    }
+    Mat4x4 CreateX() const {
+      return DirectX::XMMatrixRotationX(x);
+    }
+    Mat4x4 CreateY() const {
+      return DirectX::XMMatrixRotationY(y);
+    }
+    Mat4x4 CreateZ() const {
+      return DirectX::XMMatrixRotationZ(z);
+    }
+    Type type;
+  public:
+    float x, y, z;
+
+
+    EulerAngles(const Mat4x4 &rot) {
+      if (!CreateXYZ(rot))
+        if (!CreateYZX(rot))
+          if (!CreateZXY(rot))Println(L"error");
+    }
+
+    Mat4x4 CreateRot() const {
+      Mat4x4 rot;
+      using namespace DirectX;
+      switch (type) {
+      case Type::XYZ:
+        return CreateX() * CreateY() * CreateZ();
+      case Type::ZXY:
+        return CreateZ() * CreateX() * CreateY();
+      case Type::YZX:
+        return CreateY() * CreateZ() * CreateX();
+      }
+    }
+  };
   void VMD::Pimpl::UpdateIK(mmd::Bones &bones, const mmd::Ik &ikData) const {
-    for (int i : step(ikData.iterations)) {
-      Vector localEffectorPos{}, localTargetPos{};
+    Vector localEffectorPos = DirectX::XMVectorSet(0, 0, 0, 0);
+    Vector localTargetPos = DirectX::XMVectorSet(0, 0, 0, 0);
+    Mat4x4 targetMat = bones.CalcBoneMatML(ikData.ik_bone_index);
+
+    for (int i : step_backward(ikData.iterations)) {
       for (auto& attentionIdx : ikData.ik_child_bone_index) {
         using namespace DirectX;
         Mat4x4 effectorMat = bones.CalcBoneMatML(ikData.ik_target_bone_index);
-        Mat4x4 targetMat = bones.CalcBoneMatML(ikData.ik_bone_index);
-        const Vector &effectorPos = effectorMat.r[3];
-        const Vector &targetPos = targetMat.r[3];
-        const Mat4x4 invCoord = bones.CalcBoneMatML(attentionIdx).inverse();
-        localEffectorPos = XMVector3TransformCoord(effectorPos, invCoord); // 注目ボーン基準に変換
-        localTargetPos = XMVector3TransformCoord(targetPos, invCoord);     // 注目ボーン基準に変換
+        XMVECTOR Determinant;
+        const Mat4x4 invCoord = XMMatrixInverse(&Determinant, bones.CalcBoneMatML(attentionIdx));
+        localEffectorPos = XMVector3TransformCoord(effectorMat.r[3], invCoord); // 注目ボーン基準に変換
+        localTargetPos = XMVector3TransformCoord(targetMat.r[3], invCoord);     // 注目ボーン基準に変換
+
         // エフェクタのローカル方向（注目ボーン基準）
         Vector localEffectorDir = XMVector3Normalize(localEffectorPos);
+
         // ターゲットのローカル方向（注目ボーン基準）
         Vector localTargetDir = XMVector3Normalize(localTargetPos);
-        const auto findIt = bones[attentionIdx].name.find("ひざ");
-        if (findIt != std::string::npos) {
-          localEffectorDir = XMVector3Normalize(XMVectorSetX(localEffectorDir, 0));
-          localTargetDir = XMVector3Normalize(XMVectorSetX(localTargetDir, 0));
-        }
+
+        const auto findIt = bones[attentionIdx].name.find("ひざ") != std::string::npos;
+
         float p;
         XMStoreFloat(&p, XMVector3Dot(localEffectorDir, localTargetDir));
         if (p > 1 - 1.0e-8f) continue; // 計算誤差により1を越えるとacos()が発散するので注意!
-        float angle = acos(p);
-        if (angle > 4 * ikData.control_weight)
-          angle = 4.0f * ikData.control_weight;
-        const Vector axis = XMVector3Cross(localEffectorDir, localTargetDir);
-        //ベクトルがゼロのときエラーになるので確認する
-        Mat4x4 rotation = XMVector3Equal(axis, XMVectorZero()) ?
-          DirectX::XMMatrixIdentity() : DirectX::XMMatrixRotationAxis(axis, angle);
-        const Mat4x4 &xmboneMatBL = bones[attentionIdx].boneMat;
-        if (findIt != std::string::npos) {
-          const Mat4x4 inv = bones[attentionIdx].initMat.inverse();
-          const Mat4x4 def = rotation * xmboneMatBL * inv;
-          Vector t = XMVector3TransformCoord(XMVectorSet(0, 0, 1, 0), def);
-          if (XMVectorGetY(t) < 0) rotation = XMVector3Equal(axis, XMVectorZero()) ?
-            DirectX::XMMatrixIdentity() : DirectX::XMMatrixRotationAxis(axis, -angle);
-          // 膝ボーンがエフェクタ(ターゲットボーン)より近い時は回転量を追加する
-          const float l = XMVectorGetY(XMVector3Length(localTargetPos)) / XMVectorGetY(XMVector3Length(localEffectorPos));
-          if (fabs(angle) <= XM_PI / 2 && l < 1.0f) {
-            constexpr float a = 0.5f; // 追加量の比例係数
-            float diff = acosf(l) * a; // 追加量
-            static const float diff_limit = XM_PI / 6;	// 追加量の制限
-            if (diff > diff_limit) {
-              diff = diff_limit;
-            }
-            if (fabs(angle) > 1.0e-6f) diff *= angle / fabs(angle);	// 符号合わせ
-            angle += diff;
-          }
+        const float limitAngle = ikData.control_weight;
+        const float angle = detail::Clamp(acos(p), -limitAngle, limitAngle);
+
+        if (angle == 0.f) continue;
+        Vector axis = XMVector3Normalize(XMVector3Cross(localEffectorDir, localTargetDir));
+        if (XMVector3Equal(axis, XMVectorZero())) continue;
+
+        XMMATRIX rotation = DirectX::XMMatrixRotationAxis(axis, angle);
+        const XMMATRIX xmboneMatBL = bones[attentionIdx].boneMat;
+        if (findIt) {
+          Mat4x4 local = rotation * bones[attentionIdx].boneMat;
+          Vector rv = DirectX::XMQuaternionRotationMatrix(local);
+          Quaternion rot(rv);
+          rot.normalize();
+          EulerAngles eulerAngle(rot.toMatrix());
+
+          eulerAngle.x = detail::IKRotateLimit(eulerAngle.x, Radians(-180.f), Radians(-10.f));
+          eulerAngle.y = detail::IKRotateLimit(eulerAngle.y, Radians(0.f), Radians(0.f));
+          eulerAngle.z = detail::IKRotateLimit(eulerAngle.z, Radians(0.f), Radians(0.f));
+          local = eulerAngle.CreateRot();
+
+          bones[attentionIdx].boneMat = local * XMMatrixTranslationFromVector(xmboneMatBL.r[3]);
+        } else {
+          bones[attentionIdx].boneMat = rotation * xmboneMatBL;
         }
-        bones[attentionIdx].boneMat = rotation * xmboneMatBL;
       }
       constexpr float errToleranceSq = 0.000001f;
       using namespace DirectX;
@@ -174,6 +264,7 @@ namespace s3d_mmd {
       auto it = m_keyFrameData.find(i.name);
       if (it == m_keyFrameData.end()) continue;
       const auto &keyData = it->second;
+
       // キーフレーム補完
       if (keyData.haveNowFrame()) {
         const auto &nowFrame = keyData.getNowFrame();
@@ -181,6 +272,7 @@ namespace s3d_mmd {
         Quaternion boneRot = nowFrame.rotation;
         Vec3 bonePos = nowFrame.position;
         if (keyData.haveNextFrame()) {
+
           //次のフレームとの間の位置を計算する
           const Vec3 &p0 = bonePos;
           const vmd::KeyFrame &next = keyData.getNextFrame();
@@ -192,6 +284,7 @@ namespace s3d_mmd {
           bonePos.y = p0.y + (p1.y - p0.y) * next.bezie_y.GetY(s);
           bonePos.z = p0.z + (p1.z - p0.z) * next.bezie_z.GetY(s);
         }
+
         // 親ボーン座標系のボーン行列を求める
         const XMMATRIX rot = boneRot.toMatrix();
         const Mat4x4 trans = Mat4x4::Translate(bonePos.x, bonePos.y, bonePos.z);
@@ -230,6 +323,11 @@ namespace s3d_mmd {
   }
   void VMD::UpdateTime() const {
     m_handle->UpdateTime();
+  }
+
+  void VMD::setTime(int frameCount) const {
+    m_handle->setTime(frameCount - 1);
+    UpdateTime();
   }
 
 
