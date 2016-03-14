@@ -197,6 +197,8 @@ namespace s3d_mmd {
       case Type::YZX:
         return CreateY() * CreateZ() * CreateX();
       }
+      assert(0);
+      return Mat4x4::Identity();
     }
   };
   void VMD::Pimpl::UpdateIK(mmd::Bones &bones, const mmd::Ik &ikData) const {
