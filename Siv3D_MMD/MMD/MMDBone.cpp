@@ -41,6 +41,7 @@ namespace s3d_mmd {
     // モデルローカル座標系でのボーン行列を計算
     Mat4x4 Bones::CalcBoneMatML(int index) const {
       Mat4x4 ret = m_bones[index].boneMat;
+
       for (int parent = index; parent = m_bones[parent].parent, parent != -1;) {
         ret *= m_bones[parent].boneMat;
       }

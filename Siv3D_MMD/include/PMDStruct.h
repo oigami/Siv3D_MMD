@@ -50,6 +50,7 @@ namespace s3d_mmd {
       std::uint8_t ik_child_bone_length;  // IKチェーンの長さ
       std::uint16_t iterations;           // 再帰演算回数
       float control_weight;               // ボーンの単位制限角 1.0 → 4.0[rad]。また「ひざ」を含むボーン名をもつボーンはX軸方向にしか動かない制限がある。
+
                                           // unsigned short ik_child_bone_index[ik_chain_length]; // IK影響下のボーン番号 (配列の大きさが変化)
     };
 
@@ -57,6 +58,7 @@ namespace s3d_mmd {
       char skin_name[20];            // 表情名
       std::uint32_t skin_vert_count; // 表情用の頂点数
       std::uint8_t skin_type;        // 表情の種類 → 0:base、1:まゆ、2:目、3:リップ、4:その他
+
                                      // PmdSkinVertexData skin_vert_data[skin_vert_count];	// (配列の大きさが変化)
     };
 

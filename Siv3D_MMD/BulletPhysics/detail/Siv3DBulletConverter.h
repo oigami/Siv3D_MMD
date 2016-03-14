@@ -9,7 +9,7 @@ namespace s3d_bullet {
     namespace {
 
       /// <summary>
-      /// Bullet形式とSiv3D形式の変換 
+      /// Bullet形式とSiv3D形式の変換
       /// </summary>
       /// <param name="v"> 変換するVECTOR3 </param>
       /// <remarks>
@@ -20,7 +20,7 @@ namespace s3d_bullet {
       }
 
       /// <summary>
-      /// Bullet形式とSiv3D形式の変換 
+      /// Bullet形式とSiv3D形式の変換
       /// </summary>
       /// <param name="v"> 変換するarray </param>
       /// <remarks>
@@ -31,7 +31,7 @@ namespace s3d_bullet {
       };
 
       ///       /// <summary>
-      /// Bullet形式とSiv3D形式の変換 
+      /// Bullet形式とSiv3D形式の変換
       /// </summary>
       /// <param name="v"> 変換するVECTOR3 </param>
       /// <returns> pOutのポインタ </returns>
@@ -43,7 +43,7 @@ namespace s3d_bullet {
       }
 
       /// <summary>
-      /// Bullet形式とDirectX形式の変換 
+      /// Bullet形式とDirectX形式の変換
       /// </summary>
       /// <param name="v"> 変換するbtVector3 </param>
       inline Float3 ConvertVector(const btVector3 &v) {
@@ -59,13 +59,14 @@ namespace s3d_bullet {
       }
 
       /// <summary>
-      /// Bullet形式とDirectX形式の変換 
+      /// Bullet形式とDirectX形式の変換
       /// </summary>
       /// <param name="v"> 変換するbtVector3 </param>
       /// <returns> pOutのポインタ </returns>
       inline btTransform ConvertMatrix(const Matrix &m) {
         btTransform ret;
-        // 鏡像変換＋転置 
+
+        // 鏡像変換＋転置
 #ifndef _XM_NO_INTRINSICS_
         DirectX::XMFLOAT4 r[4];
         for (auto& i : step(4))
@@ -89,7 +90,7 @@ namespace s3d_bullet {
       }
 
       /// <summary>
-      /// Bullet形式とDirectX形式の変換 
+      /// Bullet形式とDirectX形式の変換
       /// </summary>
       /// <param name="v"> 変換するbtTransform </param>
       /// <returns> pOutのポインタ </returns>
@@ -100,7 +101,8 @@ namespace s3d_bullet {
         const btVector3 U = basis.getColumn(1);
         const btVector3 L = basis.getColumn(2);
         const btVector3 P = t.getOrigin();
-        // 鏡像変換＋転置 
+
+        // 鏡像変換＋転置
 #ifndef _XM_NO_INTRINSICS_
         ret.r[0] = DirectX::XMVectorSet(R.x(), R.y(), -R.z(), 0.f);
         ret.r[1] = DirectX::XMVectorSet(U.x(), U.y(), -U.z(), 0.f);

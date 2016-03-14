@@ -12,8 +12,10 @@ namespace s3d_mmd {
       String diffuseTextureName;
       bool isCullNone;
       bool isEdge;
+
       //TODO: スフィア
       String SphereTextureName;
+
       //TODO: Toon
       int toonTextureIndex;
 

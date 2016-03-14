@@ -10,18 +10,22 @@
 namespace s3d_mmd {
 
 #ifdef USE_BULLET_PHYSICS
+
   //#pragma unmanaged
   MmdPhysics::MmdPhysics(s3d_bullet::BulletPhysics bulletPhysics) :m_bulletPhysics(bulletPhysics) {
+
     //this->joint_mesh = NULL;
   }
 
   MmdPhysics::~MmdPhysics() {
+
     //int max=rigidbody_mesh.size();
     //int cnt=0;
     /*for(auto &it : rigidbody_mesh){
       printf("max=%d now=%d %p\n",max,cnt++,it);
       SAFE_RELEASE(it);
       }*/
+
       //SAFE_RELEASE(joint_mesh);
     Destroy();
   }
@@ -65,6 +69,7 @@ namespace s3d_mmd {
     m_rigidbodyInit.resize(pmdRigidBodiesSize);
     m_rigidbodyOffset.resize(pmdRigidBodiesSize);
     m_rigidBodies.resize(pmdRigidBodiesSize);
+
     //rigidbody_mesh.resize(pmdRigidBodiessize,0);
     //const MmdStruct::PmdRigidBody *pmdRigidBodies = &pmdRigidBodie[0];
     //#pragma loop(hint_parallel() )
@@ -164,6 +169,7 @@ namespace s3d_mmd {
       m_jointRelatedRigidIndex.push_back(joint.joint_rigidbody_a);
       m_jointMatrix.push_back(frameInA);
     }
+
     //const float length = 0.3f;
     //D3DXCreateBox(pDevice, length, length, length, &joint_mesh, 0);
     const std::uint_fast32_t rigidBodiesSize = static_cast<std::uint_fast32_t>(m_rigidBodies.size());
@@ -180,8 +186,10 @@ namespace s3d_mmd {
   }
 
   void MmdPhysics::BoneUpdate(const Mat4x4 &mat, Array<Mat4x4> &boneWorld) {
+
     //if (physicsEnabled) ;	// 物理シミュレーション
     const std::uint_fast32_t rigidBodiessize = static_cast<std::uint_fast32_t>(m_rigidBodies.size());
+
     //const MATRIX *rigidbodyoffset=&rigidbody_offset[0];
     int count = 0;
     for (std::uint_fast32_t i = 0; i < rigidBodiessize; ++i) {
@@ -210,12 +218,14 @@ namespace s3d_mmd {
         bone.boneMatML = m_initOffsetMat[i - count] * m;
         break;
       }
+
       //物理演算(bone合わせ)
       case 2:
       {
         //うまく動いてるか不明
         bone.extraBoneControl = false;
         Mat4x4 rigidWorld = m_initOffsetMat[i - count] * rigidBodie.getWorld();
+
         // ボーン位置あわせタイプの剛体の位置移動量にボーンの位置移動量を設定
         Mat4x4 boneParentMat = m_bones->CalcParentBoneMat(m_rigidbodyRelatedBoneIndex[i]);
         const Mat4x4 boneMat = bone.boneMat * boneParentMat;
@@ -248,6 +258,7 @@ namespace s3d_mmd {
     }
     DirectX::XMFLOAT3 f;
     DirectX::XMStoreFloat3(&f, (*m_bones)[i].initMatML.r[3]);
+
     // 関連ボーンがある場合は、ボーン相対座標からモデルローカル座標に変換。MmdStruct::PmdRigidBody.pos_posを参照
     p.x += f.x;
     p.y += f.y;

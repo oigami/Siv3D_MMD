@@ -2,7 +2,7 @@
 #include <Siv3D.hpp>
 #include "PMDStruct.h"
 namespace s3d_mmd {
- 
+
   class PMDReader {
 
     pmd::Vertices m_vertices;

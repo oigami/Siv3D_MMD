@@ -15,6 +15,7 @@ namespace s3d_mmd {
         m_map.clear();
         m_nowIndex = 0;
       }
+
       /// <summary>
       /// インデックスを0から振り直す
       /// </summary>
@@ -48,6 +49,7 @@ namespace s3d_mmd {
     const float alpha = pmdMaterial.alpha;
     material.isCullNone = alpha + alphaEps < 1.0;
     if (pmdMaterial.texture_file_name[0] != '\0') {
+
       //TODO: スフィアに未対応
       String filename = Widen({ pmdMaterial.texture_file_name,sizeof(pmdMaterial.texture_file_name) });
       const size_t pos = filename.lastIndexOf(L'*');
@@ -148,11 +150,13 @@ namespace s3d_mmd {
       const auto &item = pmdBones[i];
       mmd::Bone &bone = bones[i];
       const uint16 parentBoneIndex = item.parent_bone_index;
+
       //自分と同じ親で自分よりあとのボーンが兄弟になる
       for (int j = i + 1; j < size; ++j) if (parentBoneIndex == pmdBones[j].parent_bone_index) {
         bone.sibling = j;
         break;
       }
+
       //自分が親担っていて一番早く現れるボーンが子になる
       for (int j : step(size)) if (i == pmdBones[j].parent_bone_index) {
         bone.firstChild = j;

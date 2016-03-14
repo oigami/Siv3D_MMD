@@ -1,6 +1,7 @@
 ﻿/*
 bullet関係のメモリ確保時にアライメントをしっかり把握しておく
 エラー内容自体はメモリアクセス違反で原因特定がしにくいので注意する
+
 //Newはアライメントに対応してないのでクラッシュする
 //それぞれのクラスでオーバーロードされたoperator newを使う
 */
@@ -90,6 +91,7 @@ namespace s3d_bullet {
           const std::array<float, 3> & c_p1, const std::array<float, 3> & c_p2,
           const std::array<float, 3> & c_r1, const std::array<float, 3> & c_r2,
           const btVector3 & stiffnessPos, const btVector3 & stiffnessRot) {
+
         // 第五引数の効果は謎。どちらでも同じ様に見える……。
         std::shared_ptr<btGeneric6DofSpringConstraint> constraint(
           new btGeneric6DofSpringConstraint(bodyA, bodyB, frameInA, frameInB, true));
@@ -145,6 +147,7 @@ namespace s3d_bullet {
         bulletdata->body->setRestitution(restitution);
         bulletdata->body->setFriction(friction);
         bulletdata->body->setDamping(linear_damp, angular_damp);
+
         //float linearDamp = body->getLinearDamping();
         //float angularDamp = body->getAngularDamping();
         if (kinematic) {
@@ -155,8 +158,10 @@ namespace s3d_bullet {
         /*
         group : 0x8000 壁などのあたり判定用の番号
         */
+
         //WaitForSingleObject(mutex_, INFINITE);
         m_dynamicsWorld->addRigidBody(bulletdata->body.get(), group, mask);
+
         //ReleaseMutex(mutex_);
 
         //unique_ptr<btRigidBody> bodyunique(btbody);
@@ -200,6 +205,7 @@ namespace s3d_bullet {
       shift.setIdentity();
       shift.setOrigin(coord);
       heroShape->addChildShape(shift, box.get());
+
       //collisionShapes.push_back(box);
       auto bulletdata = CreateShape(move(heroShape), world, mass, restitution, friction, linear_damp, angular_damp, kinematic, group, mask);
       bulletdata->heroshape = move(box);
@@ -260,4 +266,3 @@ namespace s3d_bullet {
 
   }
 }
-

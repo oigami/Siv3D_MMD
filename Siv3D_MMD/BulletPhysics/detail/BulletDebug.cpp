@@ -19,7 +19,7 @@ namespace s3d_bullet {
   DebugDraw::~DebugDraw() {
   }
 
- 
+
   void DebugDraw::drawLine(const btVector3& from, const btVector3& to, const btVector3& btColor) {
     const Vec3 vec1 = bullet::ConvertVector(from);
     const Vec3 vec2 = bullet::ConvertVector(to);
@@ -27,7 +27,7 @@ namespace s3d_bullet {
     Line3D(vec1, vec2).drawForward(color);
   }
 
- 
+
 
   void DebugDraw::drawSphere(btScalar radius, const btTransform &transform, const btVector3 & color) {
     const Vec3 pos = bullet::ConvertVector(transform.getOrigin());
@@ -59,12 +59,13 @@ namespace s3d_bullet {
     const Vec3 vec = bullet::ConvertVector(transform.getOrigin());
     const Quaternion rot = bullet::ConvertQuaternion(transform.getRotation()*upAxis);
     SetRasterizerState(RasterizerState::WireframeCullBack, [&]() {
+
       //TODO: Capsuleがない
       Cylinder(vec, radius, halfHeight * 2, rot).draw(bullet::ConvertColor(color));
     });
   }
 
-  void DebugDraw::drawCylinder(btScalar radius, btScalar halfHeight, int upAxis, 
+  void DebugDraw::drawCylinder(btScalar radius, btScalar halfHeight, int upAxis,
     const btTransform & transform, const btVector3 & color) {
 
     const Vec3 vec = bullet::ConvertVector(transform.getOrigin());

@@ -34,7 +34,7 @@ namespace s3d_bullet {
     //  unsigned short group = 1, unsigned short mask = 0xFFFF);
 
     /// <summary>
-    /// 6軸ジョイントを追加 
+    /// 6軸ジョイントを追加
     /// </summary>
     /// <param name="bodyA"> 剛体A </param>
     /// <param name="bodyB"> 剛体B </param>
@@ -53,7 +53,7 @@ namespace s3d_bullet {
       const Float3 &stiffnessPos, const Float3 &stiffnessRot);
 
     /// <summary>
-    /// 物理演算の世界の時間を進める 
+    /// 物理演算の世界の時間を進める
     /// </summary>
     void StepSimulation();
 

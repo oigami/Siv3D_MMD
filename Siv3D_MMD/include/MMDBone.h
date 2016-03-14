@@ -58,7 +58,7 @@ namespace s3d_mmd {
 
       // モデルローカル座標系でのボーン行列を計算
       Mat4x4 CalcBoneMatML(int index) const;
-      
+
       Mat4x4 CalcParentBoneMat(int index)const {
         if (m_bones[index].parent == -1) return Mat4x4::Identity();
         return CalcBoneMatML(m_bones[index].parent);

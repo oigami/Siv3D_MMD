@@ -1,6 +1,7 @@
 ﻿#pragma once
+
 //物理演算を使用する場合に定義する
-#define USE_BULLET_PHYSICS
+//#define USE_BULLET_PHYSICS
 #include <memory>
 #include "MMDModel.h"
 #include "MMDBone.h"
@@ -19,7 +20,7 @@ namespace s3d_mmd {
     MMD(const FilePath &filename) :MMD(MMDModel(filename)) {}
     ~MMD();
 
-    void PhysicsUpdate(Array<Mat4x4> &boneWorld) const ;
+    void PhysicsUpdate(Array<Mat4x4> &boneWorld) const;
 
     void draw() const;
     void draw(const VMD &vmd) const;

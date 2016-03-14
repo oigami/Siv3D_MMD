@@ -7,6 +7,7 @@ namespace s3d_mmd {
   VMDReader::VMDReader(const FilePath & file_name) {
     constexpr int frame_rate = 60;     // 本プログラムのフレームレート
     constexpr int mmd_frame_rate = 30; // MMDのフレームレート
+
                                        // VMDファイルからVMDデータを抽出
     BinaryReader ifs(file_name);
     if (!ifs.isOpened())
@@ -16,6 +17,7 @@ namespace s3d_mmd {
 
     Array<vmd::Bone> vmdMotions;
     ReadSizeAndArray<uint32>(ifs, vmdMotions);
+
     // KeyFramesに格納
     last_frame = 0;
     for (const auto& i : vmdMotions) {

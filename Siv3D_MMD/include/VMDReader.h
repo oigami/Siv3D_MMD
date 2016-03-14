@@ -4,6 +4,7 @@ namespace s3d_mmd {
   namespace vmd {
 
 #pragma pack(push, 1)
+
     //http://harigane.at.webry.info/201103/article_1.html
 
     /// VMD構造体定義
@@ -55,7 +56,7 @@ namespace s3d_mmd {
       std::uint8_t type;   // セルフシャドウ種類, 0:OFF, 1:mode1, 2:mode2
       float distance;      // シャドウ距離(MMD入力値Lを(10000-L)/100000とした値)
     };
-    
+
     struct InfoIk {
       char name[20];       // "右足ＩＫ\0"などのIKボーン名の文字列 20byte
       std::uint8_t on_off; // IKのon/off, 0:OFF, 1:ON
@@ -65,6 +66,7 @@ namespace s3d_mmd {
       std::uint32_t frame;    // フレーム番号
       std::uint8_t show;      // モデル表示, 0:OFF, 1:ON
       std::uint32_t ik_count; // 記録するIKの数
+
       //InfoIK ik[ik_count];  // IK on/off情報配列
     };
 
@@ -91,7 +93,7 @@ namespace s3d_mmd {
 
       std::string boneName; /// <summary>ボーン名</summary>
       int frameNo;          /// <summary>フレーム番号</summary>
-      Vec3 position;        /// <summary>位置</summary> 
+      Vec3 position;        /// <summary>位置</summary>
       Quaternion rotation;  /// <summary>回転</summary>
       Bezie bezie_x;
       Bezie bezie_y;

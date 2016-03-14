@@ -12,7 +12,7 @@ namespace s3d_bullet {
     public:
       Box() = default;
       Box(const Float3& size);
-      Box::Box(float width, float height, float depth);
+      Box(float width, float height, float depth);
 
       void setMass(float mass);
 

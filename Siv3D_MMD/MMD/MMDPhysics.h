@@ -9,11 +9,11 @@
 namespace s3d_mmd {
 
   class MmdPhysics {
-    
+
     /// 全ボーン配列へのポインタをセット
     /// @param bones 全ボーン配列へのポインタ
     void SetBones(std::shared_ptr<mmd::Bones> bones);
-    
+
     /// 剛体を作成
     /// @param pmdRigidBodies Pmd剛体配列
     /// @param pmdBones Pmdボーン配列
@@ -50,6 +50,7 @@ namespace s3d_mmd {
     Array<int> m_rigidbodyType;             // 各剛体のタイプ
     Array<Matrix> m_rigidbodyInit;          // 各剛体の初期姿勢行列
     Array<Matrix> m_rigidbodyOffset;        // 各剛体のオフセット行列
+
     //vector<ID3DXMesh*> rigidbody_mesh;    // 各剛体のメッシュ
     //ID3DXMesh* joint_mesh;                // ジョイントのメッシュ
     Array<int> m_jointRelatedRigidIndex;    // 各ジョイントの関連剛体

@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <memory>
+
 //DirectXMathとの衝突を回避
 #define BT_NO_SIMD_OPERATOR_OVERLOADS
 
@@ -18,6 +19,7 @@
 
 #pragma comment(lib, "x64/bullet/BulletCollision_d")
 #pragma comment(lib, "x64/bullet/BulletDynamics_d")
+
 //#pragma comment(lib, "x64/bullet/BulletSoftBody_d.lib")
 #pragma comment(lib, "x64/bullet/LinearMath_d")
 
@@ -25,6 +27,7 @@
 
 #pragma comment(lib, "x64/bullet/BulletCollision")
 #pragma comment(lib, "x64/bullet/BulletDynamics")
+
 //#pragma comment(lib, "x64/bullet/BulletSoftBody.lib")
 #pragma comment(lib, "x64/bullet/LinearMath")
 
@@ -41,6 +44,7 @@ namespace s3d_bullet {
         }
 
         ~Data() {
+
           //どちらかが消えた場合はあっても意味が無いので直ぐに削除
           for (auto &it : Constraintnum) {
             m_dynamicsWorld->removeConstraint(it.get());
@@ -60,7 +64,7 @@ namespace s3d_bullet {
         btTransform GetWorld();
 
         /// <summary>
-        /// ジョイント 
+        /// ジョイント
         /// </summary>
         std::vector<std::shared_ptr<btTypedConstraint>> Constraintnum;
         std::unique_ptr<btRigidBody> body;
@@ -111,7 +115,7 @@ namespace s3d_bullet {
         float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
         unsigned short group = 1, unsigned short mask = 0xFFFF);
 
-      // 拘束条件追加 
+      // 拘束条件追加
       void AddPointToPointConstraint(std::shared_ptr<bullet::detail::Data> body, const btVector3& pivot);
 
       void AddPointToPointConstraint(std::shared_ptr<bullet::detail::Data> bodyA,
@@ -119,7 +123,7 @@ namespace s3d_bullet {
         const btVector3& pivotInA, const btVector3& pivotInB);
 
       /// <summary>
-      /// 6軸ジョイントを追加 
+      /// 6軸ジョイントを追加
       /// </summary>
       /// <param name="bodyA"> 剛体A </param>
       /// <param name="bodyB"> 剛体B </param>
@@ -137,13 +141,13 @@ namespace s3d_bullet {
         const std::array<float, 3>& c_r1, const std::array<float, 3>& c_r2,
         const btVector3 &stiffnessPos, const btVector3 &stiffnessRot);
 
-      // 剛体を移動 
+      // 剛体を移動
       void MoveRigidBody(int num, const btTransform &world);
 
       void SetMatrixRigidBody(int num, const btTransform &world);
 
       /// <summary>
-      /// 物理演算の世界の時間を進める 
+      /// 物理演算の世界の時間を進める
       /// </summary>
       void StepSimulation();
 

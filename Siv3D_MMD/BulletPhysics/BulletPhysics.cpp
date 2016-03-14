@@ -27,10 +27,10 @@ namespace s3d_bullet {
   }*/
 
 
-  void BulletPhysics::Add6DofSpringConstraint(bullet::RigidBody & bodyA, bullet::RigidBody & bodyB, 
-    const Mat4x4 & frameInA, const Mat4x4 & frameInB, 
-    const std::array<float, 3>& c_p1, const std::array<float, 3>& c_p2, 
-    const std::array<float, 3>& c_r1, const std::array<float, 3>& c_r2, 
+  void BulletPhysics::Add6DofSpringConstraint(bullet::RigidBody & bodyA, bullet::RigidBody & bodyB,
+    const Mat4x4 & frameInA, const Mat4x4 & frameInB,
+    const std::array<float, 3>& c_p1, const std::array<float, 3>& c_p2,
+    const std::array<float, 3>& c_r1, const std::array<float, 3>& c_r2,
     const Float3 & stiffnessPos, const Float3 & stiffnessRot) {
 
     auto constraint = m_pimpl->bulletDatail.Add6DofSpringConstraint(*bodyA.m_rigidBody, *bodyB.m_rigidBody,
@@ -57,4 +57,3 @@ namespace s3d_bullet {
   }
 
 }
-

@@ -142,9 +142,9 @@ namespace s3d_mmd {
       return{ x + 0.1, y + 0.1 };
     }
 
-    Pimpl(const MMDModel& model) 
+    Pimpl(const MMDModel& model)
 #ifdef USE_BULLET_PHYSICS
-      : m_mmdPhysics(s3d_bullet::getBulletPhysics()) 
+      : m_mmdPhysics(s3d_bullet::getBulletPhysics())
 #endif
     {
       m_bones = model.bones();
@@ -252,7 +252,7 @@ namespace s3d_mmd {
     }
 #ifdef USE_BULLET_PHYSICS
     MmdPhysics m_mmdPhysics;
-    
+
 #endif
     void PhysicsUpdate(Array<Mat4x4> &boneWorld) {
 #ifdef USE_BULLET_PHYSICS
