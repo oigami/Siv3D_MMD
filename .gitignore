@@ -213,3 +213,4 @@ ModelManifest.xml
 *.opendb
 */lib/*/*.bat
 ExampleA/
+*log.html
