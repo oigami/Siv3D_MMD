@@ -300,6 +300,10 @@ namespace s3d_mmd {
     return m_handle->m_vertexTexture;
   }
 
+  bool MMD::isOpen() const {
+    return !!m_handle;
+  }
+
   std::shared_ptr<mmd::Bones> MMD::bones() const {
     return m_handle->m_bones;
   }

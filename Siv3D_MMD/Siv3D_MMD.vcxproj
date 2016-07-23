@@ -9,6 +9,10 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="release_lib|x64">
+      <Configuration>release_lib</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
@@ -23,12 +27,18 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_lib|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_lib|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
@@ -52,6 +62,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_lib|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_lib|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -59,19 +72,30 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SIV3D_20160110)\Inc;$(ProjectDir)lib\bullet3-2.83.7\src;$(IncludePath)</IncludePath>
-    <OutDir>\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>\$(Platform)\$(Configuration)\</IntDir>
     <LibraryPath>$(SIV3D_20160110)\Lib;$(ProjectDir)lib\bullet3-2.83.7\lib;$(LibraryPath)</LibraryPath>
+    <OutDir>A:\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>A:\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_lib|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SIV3D_20160110)\Inc;$(ProjectDir)lib\bullet3-2.83.7\src;$(IncludePath)</IncludePath>
     <LibraryPath>$(SIV3D_20160110)\Lib;$(ProjectDir)lib\bullet3-2.83.7\lib;$(LibraryPath)</LibraryPath>
+    <OutDir>A:\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>A:\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_lib|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SIV3D_20160110)\Inc;$(ProjectDir)lib\bullet3-2.83.7\src;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SIV3D_20160110)\Lib;$(ProjectDir)lib\bullet3-2.83.7\lib;$(LibraryPath)</LibraryPath>
+    <OutDir>A:\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>A:\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SIV3D_20160110)\Inc;$(ProjectDir)lib\bullet3-2.83.7\src;$(IncludePath)</IncludePath>
     <LibraryPath>$(SIV3D_20160110)\Lib;$(ProjectDir)lib\bullet3-2.83.7\lib;$(LibraryPath)</LibraryPath>
+    <OutDir>A:\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>A:\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -98,6 +122,24 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;LIB_COMPILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_lib|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;LIB_COMPILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

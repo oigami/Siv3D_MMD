@@ -121,6 +121,11 @@ namespace s3d_mmd {
     void setTime(int frameCount) {
       m_nowTime = frameCount;
     }
+
+    void IsLoop(bool loop, int start) {
+      m_isLoop = loop;
+      m_loopStart = start;
+    }
   };
 
   // IKボーン影響下ボーンの行列を更新
@@ -298,6 +303,16 @@ namespace s3d_mmd {
 
   void VMD::Pimpl::UpdateTime() {
     m_nowTime++;
+    if (m_isLoop) {
+      if (m_nowTime >= m_loopEnd) {
+        for (auto& i : m_keyFrameData) {
+          KeyFrameData &keyData = i.second;
+          const size_t keyframe_size = keyData.m_keyFrames->size();
+          keyData.m_nowFrameNum = 0;
+        }
+        m_nowTime = m_loopStart;
+      }
+    }
     for (auto& i : m_keyFrameData) {
       KeyFrameData &keyData = i.second;
       const size_t keyframe_size = keyData.m_keyFrames->size();
@@ -330,6 +345,10 @@ namespace s3d_mmd {
   void VMD::setTime(int frameCount) const {
     m_handle->setTime(frameCount - 1);
     UpdateTime();
+  }
+
+  void VMD::IsLoop(bool loop, int startTime) const {
+    m_handle->IsLoop(loop, startTime);
   }
 
 

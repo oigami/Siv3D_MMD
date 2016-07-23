@@ -17,5 +17,7 @@ namespace s3d_mmd {
     void UpdateBone(mmd::Bones &bones) const;
     void UpdateTime() const;
     void setTime(int frameCount) const;
+
+    void IsLoop(bool loop, int startTime)const;
   };
 }
