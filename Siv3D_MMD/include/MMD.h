@@ -2,11 +2,13 @@
 
 //物理演算を使用する場合に定義する
 //#define USE_BULLET_PHYSICS
+#ifndef MAKE_SIV3D_MMD_EXE
 #ifdef NDEBUG
 #pragma comment(lib, "Siv3d_MMD")
 #else
 #pragma comment(lib, "Siv3d_MMD_d")
 #endif // NDEBUG
+#endif // MAKE_SIV3D_MMD_EXE
 
 #include <memory>
 #include "MMDModel.h"
