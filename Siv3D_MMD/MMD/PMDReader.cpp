@@ -1,9 +1,11 @@
 ﻿#include "../include/PMDReader.h"
 #include "ReaderHelper.h"
-namespace s3d_mmd {
-  PMDReader::PMDReader(const FilePath& path) { // ヘッダ
+namespace s3d_mmd
+{
+  PMDReader::PMDReader(const FilePath& path)
+  { // ヘッダ
     BinaryReader reader(path);
-    if (!reader.isOpened()) return;
+    if ( !reader.isOpened() ) return;
     pmd::Header pmdHeader;
     reader.read(pmdHeader);
     m_modelName = Widen(pmdHeader.model_name);
@@ -18,7 +20,8 @@ namespace s3d_mmd {
     std::uint16_t numPmdIkData;
     reader.read(numPmdIkData);
     m_ikData.resize(numPmdIkData);
-    for (auto& pmdIkData : m_ikData) {
+    for ( auto& pmdIkData : m_ikData )
+    {
       pmd::IkDataWithoutArray *pmdIkDataWithoutArray = &pmdIkData;
       reader.read(*pmdIkDataWithoutArray);
       ReadArray(reader, pmdIkData.ik_child_bone_length, pmdIkData.ik_child_bone_index);
@@ -28,7 +31,8 @@ namespace s3d_mmd {
     std::uint16_t numPmdSkin;
     reader.read(numPmdSkin);
     m_skinData.resize(numPmdSkin);
-    for (auto& skinData : m_skinData) {
+    for ( auto& skinData : m_skinData )
+    {
       pmd::SkinDataWithoutArray *pmdSkinDataWithoutArray = &skinData;
       reader.read(*pmdSkinDataWithoutArray);
       ReadArray(reader, skinData.skin_vert_count, skinData.skin_vert_data);
@@ -49,12 +53,13 @@ namespace s3d_mmd {
     reader.read(english_name_compatibility);
 
     // 各種英名
-    if (english_name_compatibility == 1) {
+    if ( english_name_compatibility == 1 )
+    {
       pmd::EnglishName tmp;
       reader.read(tmp.modelName); // モデル名
       reader.read(tmp.comment);   // コメント
       ReadArray(reader, numPmdBone, tmp.boneName); // ボーンリスト
-      if (numPmdSkin)
+      if ( numPmdSkin )
         ReadArray(reader, numPmdSkin - 1, tmp.skinName); // 表情リスト
       ReadArray(reader, numBoneDispName, tmp.boneDispName); // ボーン枠用枠名リスト
       m_englishName = tmp;
@@ -72,6 +77,6 @@ namespace s3d_mmd {
     ReadSizeAndArray<std::uint32_t>(reader, m_joints);
   }
 
-  PMDReader::~PMDReader() {
-  }
+  PMDReader::~PMDReader()
+  {}
 }

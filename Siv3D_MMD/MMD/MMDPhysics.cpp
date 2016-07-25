@@ -7,17 +7,20 @@
 #include "../include/BulletCapsule.h"
 #endif
 #include <DirectXMath.h>
-namespace s3d_mmd {
+namespace s3d_mmd
+{
 
 #ifdef USE_BULLET_PHYSICS
 
   //#pragma unmanaged
-  MmdPhysics::MmdPhysics(s3d_bullet::BulletPhysics bulletPhysics) :m_bulletPhysics(bulletPhysics) {
+  MmdPhysics::MmdPhysics(s3d_bullet::BulletPhysics bulletPhysics) :m_bulletPhysics(bulletPhysics)
+  {
 
     //this->joint_mesh = NULL;
   }
 
-  MmdPhysics::~MmdPhysics() {
+  MmdPhysics::~MmdPhysics()
+  {
 
     //int max=rigidbody_mesh.size();
     //int cnt=0;
@@ -31,14 +34,16 @@ namespace s3d_mmd {
   }
 
   void MmdPhysics::Create(std::shared_ptr<mmd::Bones> bones,
-    const std::vector<pmd::RigidBody>& pmdRigidBodies,
-    const std::vector<pmd::Joint>& pmdJoints) {
+                          const std::vector<pmd::RigidBody>& pmdRigidBodies,
+                          const std::vector<pmd::Joint>& pmdJoints)
+  {
     SetBones(bones);
     CreateRigid(pmdRigidBodies);
     CreateJoint(pmdJoints);
   }
 
-  void MmdPhysics::Destroy() {
+  void MmdPhysics::Destroy()
+  {
     /*for (auto &it : m_rigidBodies) {
       it.body_.RemoveRigidBody();
       it.body_.release();
@@ -54,7 +59,8 @@ namespace s3d_mmd {
     m_rigidMat.clear();
     m_initOffsetMat.clear();
   }
-  void MmdPhysics::SetBones(std::shared_ptr<mmd::Bones> bones) {
+  void MmdPhysics::SetBones(std::shared_ptr<mmd::Bones> bones)
+  {
     this->m_bones = bones;
   }
 
@@ -62,7 +68,8 @@ namespace s3d_mmd {
   /// @param pmdRigidBodies Pmd剛体配列
   /// @param pmdBones Pmdボーン配列
 
-  inline void MmdPhysics::CreateRigid(const std::vector<s3d_mmd::pmd::RigidBody>& pmdRigidBodies) {
+  inline void MmdPhysics::CreateRigid(const std::vector<s3d_mmd::pmd::RigidBody>& pmdRigidBodies)
+  {
     const int pmdRigidBodiesSize = static_cast<int>(pmdRigidBodies.size());
     m_rigidbodyRelatedBoneIndex.resize(pmdRigidBodiesSize);
     m_rigidbodyType.resize(pmdRigidBodiesSize);
@@ -76,7 +83,8 @@ namespace s3d_mmd {
 
     //for(auto it=pmdRigidBodie.begin(); it!=itend; ++it){
 
-    for (int i = 0; i < pmdRigidBodiesSize; ++i) {
+    for ( int i = 0; i < pmdRigidBodiesSize; ++i )
+    {
       using namespace DirectX;
       m_rigidbodyRelatedBoneIndex[i] = (pmdRigidBodies[i].rigidbody_rel_bone_index);
       m_rigidbodyType[i] = (pmdRigidBodies[i].rigidbody_type);
@@ -87,27 +95,32 @@ namespace s3d_mmd {
       m_rigidbodyOffset[i] = world_inv;
       s3d_bullet::bullet::RigidBody rigidBody;
       const bool isKinematic = pmdRigidBodies[i].rigidbody_type == 0;
-      if (pmdRigidBodies[i].shape_type == 0) {		// 球
+      if ( pmdRigidBodies[i].shape_type == 0 )
+      {		// 球
         const float radius = pmdRigidBodies[i].shape_w;
 
         s3d_bullet::bullet::Sphere sphere(radius);
-        if (!isKinematic) sphere.setMass(pmdRigidBodies[i].rigidbody_weight);
+        if ( !isKinematic ) sphere.setMass(pmdRigidBodies[i].rigidbody_weight);
         rigidBody = std::move(s3d_bullet::bullet::RigidBody{ sphere, m_rigidbodyInit[i] });
 
-      } else if (pmdRigidBodies[i].shape_type == 1) {	// 箱
+      }
+      else if ( pmdRigidBodies[i].shape_type == 1 )
+      {	// 箱
         const float width = 2 * pmdRigidBodies[i].shape_w;
         const float height = 2 * pmdRigidBodies[i].shape_h;
         const float depth = 2 * pmdRigidBodies[i].shape_d;
 
         s3d_bullet::bullet::Box box(width, height, depth);
-        if (!isKinematic) box.setMass(pmdRigidBodies[i].rigidbody_weight);
+        if ( !isKinematic ) box.setMass(pmdRigidBodies[i].rigidbody_weight);
         rigidBody = { box, m_rigidbodyInit[i] };
 
-      } else if (pmdRigidBodies[i].shape_type == 2) {	// カプセル
+      }
+      else if ( pmdRigidBodies[i].shape_type == 2 )
+      {	// カプセル
         const float radius = pmdRigidBodies[i].shape_w, height = pmdRigidBodies[i].shape_h;
 
         s3d_bullet::bullet::Capsule capsule(radius, height);
-        if (!isKinematic) capsule.setMass(pmdRigidBodies[i].rigidbody_weight);
+        if ( !isKinematic ) capsule.setMass(pmdRigidBodies[i].rigidbody_weight);
         rigidBody = { capsule, m_rigidbodyInit[i] };
       }
 
@@ -121,22 +134,26 @@ namespace s3d_mmd {
     }
   }
 
-  template<class T, size_t n> std::array<float, 3> ConvertArray(T(&val)[n]) {
+  template<class T, size_t n> std::array<float, 3> ConvertArray(T(&val)[n])
+  {
     static_assert(n == 3 || n == 4, "");
     return std::array<float, 3>({ val[0], val[1], val[2] });
   }
 
-  template<class T, size_t n> Float3 ConvertFloat(T(&val)[n]) {
+  template<class T, size_t n> Float3 ConvertFloat(T(&val)[n])
+  {
     static_assert(n == 3 || n == 4, "");
     return Float3(val[0], val[1], val[2]);
   }
 
-  void MmdPhysics::CreateJoint(const Array<s3d_mmd::pmd::Joint> &pmdJoints) {
+  void MmdPhysics::CreateJoint(const Array<s3d_mmd::pmd::Joint> &pmdJoints)
+  {
     const size_t pmdJointsSize = pmdJoints.size();
     m_jointRelatedRigidIndex.reserve(pmdJointsSize);
     m_jointMatrix.reserve(pmdJointsSize);
 
-    for (auto &joint : pmdJoints) {
+    for ( auto &joint : pmdJoints )
+    {
       using namespace DirectX;
       std::array<float, 3> c_p1(ConvertArray(joint.constrain_pos_1));
       std::array<float, 3> c_p2(ConvertArray(joint.constrain_pos_2));
@@ -162,9 +179,9 @@ namespace s3d_mmd {
       const Mat4x4 frameInB = world * bInv;
 
       m_bulletPhysics.Add6DofSpringConstraint(rigidbody_a, rigidbody_b,
-        frameInA,
-        frameInB,
-        c_p1, c_p2, c_r1, c_r2, s_p, s_r);
+                                              frameInA,
+                                              frameInB,
+                                              c_p1, c_p2, c_r1, c_r2, s_p, s_r);
 
       m_jointRelatedRigidIndex.push_back(joint.joint_rigidbody_a);
       m_jointMatrix.push_back(frameInA);
@@ -173,8 +190,9 @@ namespace s3d_mmd {
     //const float length = 0.3f;
     //D3DXCreateBox(pDevice, length, length, length, &joint_mesh, 0);
     const std::uint_fast32_t rigidBodiesSize = static_cast<std::uint_fast32_t>(m_rigidBodies.size());
-    for (std::uint_fast32_t i = 0; i < rigidBodiesSize; ++i) {
-      if (m_rigidbodyRelatedBoneIndex[i] == 0xFFFF)
+    for ( std::uint_fast32_t i = 0; i < rigidBodiesSize; ++i )
+    {
+      if ( m_rigidbodyRelatedBoneIndex[i] == 0xFFFF )
         continue;
       const mmd::Bone &bone = (*m_bones)[m_rigidbodyRelatedBoneIndex[i]];
       const Matrix m = m_rigidbodyInit[i] * bone.offsetMat;
@@ -185,22 +203,26 @@ namespace s3d_mmd {
 
   }
 
-  void MmdPhysics::BoneUpdate(const Mat4x4 &mat, Array<Mat4x4> &boneWorld) {
+  void MmdPhysics::BoneUpdate(const Mat4x4 &mat, Array<Mat4x4> &boneWorld)
+  {
 
     //if (physicsEnabled) ;	// 物理シミュレーション
     const std::uint_fast32_t rigidBodiessize = static_cast<std::uint_fast32_t>(m_rigidBodies.size());
 
     //const MATRIX *rigidbodyoffset=&rigidbody_offset[0];
     int count = 0;
-    for (std::uint_fast32_t i = 0; i < rigidBodiessize; ++i) {
-      if (m_rigidbodyRelatedBoneIndex[i] == 0xFFFF) {
+    for ( std::uint_fast32_t i = 0; i < rigidBodiessize; ++i )
+    {
+      if ( m_rigidbodyRelatedBoneIndex[i] == 0xFFFF )
+      {
         count++;
         continue;
       }
       mmd::Bone& bone = (*m_bones)[m_rigidbodyRelatedBoneIndex[i]];
       auto &rigidBodie = m_rigidBodies[i];
       using namespace DirectX;
-      switch (m_rigidbodyType[i]) {
+      switch ( m_rigidbodyType[i] )
+      {
       case 0: //bone追従
       {
         // ボーン追従タイプの剛体にボーン行列を設定
@@ -251,9 +273,11 @@ namespace s3d_mmd {
   // @param rot		剛体の回転		：MmdStruct::PmdRigidBody.pos_rot[3]
   // @param i			関連ボーン番号
   // @return			ワールド変換行列
-  Mat4x4 MmdPhysics::CreateRigidMatrix(const float* pos, const float* rot, int i) {
+  Mat4x4 MmdPhysics::CreateRigidMatrix(const float* pos, const float* rot, int i)
+  {
     Float3 p = Float3(pos[0], pos[1], pos[2]);
-    if (i == 0xffff) {
+    if ( i == 0xffff )
+    {
       i = 0; //関連ボーンがない場合は0のセンターボーンが基準
     }
     DirectX::XMFLOAT3 f;

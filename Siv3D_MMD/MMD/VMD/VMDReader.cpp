@@ -1,16 +1,18 @@
 ﻿#include "../../include/VMDReader.h"
 #include "../ReaderHelper.h"
-namespace s3d_mmd {
+namespace s3d_mmd
+{
 
   /// <summary>VMDファイルからデータを取り出す</summary>
   /// <param name="file_name"></param>
-  VMDReader::VMDReader(const FilePath & file_name) {
+  VMDReader::VMDReader(const FilePath & file_name)
+  {
     constexpr int frame_rate = 60;     // 本プログラムのフレームレート
     constexpr int mmd_frame_rate = 30; // MMDのフレームレート
 
                                        // VMDファイルからVMDデータを抽出
     BinaryReader ifs(file_name);
-    if (!ifs.isOpened())
+    if ( !ifs.isOpened() )
       return;
     vmd::Header vmdHeader;
     ifs.read(vmdHeader);
@@ -20,7 +22,8 @@ namespace s3d_mmd {
 
     // KeyFramesに格納
     last_frame = 0;
-    for (const auto& i : vmdMotions) {
+    for ( const auto& i : vmdMotions )
+    {
       vmd::KeyFrame keyFrame;
       keyFrame.boneName = i.boneName;
       keyFrame.frameNo = i.frameNo;
@@ -35,7 +38,8 @@ namespace s3d_mmd {
       getKeyFrames(i.boneName)->push_back(std::move(keyFrame));
     }
 
-    for (auto& it : keyFrames) {
+    for ( auto& it : keyFrames )
+    {
       auto &i = it.second;
       std::sort(i->begin(), i->end());
     }
@@ -44,9 +48,11 @@ namespace s3d_mmd {
   /// <summary>ボーン名に応じたキーフレームを返す</summary>
   /// <param name="bone_name">ボーン名</param>
   /// <returns>キーフレーム</returns>
-  std::shared_ptr<Array<vmd::KeyFrame>> VMDReader::getKeyFrames(const std::string & bone_name) {
+  std::shared_ptr<Array<vmd::KeyFrame>> VMDReader::getKeyFrames(const std::string & bone_name)
+  {
     auto &frame = keyFrames[bone_name];
-    if (frame == nullptr) {
+    if ( frame == nullptr )
+    {
       frame = std::make_shared<Array<vmd::KeyFrame>>();
     }
     return frame;

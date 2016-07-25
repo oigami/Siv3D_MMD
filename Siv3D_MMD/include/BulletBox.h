@@ -1,11 +1,14 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
 #include "BulletRigidBody.h"
-namespace s3d_bullet {
-  namespace bullet {
+namespace s3d_bullet
+{
+  namespace bullet
+  {
     class RigidBody;
 
-    class Box {
+    class Box
+    {
       friend RigidBody;
       class Pimpl;
       std::shared_ptr<Pimpl> m_pimpl;

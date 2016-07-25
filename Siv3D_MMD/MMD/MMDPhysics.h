@@ -6,9 +6,11 @@
 #include "../include/PMDStruct.h"
 #include "../include/MMDBone.h"
 
-namespace s3d_mmd {
+namespace s3d_mmd
+{
 
-  class MmdPhysics {
+  class MmdPhysics
+  {
 
     /// 全ボーン配列へのポインタをセット
     /// @param bones 全ボーン配列へのポインタ
@@ -29,8 +31,8 @@ namespace s3d_mmd {
     ~MmdPhysics();
 
     void Create(std::shared_ptr<mmd::Bones> bones,
-      const std::vector<pmd::RigidBody> &pmdRigidBodies,
-      const std::vector<pmd::Joint> &pmdJoints);
+                const std::vector<pmd::RigidBody> &pmdRigidBodies,
+                const std::vector<pmd::Joint> &pmdJoints);
 
     void Destroy();
 

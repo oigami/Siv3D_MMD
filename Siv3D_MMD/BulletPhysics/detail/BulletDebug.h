@@ -3,9 +3,11 @@
 
 #include <LinearMath/btIDebugDraw.h>
 
-namespace s3d_bullet {
+namespace s3d_bullet
+{
 
-  class DebugDraw : public btIDebugDraw {
+  class DebugDraw : public btIDebugDraw
+  {
     int  m_debugMode;
 
   public:

@@ -1,19 +1,23 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
-namespace s3d_mmd {
-  namespace vmd {
+namespace s3d_mmd
+{
+  namespace vmd
+  {
 
 #pragma pack(push, 1)
 
     //http://harigane.at.webry.info/201103/article_1.html
 
     /// VMD構造体定義
-    struct Header {
+    struct Header
+    {
       char vmdHeader[30];
       char vmdModelName[20];
     };
 
-    struct Bone {
+    struct Bone
+    {
       char boneName[15];
       std::uint32_t frameNo;
       float location[3]; // 移動量
@@ -21,13 +25,15 @@ namespace s3d_mmd {
       std::uint8_t interpolation[64];
     };
 
-    struct Morph {
+    struct Morph
+    {
       char name[15];
       std::uint32_t frameNo;
       float weight;
     };
 
-    struct Camera {
+    struct Camera
+    {
       std::uint32_t frameNo;   // フレーム番号
       float distance;          // 目標点とカメラの距離(目標点がカメラ前面でマイナス)
       float x;                 // 目標点のX軸位置
@@ -41,7 +47,8 @@ namespace s3d_mmd {
       std::uint8_t parth;      // パースペクティブ, 0:ON, 1:OFF
     };
 
-    struct Light {
+    struct Light
+    {
       std::uint32_t frame; // フレーム番号
       float r;             // 照明色赤(MMD入力値を256で割った値)
       float g;             // 照明色緑(MMD入力値を256で割った値)
@@ -51,18 +58,21 @@ namespace s3d_mmd {
       float z;             // 照明z位置(MMD入力値)
     };
 
-    struct SelfShadow {
+    struct SelfShadow
+    {
       std::uint32_t frame; // フレーム番号
       std::uint8_t type;   // セルフシャドウ種類, 0:OFF, 1:mode1, 2:mode2
       float distance;      // シャドウ距離(MMD入力値Lを(10000-L)/100000とした値)
     };
 
-    struct InfoIk {
+    struct InfoIk
+    {
       char name[20];       // "右足ＩＫ\0"などのIKボーン名の文字列 20byte
       std::uint8_t on_off; // IKのon/off, 0:OFF, 1:ON
     };
 
-    struct ShowIkWithoutArray {
+    struct ShowIkWithoutArray
+    {
       std::uint32_t frame;    // フレーム番号
       std::uint8_t show;      // モデル表示, 0:OFF, 1:ON
       std::uint32_t ik_count; // 記録するIKの数
@@ -72,12 +82,14 @@ namespace s3d_mmd {
 
 #pragma pack(pop)
 
-    struct ShowIk : ShowIkWithoutArray {
+    struct ShowIk : ShowIkWithoutArray
+    {
       Array<InfoIk> ik;
     };
 
     /// 0～1に規格化されたベジェ曲線
-    class Bezie {
+    class Bezie
+    {
 
       Float2 p1, p2; /// 制御点
 
@@ -87,24 +99,29 @@ namespace s3d_mmd {
       Bezie(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2);
       float GetY(float x) const;	/// xにおけるyを取得
 
-      float newton(float t, float x) const {
-        auto  f = [&](float t, float x) {
+      float newton(float t, float x) const
+      {
+        auto  f = [&](float t, float x)
+        {
           return 3 * (1 - t) * (1 - t) * t * p1.x + 3 * (1 - t) * t * t * p2.x + t * t * t - x;
         };
-        auto fd = [&](float t) {
+        auto fd = [&](float t)
+        {
           return 3 * t * t * (3 * (p1.x - p2.x) + 1) + 6 * t * (p2.x - 2 * p1.x) + 3 * p1.x;
         };
         constexpr int N = 16;
-        for (int i = N - 1; i >= 0; --i) {
+        for ( int i = N - 1; i >= 0; --i )
+        {
           float t1 = t - f(t, x) / fd(t);
-          if (fabs(t1 - t) < 1e-6) break;
+          if ( fabs(t1 - t) < 1e-6 ) break;
           t = t1;
         }
         return t;
       }
     };
 
-    struct KeyFrame {
+    struct KeyFrame
+    {
 
       std::string boneName; /// <summary>ボーン名</summary>
       int frameNo;          /// <summary>フレーム番号</summary>
@@ -116,14 +133,16 @@ namespace s3d_mmd {
       Bezie bezie_r;
 
       // フレーム番号で比較
-      bool operator<(const KeyFrame &k) const {
+      bool operator<(const KeyFrame &k) const
+      {
         return frameNo < k.frameNo;
       }
 
     };
   }
 
-  class VMDReader {
+  class VMDReader
+  {
 
     int last_frame;
     std::map<std::string, std::shared_ptr<Array<vmd::KeyFrame>>> keyFrames;
@@ -141,7 +160,8 @@ namespace s3d_mmd {
     /// <summary>ボーン名に応じたキーフレームを返す</summary>
     /// <param name="bone_name">ボーン名</param>
     /// <returns>キーフレーム</returns>
-    std::map<std::string, std::shared_ptr<Array<vmd::KeyFrame>>> getKeyFrames() {
+    std::map<std::string, std::shared_ptr<Array<vmd::KeyFrame>>> getKeyFrames()
+    {
       return keyFrames;
     }
 

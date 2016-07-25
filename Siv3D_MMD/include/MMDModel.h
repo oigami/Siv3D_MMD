@@ -2,9 +2,12 @@
 #include <Siv3D.hpp>
 #include "PMDStruct.h"
 #include "MMDBone.h"
-namespace s3d_mmd {
-  namespace mmd {
-    struct Material {
+namespace s3d_mmd
+{
+  namespace mmd
+  {
+    struct Material
+    {
 
       ColorF ambient;
       ColorF diffuse;
@@ -22,7 +25,8 @@ namespace s3d_mmd {
       //s3d::Materialと同じように扱えるように不要なデータも追加
     };
 
-    struct MeshVertex {
+    struct MeshVertex
+    {
       Float3 position;
       Float3 normal;
       Float2 texcoord;
@@ -31,17 +35,20 @@ namespace s3d_mmd {
       bool isEdge;
     };
 
-    struct MeshData {
+    struct MeshData
+    {
       Array<mmd::MeshVertex> vertices;
       Array<uint32> indices;
     };
 
-    struct ModelNode {
+    struct ModelNode
+    {
       mmd::MeshData mesh;
       mmd::Material material;
     };
   }
-  class MMDModel {
+  class MMDModel
+  {
 
     class Pimpl;
     std::shared_ptr<Pimpl> m_handle;

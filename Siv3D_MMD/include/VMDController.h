@@ -2,9 +2,11 @@
 #include <Siv3D.hpp>
 #include "MMDBone.h"
 #include "VMDReader.h"
-namespace s3d_mmd {
+namespace s3d_mmd
+{
 
-  class VMD {
+  class VMD
+  {
     class Pimpl;
     std::shared_ptr<Pimpl> m_handle;
 

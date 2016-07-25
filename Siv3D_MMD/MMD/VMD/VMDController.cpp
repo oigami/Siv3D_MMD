@@ -4,26 +4,35 @@
 #include "../../include/VMDController.h"
 #include "../ReaderHelper.h"
 
-namespace s3d_mmd {
-  namespace detail {
+namespace s3d_mmd
+{
+  namespace detail
+  {
 
     //https://github.com/mmd-for-unity-proj/mmd-for-unity/blob/master/.MMDIKBaker/MMDIKBakerLibrary/Misc/DefaultIKLimitter.cs#L204
-    float IKRotateLimit(float val, float min, float max) {
-      if (min == max) return min;
-      if (max < val) {
+    float IKRotateLimit(float val, float min, float max)
+    {
+      if ( min == max ) return min;
+      if ( max < val )
+      {
         return max * 2.f - val;
-      } else if (val < min) {
+      }
+      else if ( val < min )
+      {
         return min * 2.f - val;
       }
       return val;
     }
 
-    float Clamp(float val, float min, float max) {
+    float Clamp(float val, float min, float max)
+    {
       return std::min(std::max(min, val), max);
     }
   }
-  namespace vmd {
-    Bezie::Bezie(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2) {
+  namespace vmd
+  {
+    Bezie::Bezie(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2)
+    {
       p1.x = x1 / 127.0f;
       p1.y = y1 / 127.0f;
       p2.x = x2 / 127.0f;
@@ -32,22 +41,27 @@ namespace s3d_mmd {
 
     /// http://d.hatena.ne.jp/edvakf/20111016/1318716097
     /// 二分探索
-    float Bezie::GetY(float x) const {
+    float Bezie::GetY(float x) const
+    {
       //return newton(0.5f, x);
       float t = 0.5f;
       float t1, t2, t3;
 
       constexpr int N = 16; // 計算繰り返し回数
-      for (int i = 0; i < N; ++i) {
+      for ( int i = 0; i < N; ++i )
+      {
         const float s = 1 - t;
         t1 = s * s * t * 3.0f;
         t2 = s * t * t * 3.0f;
         t3 = t * t * t;
         float ft = t1 * p1.x + t2 * p2.x + t3 - x;
-        if (fabs(ft) < 1e-6) break; // 誤差が定数以内なら終了
-        if (ft > 0) { // 範囲を変更して再計算
+        if ( fabs(ft) < 1e-6 ) break; // 誤差が定数以内なら終了
+        if ( ft > 0 )
+        { // 範囲を変更して再計算
           t -= 1.0f / (4 << i);
-        } else {
+        }
+        else
+        {
           t += 1.0f / (4 << i);
         }
       }
@@ -56,7 +70,8 @@ namespace s3d_mmd {
   }
 
 
-  class VMD::Pimpl {
+  class VMD::Pimpl
+  {
 
     Array<uint32> m_nowFrameNumber;
     bool m_blendFlag;
@@ -68,22 +83,27 @@ namespace s3d_mmd {
     Array<pmd::IkData>* m_pmdIkData;
 
     /// キーフレームアニメーション
-    struct KeyFrameData {
+    struct KeyFrameData
+    {
       KeyFrameData() :m_nowFrameNum(0) {}
 
-      const vmd::KeyFrame& getNowFrame() const {
+      const vmd::KeyFrame& getNowFrame() const
+      {
         return (*m_keyFrames)[m_nowFrameNum];
       }
 
-      const vmd::KeyFrame& getNextFrame() const {
+      const vmd::KeyFrame& getNextFrame() const
+      {
         return (*m_keyFrames)[m_nowFrameNum + 1];
       }
 
-      bool haveNextFrame() const {
+      bool haveNextFrame() const
+      {
         return m_nowFrameNum + 1 < m_keyFrames->size();
       }
 
-      bool haveNowFrame() const {
+      bool haveNowFrame() const
+      {
         return m_nowFrameNum < m_keyFrames->size();
       }
 
@@ -97,14 +117,16 @@ namespace s3d_mmd {
 
   public:
 
-    Pimpl(VMDReader &data) {
+    Pimpl(VMDReader &data)
+    {
       m_nowTime = 0;
       m_loopStart = 0;
       m_loopEnd = 0;
       m_isLoop = false;
       m_blendFlag = true;
       m_isFrameEnd = true;
-      for (auto& i : data.getKeyFrames()) {
+      for ( auto& i : data.getKeyFrames() )
+      {
         m_keyFrameData[i.first].m_keyFrames = i.second;
       }
 
@@ -120,66 +142,79 @@ namespace s3d_mmd {
     void UpdateBone(mmd::Bones &bons)const;
     void UpdateTime();
 
-    void setTime(int frameCount) {
+    void setTime(int frameCount)
+    {
       m_nowTime = frameCount;
     }
 
-    void IsLoop(bool loop, int start) {
+    void IsLoop(bool loop, int start)
+    {
       m_isLoop = loop;
       m_loopStart = start;
     }
   };
 
   // IKボーン影響下ボーンの行列を更新
-  void VMD::Pimpl::UpdateIK(mmd::Bones &bones) const {
-    for (auto& ikData : bones.ikData())
+  void VMD::Pimpl::UpdateIK(mmd::Bones &bones) const
+  {
+    for ( auto& ikData : bones.ikData() )
       UpdateIK(bones, ikData);
   }
-  class EulerAngles {
-    enum class Type {
+  class EulerAngles
+  {
+    enum class Type
+    {
       XYZ, YZX, ZXY
     };
-    static bool IsGimballock(float val) {
+    static bool IsGimballock(float val)
+    {
       constexpr float eps = 1.0e-4f;
-      if (val < -1 + eps || 1 - eps < val) {
+      if ( val < -1 + eps || 1 - eps < val )
+      {
         return true;
       }
       return false;
     }
-    bool CreateXYZ(const Mat4x4 &rot) {
+    bool CreateXYZ(const Mat4x4 &rot)
+    {
       using namespace DirectX;
       y = -asinf(XMVectorGetZ(rot.r[0]));
-      if (IsGimballock(y)) return false;
+      if ( IsGimballock(y) ) return false;
       x = atan2f(XMVectorGetZ(rot.r[1]), XMVectorGetZ(rot.r[2]));
       z = atan2f(XMVectorGetY(rot.r[0]), XMVectorGetX(rot.r[0]));
       type = Type::XYZ;
       return true;
     }
-    bool CreateYZX(const Mat4x4 &rot) {
+    bool CreateYZX(const Mat4x4 &rot)
+    {
       using namespace DirectX;
       z = -asinf(XMVectorGetX(rot.r[1]));
-      if (IsGimballock(z)) return false;
+      if ( IsGimballock(z) ) return false;
       x = atan2f(XMVectorGetX(rot.r[2]), XMVectorGetX(rot.r[0]));
       y = atan2f(XMVectorGetZ(rot.r[1]), XMVectorGetY(rot.r[1]));
       type = Type::YZX;
       return true;
     }
-    bool CreateZXY(const Mat4x4 &rot) {
+    bool CreateZXY(const Mat4x4 &rot)
+    {
       using namespace DirectX;
       x = -asinf(XMVectorGetY(rot.r[2]));
-      if (IsGimballock(x)) return false;
+      if ( IsGimballock(x) ) return false;
       y = atan2f(XMVectorGetX(rot.r[2]), XMVectorGetZ(rot.r[2]));
       z = atan2f(XMVectorGetY(rot.r[0]), XMVectorGetY(rot.r[1]));
       type = Type::ZXY;
       return true;
     }
-    Mat4x4 CreateX() const {
+    Mat4x4 CreateX() const
+    {
       return DirectX::XMMatrixRotationX(x);
     }
-    Mat4x4 CreateY() const {
+    Mat4x4 CreateY() const
+    {
       return DirectX::XMMatrixRotationY(y);
     }
-    Mat4x4 CreateZ() const {
+    Mat4x4 CreateZ() const
+    {
       return DirectX::XMMatrixRotationZ(z);
     }
     Type type;
@@ -187,16 +222,19 @@ namespace s3d_mmd {
     float x, y, z;
 
 
-    EulerAngles(const Mat4x4 &rot) {
-      if (!CreateXYZ(rot))
-        if (!CreateYZX(rot))
-          if (!CreateZXY(rot))Println(L"error");
+    EulerAngles(const Mat4x4 &rot)
+    {
+      if ( !CreateXYZ(rot) )
+        if ( !CreateYZX(rot) )
+          if ( !CreateZXY(rot) )Println(L"error");
     }
 
-    Mat4x4 CreateRot() const {
+    Mat4x4 CreateRot() const
+    {
       Mat4x4 rot;
       using namespace DirectX;
-      switch (type) {
+      switch ( type )
+      {
       case Type::XYZ:
         return CreateX() * CreateY() * CreateZ();
       case Type::ZXY:
@@ -208,13 +246,16 @@ namespace s3d_mmd {
       return Mat4x4::Identity();
     }
   };
-  void VMD::Pimpl::UpdateIK(mmd::Bones &bones, const mmd::Ik &ikData) const {
+  void VMD::Pimpl::UpdateIK(mmd::Bones &bones, const mmd::Ik &ikData) const
+  {
     Vector localEffectorPos = DirectX::XMVectorSet(0, 0, 0, 0);
     Vector localTargetPos = DirectX::XMVectorSet(0, 0, 0, 0);
     Mat4x4 targetMat = bones.CalcBoneMatML(ikData.ik_bone_index);
 
-    for (int i : step_backward(ikData.iterations)) {
-      for (auto& attentionIdx : ikData.ik_child_bone_index) {
+    for ( int i : step_backward(ikData.iterations) )
+    {
+      for ( auto& attentionIdx : ikData.ik_child_bone_index )
+      {
         using namespace DirectX;
         Mat4x4 effectorMat = bones.CalcBoneMatML(ikData.ik_target_bone_index);
         XMVECTOR Determinant;
@@ -232,17 +273,18 @@ namespace s3d_mmd {
 
         float p;
         XMStoreFloat(&p, XMVector3Dot(localEffectorDir, localTargetDir));
-        if (p > 1 - 1.0e-8f) continue; // 計算誤差により1を越えるとacos()が発散するので注意!
+        if ( p > 1 - 1.0e-8f ) continue; // 計算誤差により1を越えるとacos()が発散するので注意!
         const float limitAngle = ikData.control_weight;
         const float angle = detail::Clamp(acos(p), -limitAngle, limitAngle);
 
-        if (angle == 0.f) continue;
+        if ( angle == 0.f ) continue;
         Vector axis = XMVector3Normalize(XMVector3Cross(localEffectorDir, localTargetDir));
-        if (XMVector3Equal(axis, XMVectorZero())) continue;
+        if ( XMVector3Equal(axis, XMVectorZero()) ) continue;
 
         XMMATRIX rotation = DirectX::XMMatrixRotationAxis(axis, angle);
         const XMMATRIX xmboneMatBL = bones[attentionIdx].boneMat;
-        if (findIt) {
+        if ( findIt )
+        {
           Mat4x4 local = rotation * bones[attentionIdx].boneMat;
           Vector rv = DirectX::XMQuaternionRotationMatrix(local);
           Quaternion rot(rv);
@@ -255,32 +297,39 @@ namespace s3d_mmd {
           local = eulerAngle.CreateRot();
 
           bones[attentionIdx].boneMat = local * XMMatrixTranslationFromVector(xmboneMatBL.r[3]);
-        } else {
+        }
+        else
+        {
           bones[attentionIdx].boneMat = rotation * xmboneMatBL;
         }
       }
       constexpr float errToleranceSq = 0.000001f;
       using namespace DirectX;
-      if (DirectX::XMVectorGetY(DirectX::XMVector3LengthSq(localEffectorPos - localTargetPos)) < errToleranceSq) {
+      if ( DirectX::XMVectorGetY(DirectX::XMVector3LengthSq(localEffectorPos - localTargetPos)) < errToleranceSq )
+      {
         return;
       }
     }
   }
 
-  void VMD::Pimpl::UpdateBone(mmd::Bones &bones) const {
+  void VMD::Pimpl::UpdateBone(mmd::Bones &bones) const
+  {
     using namespace DirectX;
-    for (auto &i : bones) {
+    for ( auto &i : bones )
+    {
       auto it = m_keyFrameData.find(i.name);
-      if (it == m_keyFrameData.end()) continue;
+      if ( it == m_keyFrameData.end() ) continue;
       const auto &keyData = it->second;
 
       // キーフレーム補完
-      if (keyData.haveNowFrame()) {
+      if ( keyData.haveNowFrame() )
+      {
         const auto &nowFrame = keyData.getNowFrame();
         const int t0 = nowFrame.frameNo;
         Quaternion boneRot = nowFrame.rotation;
         Vec3 bonePos = nowFrame.position;
-        if (keyData.haveNextFrame()) {
+        if ( keyData.haveNextFrame() )
+        {
 
           //次のフレームとの間の位置を計算する
           const Vec3 &p0 = bonePos;
@@ -303,11 +352,15 @@ namespace s3d_mmd {
     UpdateIK(bones);
   }
 
-  void VMD::Pimpl::UpdateTime() {
+  void VMD::Pimpl::UpdateTime()
+  {
     m_nowTime++;
-    if (m_isLoop) {
-      if (m_nowTime >= m_loopEnd) {
-        for (auto& i : m_keyFrameData) {
+    if ( m_isLoop )
+    {
+      if ( m_nowTime >= m_loopEnd )
+      {
+        for ( auto& i : m_keyFrameData )
+        {
           KeyFrameData &keyData = i.second;
           const size_t keyframe_size = keyData.m_keyFrames->size();
           keyData.m_nowFrameNum = 0;
@@ -315,40 +368,48 @@ namespace s3d_mmd {
         m_nowTime = m_loopStart;
       }
     }
-    for (auto& i : m_keyFrameData) {
+    for ( auto& i : m_keyFrameData )
+    {
       KeyFrameData &keyData = i.second;
       const size_t keyframe_size = keyData.m_keyFrames->size();
       int &nowFrameNum = keyData.m_nowFrameNum;
-      if (nowFrameNum + 1 < keyframe_size) {
+      if ( nowFrameNum + 1 < keyframe_size )
+      {
         const Array<vmd::KeyFrame> &key_frame = *keyData.m_keyFrames;
         const uint32 t1 = key_frame[nowFrameNum + 1].frameNo;
-        if (m_nowTime > t1) ++nowFrameNum;
+        if ( m_nowTime > t1 ) ++nowFrameNum;
       }
     }
   }
 
-  VMD::VMD() {
+  VMD::VMD()
+  {
     m_handle = std::make_shared<Pimpl>();
   }
 
-  VMD::VMD(const FilePath & filename) {
+  VMD::VMD(const FilePath & filename)
+  {
     m_handle = std::make_shared<Pimpl>(VMDReader(filename));
   }
 
   VMD::~VMD() {}
-  void VMD::UpdateBone(mmd::Bones &bones) const {
+  void VMD::UpdateBone(mmd::Bones &bones) const
+  {
     m_handle->UpdateBone(bones);
   }
-  void VMD::UpdateTime() const {
+  void VMD::UpdateTime() const
+  {
     m_handle->UpdateTime();
   }
 
-  void VMD::setTime(int frameCount) const {
+  void VMD::setTime(int frameCount) const
+  {
     m_handle->setTime(frameCount - 1);
     UpdateTime();
   }
 
-  void VMD::IsLoop(bool loop, int startTime) const {
+  void VMD::IsLoop(bool loop, int startTime) const
+  {
     m_handle->IsLoop(loop, startTime);
   }
 

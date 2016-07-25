@@ -6,7 +6,8 @@ using namespace s3d_mmd;
 #include <iostream>
 
 
-void Main() {
+void Main()
+{
   Window::SetStyle(WindowStyle::Sizeable);
   Graphics::SetBackground(Color(80, 160, 230));
   const MMD model(L"Data/初音ミク/初音ミクVer2.pmd");
@@ -24,7 +25,8 @@ void Main() {
   gui.setTitle(L"タイトル");
 
   gui.add(L"frame", GUISlider::Create(0, 1000, 0));
-  while (System::Update()) {
+  while ( System::Update() )
+  {
     font(Profiler::FPS(), L"fps").draw();
 
     //vmd.setTime(gui.slider(L"frame").valueInt);

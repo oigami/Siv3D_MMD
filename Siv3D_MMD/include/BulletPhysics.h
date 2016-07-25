@@ -4,18 +4,22 @@
 
 #include <Siv3D.hpp>
 
-namespace s3d_bullet {
+namespace s3d_bullet
+{
   class BulletPhysics;
 
-  namespace bullet {
+  namespace bullet
+  {
     class RigidBody;
-    namespace detail {
+    namespace detail
+    {
       class Data;
     }
 
   }
 
-  class BulletPhysics final {
+  class BulletPhysics final
+  {
 
     class Pimpl;
 
@@ -47,10 +51,10 @@ namespace s3d_bullet {
     /// <param name="stiffnessPos"> バネ剛性(平行移動) </param>
     /// <param name="stiffnessRot"> バネ剛性(回転移動) </param>
     void Add6DofSpringConstraint(bullet::RigidBody& bodyA, bullet::RigidBody& bodyB,
-      const Mat4x4& frameInA, const Mat4x4& frameInB,
-      const std::array<float, 3>& c_p1, const std::array<float, 3>& c_p2,
-      const std::array<float, 3>& c_r1, const std::array<float, 3>& c_r2,
-      const Float3 &stiffnessPos, const Float3 &stiffnessRot);
+                                 const Mat4x4& frameInA, const Mat4x4& frameInB,
+                                 const std::array<float, 3>& c_p1, const std::array<float, 3>& c_p2,
+                                 const std::array<float, 3>& c_r1, const std::array<float, 3>& c_r2,
+                                 const Float3 &stiffnessPos, const Float3 &stiffnessRot);
 
     /// <summary>
     /// 物理演算の世界の時間を進める

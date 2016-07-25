@@ -1,9 +1,11 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
 #include "PMDStruct.h"
-namespace s3d_mmd {
+namespace s3d_mmd
+{
 
-  class PMDReader {
+  class PMDReader
+  {
 
     pmd::Vertices m_vertices;
     pmd::Faces m_faces;

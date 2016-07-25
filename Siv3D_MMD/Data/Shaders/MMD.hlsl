@@ -1,7 +1,5 @@
 #include "fx_stdafx.h"
 
-
-
 struct VS_INPUT {
   float4 pos : POSITION;
   float3 normal : NORMAL;
@@ -22,13 +20,13 @@ SamplerState DiffuseSampler {
   AddressV = Wrap;
 };
 
-//í∏ì_ÉVÉFÅ[É_
+//È†ÇÁÇπ„Ç∑„Çß„Éº„ÉÄ
 cbuffer BoneBuff: register(b1) {
   row_major float4x4 BoneMatrix[256];
 }
 TexVertex GetVertex(float2 pos) {
   TexVertex ret;
-  int3 vPos = int3((int)(pos.x), (int)(pos.y), 0);
+  int3 vPos = int3((int) (pos.x), (int) (pos.y), 0);
   ret.pos = texVertex1.Load(vPos).xyz * 100000;
   vPos.x += 1;
   ret.idx = texVertex1.Load(vPos) * 256;
@@ -58,9 +56,9 @@ struct PS_OUTPUT {
 cbuffer vscbMesh0 : register(b0) {
   row_major float4x4 g_viewProjectionMatrix;
 }
-// í∏ì_ÉVÉFÅ[É_
+// È†ÇÁÇπ„Ç∑„Çß„Éº„ÉÄ
 VS_OUTPUT VS(VS_INPUT input) {
-  VS_OUTPUT Out = (VS_OUTPUT)0;
+  VS_OUTPUT Out = (VS_OUTPUT) 0;
   TexVertex v = GetVertex(input.tex);
   float3 w = v.blend;
   float4x4 comb = (float4x4)0;
@@ -71,7 +69,7 @@ VS_OUTPUT VS(VS_INPUT input) {
   input.pos.w = 1;
   float4 pos = mul(input.pos, comb);
   //float4 pos = float4(In.pos, 1.0);
-  float4 normal_head = mul(input.pos+float4(input.normal, 0), comb);
+  float4 normal_head = mul(input.pos + float4(input.normal, 0), comb);
   float3 normal = normalize(normal_head.xyz - pos.xyz);
   Out.normal = normal;
   Out.pos = mul(pos, g_viewProjectionMatrix);
@@ -101,7 +99,7 @@ PS_OUTPUT PS(VS_OUTPUT input) {
 }
 
 /*
-// ÉeÉNÉjÉbÉN
+// „ÉÜ„ÇØ„Éã„ÉÉ„ÇØ
 technique BlendTech {
 pass P0	{
 VertexShader = compile vs_2_0 BlendVS();

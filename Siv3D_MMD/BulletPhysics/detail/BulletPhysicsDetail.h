@@ -33,20 +33,26 @@
 
 #endif
 
-namespace s3d_bullet {
+namespace s3d_bullet
+{
 
-  namespace bullet {
-    namespace detail {
+  namespace bullet
+  {
+    namespace detail
+    {
 
-      class Data {
+      class Data
+      {
       public:
-        Data(std::shared_ptr<btDynamicsWorld> world) : m_dynamicsWorld(world) {
-        }
+        Data(std::shared_ptr<btDynamicsWorld> world) : m_dynamicsWorld(world)
+        {}
 
-        ~Data() {
+        ~Data()
+        {
 
           //どちらかが消えた場合はあっても意味が無いので直ぐに削除
-          for (auto &it : Constraintnum) {
+          for ( auto &it : Constraintnum )
+          {
             m_dynamicsWorld->removeConstraint(it.get());
             it.reset();
           }
@@ -78,12 +84,14 @@ namespace s3d_bullet {
 
       };
 
-      struct Callback {
+      struct Callback
+      {
         int my_handlehandle;
         void *pointar;
       };
 
-      struct Constraint {
+      struct Constraint
+      {
         int bodyA;
         int bodyB;
         btGeneric6DofSpringConstraint* constraint;
@@ -91,8 +99,10 @@ namespace s3d_bullet {
 
     }
   }
-  namespace detail {
-    class BulletPhysicsDetail final {
+  namespace detail
+  {
+    class BulletPhysicsDetail final
+    {
 
       class Pimpl;
 
@@ -103,24 +113,24 @@ namespace s3d_bullet {
       BulletPhysicsDetail(const btVector3& gravity);
       ~BulletPhysicsDetail();
       std::shared_ptr<bullet::detail::Data> CreateCompoundShape(std::unique_ptr<btCollisionShape> box, const btTransform &world,
-        float mass, float restitution, float friction, float linear_damp, float angular_damp, bool kinematic, unsigned short group, unsigned short mask, const btVector3 &coord);
+                                                                float mass, float restitution, float friction, float linear_damp, float angular_damp, bool kinematic, unsigned short group, unsigned short mask, const btVector3 &coord);
 
       std::shared_ptr<bullet::detail::Data> CreateShape(std::unique_ptr<btCollisionShape> shape, const btTransform &world,
-        float mass, float restitution, float friction, float linear_damp,
-        float angular_damp, bool kinematic, unsigned short group, unsigned short mask);
+                                                        float mass, float restitution, float friction, float linear_damp,
+                                                        float angular_damp, bool kinematic, unsigned short group, unsigned short mask);
 
 
       std::shared_ptr<bullet::detail::Data> CreateCylinder(float radius, float length, const btTransform &world, // 中心軸はZ軸
-        float mass = 0, float restitution = 0, float friction = 0.5f,
-        float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
-        unsigned short group = 1, unsigned short mask = 0xFFFF);
+                                                           float mass = 0, float restitution = 0, float friction = 0.5f,
+                                                           float linear_damp = 0, float angular_damp = 0, bool kinematic = false,
+                                                           unsigned short group = 1, unsigned short mask = 0xFFFF);
 
       // 拘束条件追加
       void AddPointToPointConstraint(std::shared_ptr<bullet::detail::Data> body, const btVector3& pivot);
 
       void AddPointToPointConstraint(std::shared_ptr<bullet::detail::Data> bodyA,
-        std::shared_ptr<bullet::detail::Data> bodyB,
-        const btVector3& pivotInA, const btVector3& pivotInB);
+                                     std::shared_ptr<bullet::detail::Data> bodyB,
+                                     const btVector3& pivotInA, const btVector3& pivotInB);
 
       /// <summary>
       /// 6軸ジョイントを追加
@@ -136,10 +146,10 @@ namespace s3d_bullet {
       /// <param name="stiffnessPos"> バネ剛性(平行移動3要素) </param>
       /// <param name="stiffnessRot"> バネ剛性(回転移動3要素) </param>
       std::shared_ptr<btGeneric6DofSpringConstraint> Add6DofSpringConstraint(btRigidBody& bodyA, btRigidBody& bodyB,
-        const btTransform& frameInA, const btTransform& frameInB,
-        const std::array<float, 3>& c_p1, const std::array<float, 3>& c_p2,
-        const std::array<float, 3>& c_r1, const std::array<float, 3>& c_r2,
-        const btVector3 &stiffnessPos, const btVector3 &stiffnessRot);
+                                                                             const btTransform& frameInA, const btTransform& frameInB,
+                                                                             const std::array<float, 3>& c_p1, const std::array<float, 3>& c_p2,
+                                                                             const std::array<float, 3>& c_r1, const std::array<float, 3>& c_r2,
+                                                                             const btVector3 &stiffnessPos, const btVector3 &stiffnessRot);
 
       // 剛体を移動
       void MoveRigidBody(int num, const btTransform &world);

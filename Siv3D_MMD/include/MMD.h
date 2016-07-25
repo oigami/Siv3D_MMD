@@ -15,9 +15,11 @@
 #include "MMDBone.h"
 #include "VMDController.h"
 #include "BulletPhysics.h"
-namespace s3d_mmd {
+namespace s3d_mmd
+{
 
-  class MMD {
+  class MMD
+  {
     class Pimpl;
     std::shared_ptr<Pimpl> m_handle;
 
@@ -46,7 +48,8 @@ namespace s3d_mmd {
 
   };
 
-  class DrawableVMD {
+  class DrawableVMD
+  {
     friend class MMD;
     const MMD m_mmd;
     const VMD m_vmd;

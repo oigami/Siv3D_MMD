@@ -1,10 +1,12 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
-namespace s3d_mmd {
+namespace s3d_mmd
+{
   template<class Type>
-  bool ReadArray(IReader& reader, const size_t size, std::vector<Type> &arr) { //Arrayで受け取れないのでvectorにしておく
+  bool ReadArray(IReader& reader, const size_t size, std::vector<Type> &arr)
+  { //Arrayで受け取れないのでvectorにしておく
     arr.resize(size);
-    if (size == 0 || reader.read(arr.data(), sizeof(Type) * size))
+    if ( size == 0 || reader.read(arr.data(), sizeof(Type) * size) )
       return true;
     return false;
   }
@@ -20,9 +22,10 @@ namespace s3d_mmd {
   /// それ以外 : データの読み込み成否
   /// </returns>
   template<class SizeType, class Type>
-  Optional<bool> ReadSizeAndArray(IReader& reader, std::vector<Type> &arr) {//Arrayで受け取れないのでvectorにしておく
+  Optional<bool> ReadSizeAndArray(IReader& reader, std::vector<Type> &arr)
+  {//Arrayで受け取れないのでvectorにしておく
     SizeType num;
-    if (!reader.read(num)) return{};
+    if ( !reader.read(num) ) return{};
     return ReadArray(reader, num, arr);
   }
 }

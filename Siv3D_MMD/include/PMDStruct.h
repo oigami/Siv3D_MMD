@@ -1,20 +1,24 @@
 ﻿#pragma once
 #include <cstdint>
 #include <vector>
-namespace s3d_mmd {
-  namespace pmd {
+namespace s3d_mmd
+{
+  namespace pmd
+  {
 
 #pragma pack(push, 1)
 
     /// PMD構造体定義
-    struct Header {
+    struct Header
+    {
       std::uint8_t magic[3];
       float version;
       char model_name[20];
       char comment[256];
     };
 
-    struct Vertex {
+    struct Vertex
+    {
       float pos[3];
       float normal_vec[3];
       float uv[2];
@@ -23,7 +27,8 @@ namespace s3d_mmd {
       std::uint8_t edge_flag;
     };
 
-    struct Material {
+    struct Material
+    {
       float diffuse_color[3];
       float alpha;
       float specularity;
@@ -35,7 +40,8 @@ namespace s3d_mmd {
       char texture_file_name[20];
     };
 
-    struct Bone {
+    struct Bone
+    {
       char bone_name[20];
       std::uint16_t parent_bone_index;    // ない場合は0xFFFF
       std::uint16_t tail_pos_bone_index;  // ない場合は0xFFFF
@@ -44,7 +50,8 @@ namespace s3d_mmd {
       float bone_head_pos[3];
     };
 
-    struct IkDataWithoutArray {
+    struct IkDataWithoutArray
+    {
       std::uint16_t ik_bone_index;        // IKボーン番号
       std::uint16_t ik_target_bone_index; // IKボーンの位置にこのボーンを一致させるようにIK処理が行われる
       std::uint8_t ik_child_bone_length;  // IKチェーンの長さ
@@ -54,7 +61,8 @@ namespace s3d_mmd {
                                           // unsigned short ik_child_bone_index[ik_chain_length]; // IK影響下のボーン番号 (配列の大きさが変化)
     };
 
-    struct SkinDataWithoutArray {
+    struct SkinDataWithoutArray
+    {
       char skin_name[20];            // 表情名
       std::uint32_t skin_vert_count; // 表情用の頂点数
       std::uint8_t skin_type;        // 表情の種類 → 0:base、1:まゆ、2:目、3:リップ、4:その他
@@ -62,21 +70,25 @@ namespace s3d_mmd {
                                      // PmdSkinVertexData skin_vert_data[skin_vert_count];	// (配列の大きさが変化)
     };
 
-    struct SkinVertexData {
+    struct SkinVertexData
+    {
       std::uint32_t skin_vert_index; // 表情用の頂点の番号(頂点リストにある番号)
       float skin_vert_pos[3];
     };
 
-    struct BoneDispName {
+    struct BoneDispName
+    {
       char name[50];
     };
 
-    struct BoneDisp {
+    struct BoneDisp
+    {
       std::uint16_t bone_index;           // 枠用ボーン番号
       std::uint8_t bone_disp_frame_index; // 表示枠番号
     };
 
-    struct RigidBody {
+    struct RigidBody
+    {
       char rigidbody_name[20];                // 名称
       std::uint16_t rigidbody_rel_bone_index; // 関連ボーン番号 （なし→0xFFFF）
       std::uint8_t rigidbody_group_index;     // グループ(1～16)
@@ -95,7 +107,8 @@ namespace s3d_mmd {
       std::uint8_t rigidbody_type;            // 剛体タイプ 0:Bone追従 1:物理演算 2:物理演算(Bone位置あわせ)
     };
 
-    struct Joint {
+    struct Joint
+    {
       char joint_name[20];             // 名称
       std::uint32_t joint_rigidbody_a; // 剛体A
       std::uint32_t joint_rigidbody_b; // 剛体B
@@ -109,25 +122,30 @@ namespace s3d_mmd {
       float spring_rot[3];             // 回転ばね (rad(x), rad(y), rad(z))
     };
 
-    struct BoneEnglishName {
+    struct BoneEnglishName
+    {
       char name[20];
     };
 
-    struct SkinEnglishName {
+    struct SkinEnglishName
+    {
       char name[20];
     };
 
-    struct BoneDispEnglishName {
+    struct BoneDispEnglishName
+    {
       char name[50];
     };
 
-    struct ToonTexture {
+    struct ToonTexture
+    {
       char filename[100];
     };
 
 #pragma pack(pop)
 
-    struct EnglishName {
+    struct EnglishName
+    {
       char modelName[20];
       char comment[256];
       std::vector<BoneEnglishName> boneName;
@@ -135,11 +153,13 @@ namespace s3d_mmd {
       std::vector<BoneDispEnglishName> boneDispName;
     };
 
-    struct Ik : public IkDataWithoutArray {
+    struct Ik : public IkDataWithoutArray
+    {
       std::vector<std::uint16_t> ik_child_bone_index; // unsigned short ik_child_bone_index[ik_chain_length]; // IK影響下のボーン番号
     };
 
-    struct Skin : public SkinDataWithoutArray {
+    struct Skin : public SkinDataWithoutArray
+    {
       std::vector<SkinVertexData> skin_vert_data; //表情用頂点データ
     };
 

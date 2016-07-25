@@ -8,22 +8,26 @@ class btCollisionShape;
 class btRigidBody;
 struct btDefaultMotionState;
 class btGeneric6DofSpringConstraint;
-namespace s3d_bullet {
+namespace s3d_bullet
+{
   class BulletPhysics;
-  namespace bullet {
-    class Shape {
+  namespace bullet
+  {
+    class Shape
+    {
       std::shared_ptr<btCollisionShape> m_shape;
       float m_mass;
 
     public:
       Shape() = default;
-      Shape(std::shared_ptr<btCollisionShape> shape, float mass) :m_shape(shape), m_mass(mass) {
-      }
+      Shape(std::shared_ptr<btCollisionShape> shape, float mass) :m_shape(shape), m_mass(mass)
+      {}
       btCollisionShape* get() const { return m_shape.get(); }
       float mass() const { return m_mass; }
     };
 
-    class RigidBody {
+    class RigidBody
+    {
       friend BulletPhysics;
       std::unique_ptr<btDefaultMotionState> m_motionState;
       Array<std::shared_ptr<btGeneric6DofSpringConstraint>> m_constraint;

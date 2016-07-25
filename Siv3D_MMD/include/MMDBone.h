@@ -1,8 +1,11 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
-namespace s3d_mmd {
-  namespace mmd {
-    struct Ik {
+namespace s3d_mmd
+{
+  namespace mmd
+  {
+    struct Ik
+    {
 
       int ik_bone_index;
       int ik_target_bone_index;
@@ -13,7 +16,8 @@ namespace s3d_mmd {
     };
 
     // ボーン
-    struct Bone {
+    struct Bone
+    {
 
       Bone();
 
@@ -32,7 +36,8 @@ namespace s3d_mmd {
 
     };
 
-    class Bones {
+    class Bones
+    {
 
       Array<mmd::Bone> m_bones;
       Array<mmd::Ik> m_ikData;
@@ -59,8 +64,9 @@ namespace s3d_mmd {
       // モデルローカル座標系でのボーン行列を計算
       Mat4x4 CalcBoneMatML(int index) const;
 
-      Mat4x4 CalcParentBoneMat(int index)const {
-        if (m_bones[index].parent == -1) return Mat4x4::Identity();
+      Mat4x4 CalcParentBoneMat(int index)const
+      {
+        if ( m_bones[index].parent == -1 ) return Mat4x4::Identity();
         return CalcBoneMatML(m_bones[index].parent);
       };
       const Array<Ik> &ikData() const { return m_ikData; }

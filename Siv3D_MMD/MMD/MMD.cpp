@@ -5,57 +5,70 @@
 #include "MMDPhysics.h"
 #endif // USE_BULLET_PHYSICS
 
-namespace s3d_mmd {
+namespace s3d_mmd
+{
 
-  MMD::MMD(const MMDModel &model) {
+  MMD::MMD(const MMDModel &model)
+  {
     m_handle = std::make_shared<Pimpl>(model);
   }
 
   MMD::~MMD() {}
-  void MMD::PhysicsUpdate(Array<Mat4x4> &boneWorld) const {
+  void MMD::PhysicsUpdate(Array<Mat4x4> &boneWorld) const
+  {
     m_handle->PhysicsUpdate(boneWorld);
 
   }
-  void MMD::draw(double edgeSize) const {
+  void MMD::draw(double edgeSize) const
+  {
     draw();
     drawEdge(edgeSize);
   }
 
-  void MMD::drawEdge(double edgeSize) const {
+  void MMD::drawEdge(double edgeSize) const
+  {
     m_handle->drawEdge();
   }
 
-  void MMD::draw() const {
+  void MMD::draw() const
+  {
     m_handle->draw();
   }
 
-  void MMD::draw(const VMD &vmd) const {
+  void MMD::draw(const VMD &vmd) const
+  {
     DrawableVMD(*this, vmd).draw();
   }
 
-  const Texture & MMD::vertexTexture() const {
+  const Texture & MMD::vertexTexture() const
+  {
     return m_handle->m_vertexTexture;
   }
 
-  bool MMD::isOpen() const {
+  bool MMD::isOpen() const
+  {
     return !!m_handle;
   }
 
-  std::shared_ptr<mmd::Bones> MMD::bones() const {
+  std::shared_ptr<mmd::Bones> MMD::bones() const
+  {
     return m_handle->m_bones;
   }
 
-  const String & MMD::name() const {
+  const String & MMD::name() const
+  {
     return m_handle->m_name;
   }
 
-  const String & MMD::comment() const {
+  const String & MMD::comment() const
+  {
     return m_handle->m_comment;
   }
 
   DrawableVMD::DrawableVMD(const MMD &mmd, const VMD &vmd) :m_mmd(mmd), m_vmd(vmd) {}
 
-  void DrawableVMD::draw() const {
+  void DrawableVMD::draw() const
+  {
     auto bones = m_mmd.bones();
     m_vmd.UpdateBone(*bones);
     {
