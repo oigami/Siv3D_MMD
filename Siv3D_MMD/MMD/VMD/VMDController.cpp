@@ -33,15 +33,17 @@ namespace s3d_mmd {
     /// http://d.hatena.ne.jp/edvakf/20111016/1318716097
     /// 二分探索
     float Bezie::GetY(float x) const {
+      //return newton(0.5f, x);
       float t = 0.5f;
-      float a, b, c;
-      constexpr int N = 15; // 計算繰り返し回数
+      float t1, t2, t3;
+
+      constexpr int N = 16; // 計算繰り返し回数
       for (int i = 0; i < N; ++i) {
         const float s = 1 - t;
-        a = s * s * t * 3.0f;
-        b = s * t * t * 3.0f;
-        c = t * t * t;
-        float ft = static_cast<float>(a * p1.x + b * p2.x + c - x);
+        t1 = s * s * t * 3.0f;
+        t2 = s * t * t * 3.0f;
+        t3 = t * t * t;
+        float ft = t1 * p1.x + t2 * p2.x + t3 - x;
         if (fabs(ft) < 1e-6) break; // 誤差が定数以内なら終了
         if (ft > 0) { // 範囲を変更して再計算
           t -= 1.0f / (4 << i);
@@ -49,7 +51,7 @@ namespace s3d_mmd {
           t += 1.0f / (4 << i);
         }
       }
-      return static_cast<float>(a * p1.y + b * p2.y + c);
+      return t1 * p1.y + t2 * p2.y + t3;
     }
   }
 
@@ -285,7 +287,7 @@ namespace s3d_mmd {
           const vmd::KeyFrame &next = keyData.getNextFrame();
           const int t1 = next.frameNo;
           const Vec3 &p1 = next.position;
-          float s = (float)(m_nowTime - t0) / float(t1 - t0);
+          float s = (float) (m_nowTime - t0) / float(t1 - t0);
           boneRot = Math::Slerp(boneRot, next.rotation, next.bezie_r.GetY(s));
           bonePos.x = p0.x + (p1.x - p0.x) * next.bezie_x.GetY(s);
           bonePos.y = p0.y + (p1.y - p0.y) * next.bezie_y.GetY(s);
@@ -333,8 +335,7 @@ namespace s3d_mmd {
     m_handle = std::make_shared<Pimpl>(VMDReader(filename));
   }
 
-  VMD::~VMD() {
-  }
+  VMD::~VMD() {}
   void VMD::UpdateBone(mmd::Bones &bones) const {
     m_handle->UpdateBone(bones);
   }
