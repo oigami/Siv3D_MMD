@@ -306,6 +306,7 @@
     <ClInclude Include="include\VMDReader.h" />
     <ClInclude Include="MMD\MMDPhysics.h" />
     <ClInclude Include="MMD\ReaderHelper.h" />
+    <ClInclude Include="MMD\detail\mmd_pimpl.h" />
     <ClInclude Include="ShaderAttacher.h" />
     <ClInclude Include="stdafx\stdafx.h" />
   </ItemGroup>
