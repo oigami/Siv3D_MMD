@@ -29,7 +29,7 @@ namespace s3d_mmd
     {
       char name[15];
       std::uint32_t frameNo;
-      float weight;
+      float m_weight;
     };
 
     struct Camera

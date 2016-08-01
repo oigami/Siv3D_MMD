@@ -140,7 +140,7 @@ namespace s3d_mmd
 
       struct ConstatnMorphWeightData
       {
-        float weight[4096];
+        float m_weight[4096];
       };
     }
   }
@@ -203,8 +203,7 @@ namespace s3d_mmd
         };
         Array<int> baseMorph;
         // 表情モーフの設定
-        m_faceMorph.faceNum.reserve(model.skinData().size());
-        m_faceMorph.weight.resize(model.skinData().size());
+        std::unordered_map<String, int> faceIndex(model.skinData().size());
         int index = 0;
         for ( auto& i : model.skinData() )
         {
@@ -223,9 +222,10 @@ namespace s3d_mmd
             faceMorphVertex[baseMorph[j.skin_vert_index]].vertex.push_back({ j.skin_vert_pos,
                                                                             static_cast<float>(index) });
           }
-          m_faceMorph.faceNum.insert({ Widen(i.skin_name), index });
+          faceIndex.insert({ Widen(i.skin_name), index });
           index++;
         }
+        m_faceMorph = mmd::FaceMorph(std::move(faceIndex));
       }
 
 
@@ -316,24 +316,30 @@ namespace s3d_mmd
       if ( !vsForwardAttach ) return;
 
       // ボーンをGPUに送信
-      ConstantBuffer<mmd::ConstantBoneData> data;
-      PhysicsUpdate(worlds);
-      m_bones->CalcWorld(Mat4x4::Identity(), worlds);
-      for ( auto& i : step(static_cast<int>(worlds.size())) )
       {
-        data->bones[i] = worlds[i];
+        ConstantBuffer<mmd::ConstantBoneData> data;
+        PhysicsUpdate(worlds);
+        m_bones->CalcWorld(Mat4x4::Identity(), worlds);
+        for ( auto& i : step(static_cast<int>(worlds.size())) )
+        {
+          data->bones[i] = worlds[i];
+        }
+        Graphics3D::SetConstant(ShaderStage::Vertex, 1, data);
+        Graphics3D::SetConstantForward(ShaderStage::Vertex, 1, data);
       }
-      Graphics3D::SetConstant(ShaderStage::Vertex, 1, data);
-      Graphics3D::SetConstantForward(ShaderStage::Vertex, 1, data);
 
       // 表情モーフの重みをGPUに送信
-      ConstantBuffer<std::array<Float4, 1024>> morphData{ {} };
-      for ( auto& i : step(static_cast<int>(m_faceMorph.faceNum.size())) )
       {
-        morphData.get()[i].x = m_faceMorph.weight[i];
+        ConstantBuffer<std::array<Float4, 1024>> morphData{ {} };
+        const auto& weights = m_faceMorph.weights();
+
+        for ( auto& i : step(static_cast<int>(weights.size())) )
+          morphData.get()[i].x = weights[i];
+
+        Graphics3D::SetConstant(ShaderStage::Vertex, 2, morphData);
+        Graphics3D::SetConstantForward(ShaderStage::Vertex, 2, morphData);
       }
-      Graphics3D::SetConstant(ShaderStage::Vertex, 2, morphData);
-      Graphics3D::SetConstantForward(ShaderStage::Vertex, 2, morphData);
+
       Graphics3D::SetTexture(ShaderStage::Vertex, 1, m_vertexTexture);
       const auto rasterizerState = Graphics3D::GetRasterizerState();
       const auto rasterizerStateForawrt = Graphics3D::GetRasterizerStateForward();

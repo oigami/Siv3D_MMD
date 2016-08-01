@@ -75,7 +75,7 @@ namespace s3d_mmd
     struct Morph
     {
       uint32 frameNo;
-      float weight;
+      float m_weight;
       bool operator<(const Morph& m)const
       {
         return frameNo < m.frameNo;
@@ -171,7 +171,7 @@ namespace s3d_mmd
 
       for ( auto& i : data.getMorph() )
       {
-        m_morphData[i.name].m_morph.push_back(Morph{ i.frameNo,i.weight });
+        m_morphData[i.name].m_morph.push_back(Morph{ i.frameNo,i.m_weight });
       }
       for ( auto& i : m_morphData )
       {
@@ -447,18 +447,18 @@ namespace s3d_mmd
     for ( auto& i : m_morphData )
     {
       if ( !i.second.haveNowFrame() )continue;
-      auto it = morph.faceNum.find(Widen(i.first));
-      if ( it == morph.faceNum.end() )
-        continue;
-      auto now = i.second.getNowFrame();
-      float w = now.weight;
-      if ( i.second.haveNextFrame() )
+      if ( auto index = morph.getFaceIndex(Widen(i.first)) )
       {
-        auto& next = i.second.getNextFrame();
-        float t = float(m_nowTime - now.frameNo) / (next.frameNo - now.frameNo);
-        w = Math::Lerp(now.weight, next.weight, t);
+        auto now = i.second.getNowFrame();
+        float w = now.m_weight;
+        if ( i.second.haveNextFrame() )
+        {
+          auto& next = i.second.getNextFrame();
+          float t = float(m_nowTime - now.frameNo) / (next.frameNo - now.frameNo);
+          w = Math::Lerp(w, next.m_weight, t);
+        }
+        morph.setWeight(*index, w);
       }
-      morph.weight[it->second] = w;
     }
   }
 
@@ -474,14 +474,17 @@ namespace s3d_mmd
   }
 
   VMD::~VMD() {}
+
   void VMD::UpdateBone(mmd::Bones &bones) const
   {
     m_handle->UpdateBone(bones);
   }
+
   void VMD::UpdateMorph(mmd::FaceMorph & m_morph) const
   {
     m_handle->UpdateMorph(m_morph);
   }
+
   void VMD::UpdateTime() const
   {
     m_handle->UpdateTime();
