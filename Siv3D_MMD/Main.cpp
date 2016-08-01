@@ -10,6 +10,7 @@ void Main()
 {
   Window::SetStyle(WindowStyle::Sizeable);
   Graphics::SetBackground(Color(80, 160, 230));
+  Graphics3D::SetAmbientLight(ColorF(0.3));
   const MMD model(L"Data/初音ミク/初音ミクVer2.pmd");
   Println(model.name());
   Println(model.comment());
@@ -21,10 +22,11 @@ void Main()
   //bone10.extraBoneControl = true;
   const Font font(30);
   auto bulletPtr = getBulletPhysics();
-  GUI gui(GUIStyle::Default);
+  /*GUI gui(GUIStyle::Default);
   gui.setTitle(L"タイトル");
 
-  gui.add(L"frame", GUISlider::Create(0, 1000, 0));
+  gui.add(L"frame", GUISlider::Create(0, 1000, 0));*/
+  Camera camera;
   while ( System::Update() )
   {
     font(Profiler::FPS(), L"fps").draw();
@@ -32,12 +34,17 @@ void Main()
     //vmd.setTime(gui.slider(L"frame").valueInt);
     //if (Input::KeyN.pressed)
     vmd.UpdateTime();
-    Graphics3D::FreeCamera();
     meshGround.draw();
 
     //bone10.extraBoneMat *= Quaternion(10_deg, 0, 0, 1).toMatrix();
     model.draw(vmd);
+    auto mat = model.bones()->CalcBoneMatML(3);
+    DirectX::XMFLOAT4 xmpos;
+    DirectX::XMStoreFloat4(&xmpos, mat.r[0]);
+    camera.lookat = mat.transform(Vec3(0, 0, 0));
+    camera.pos = mat.transform(Vec3(0, 0, -10));
 
+    Graphics3D::SetCamera(camera);
     //if (Input::KeyB.pressed)
     bulletPtr.StepSimulation();
 

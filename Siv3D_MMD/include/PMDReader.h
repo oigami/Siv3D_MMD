@@ -33,6 +33,7 @@ namespace s3d_mmd
     const pmd::IkData& getIkData() const { return m_ikData; }
     const pmd::RigidBodies& getRigidBodies()const { return m_rigidBodies; }
     const pmd::Joints& getJoints() const { return m_joints; }
+    const pmd::SkinData& getSkinData() const { return m_skinData; }
 
 
     const FilePath& getFilePath()const { return m_filepath; }

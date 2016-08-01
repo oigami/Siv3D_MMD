@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
 #include "MMDBone.h"
+#include "MMDMorph.h"
 #include "VMDReader.h"
 namespace s3d_mmd
 {
@@ -17,6 +18,7 @@ namespace s3d_mmd
     ~VMD();
 
     void UpdateBone(mmd::Bones &bones) const;
+    void UpdateMorph(mmd::FaceMorph& m_morph)const;
     void UpdateTime() const;
     void setTime(int frameCount) const;
 

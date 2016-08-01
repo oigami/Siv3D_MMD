@@ -157,12 +157,13 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeaderFile>stdafx/stdafx.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>stdafx/stdafx.h</ForcedIncludeFiles>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -298,6 +299,7 @@
     <ClInclude Include="BulletPhysics\detail\Siv3DBulletConverter.h" />
     <ClInclude Include="include\BulletPhysics.h" />
     <ClInclude Include="include\MMD.h" />
+    <ClInclude Include="include\MMDMorph.h" />
     <ClInclude Include="include\MMDModel.h" />
     <ClInclude Include="include\MMDBone.h" />
     <ClInclude Include="include\PMDReader.h" />

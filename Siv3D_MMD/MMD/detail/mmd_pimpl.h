@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "../../include/MMD.h"
 #include "../../ShaderAttacher.h"
 namespace s3d_mmd
@@ -80,8 +80,8 @@ namespace s3d_mmd
           m_psEdge.release();
         }
 
-        static const VertexShader& vsInstance() { return m_vsEdge; }
-        static const PixelShader& psInstance() { return m_psEdge; }
+        static const VertexShader& vs() { return m_vsEdge; }
+        static const PixelShader& ps() { return m_psEdge; }
 
       private:
 
@@ -119,8 +119,8 @@ namespace s3d_mmd
           m_ps.release();
         }
 
-        static const VertexShader& vsInstance() { return m_vs; }
-        static const PixelShader& psInstance() { return m_ps; }
+        static const VertexShader& vs() { return m_vs; }
+        static const PixelShader& ps() { return m_ps; }
 
       private:
 
@@ -137,24 +137,43 @@ namespace s3d_mmd
       {
         Matrix bones[256];
       };
+
+      struct ConstatnMorphWeightData
+      {
+        float weight[4096];
+      };
     }
   }
+
   class MMD::Pimpl
   {
   public:
 
-    Float2 WriteTextureVertex(ImageRGBA32F &vertexImage, const mmd::MeshVertex &v, int &vPos)
+    Float2 WriteTextureVertex(ImageRGBA32F &vertexImage, const mmd::MeshVertex &v, int &vPos, const Array<Float4>& m_morph)
     {
-      const int x = vPos % 1020;
-      const int y = vPos / 1020;
+      int x = vPos % 1016;
+      int y = vPos / 1016;
+      const int dataSize = (3 + m_morph.size() + 1);
+      if ( 1024 < x + dataSize )
+      {
+        vPos += -x + vertexImage.width;
+        x = 0;
+        y++;
+      }
+
       auto image = vertexImage[y];
-      image[x] = RGBA32F(v.position.x, v.position.y, v.position.z, 0);
-      image[x + 1].r = v.boneNum[0] / 256.0f;
-      image[x + 1].g = v.boneNum[1] / 256.0f;
-      image[x + 2] = RGBA32F(v.boneWeight.x, v.boneWeight.y, v.boneWeight.z, v.boneWeight.w);
-      image[x + 3].r = v.texcoord.x;
-      image[x + 3].g = v.texcoord.y;
-      vPos += 4;
+
+      image[x] = RGBA32F(v.boneNum[0], v.boneNum[1], 0.0f, 0.0f);
+      image[x + 1] = RGBA32F(v.boneWeight.x, v.boneWeight.y, v.boneWeight.z, v.boneWeight.w);
+      image[x + 2] = RGBA32F(v.texcoord.x, v.texcoord.y, 0.0f, 0.0f);
+
+      image[x + 3].r = m_morph.size();
+      int now = x + 3;
+      for ( auto& i : m_morph )
+      {
+        image[++now] = RGBA32F(i.x, i.y, i.z, i.w);
+      }
+      vPos += dataSize;
       return{ x + 0.1, y + 0.1 };
     }
 
@@ -169,9 +188,50 @@ namespace s3d_mmd
 #ifdef USE_BULLET_PHYSICS
       m_mmdPhysics.Create(m_bones, model.rigidBodies(), model.joints());
 #endif
-      mmd::AllNode nodes;
       ImageRGBA32F vertexImage(1024, 1024);
+      struct FaceMorph
+      {
+        Array<Float4> vertex;
+      };
+      std::unordered_map<int, FaceMorph> faceMorphVertex;
+
+      {
+        struct BaseFaceMorph
+        {
+          int num;
+          Array<int> index;
+        };
+        Array<int> baseMorph;
+        // 表情モーフの設定
+        m_faceMorph.faceNum.reserve(model.skinData().size());
+        m_faceMorph.weight.resize(model.skinData().size());
+        int index = 0;
+        for ( auto& i : model.skinData() )
+        {
+          // baseの時はindexのみ配列化する
+          if ( i.skin_type == 0 )
+          {
+            for ( auto& j : i.skin_vert_data )
+            {
+              baseMorph.push_back(j.skin_vert_index);
+            }
+            continue;
+          }
+          // 通常のタイプの時はbaseのindexを使い頂点indexをグローバルな方に戻す
+          for ( auto& j : i.skin_vert_data )
+          {
+            faceMorphVertex[baseMorph[j.skin_vert_index]].vertex.push_back({ j.skin_vert_pos,
+                                                                            static_cast<float>(index) });
+          }
+          m_faceMorph.faceNum.insert({ Widen(i.skin_name), index });
+          index++;
+        }
+      }
+
+
+      // メッシュの生成
       int vPos = 0;
+      mmd::AllNode nodes;
       for ( auto& node : model.nodes() )
       {
         const int size = static_cast<int>(node.mesh.vertices.size());
@@ -179,12 +239,16 @@ namespace s3d_mmd
         for ( auto &i : step(size) )
         {
           const mmd::MeshVertex &v = node.mesh.vertices[i];
-          Float2 pos = WriteTextureVertex(vertexImage, v, vPos);
+          auto it = faceMorphVertex.find(v.vertexNum);
+          Float2 pos = WriteTextureVertex(vertexImage, v, vPos, it != faceMorphVertex.end() ? it->second.vertex : Array<Float4>{});
           vertex[i] = { v.position , v.normal, pos };
         }
         nodes.set(mmd::Node{ Mesh({ vertex, node.mesh.indices }), node.material });
       }
       m_nodes = std::move(nodes);
+
+
+      // エッジの生成
       m_edges.reserve(model.edgeNodes().size());
       for ( auto& node : model.edgeNodes() )
       {
@@ -193,7 +257,8 @@ namespace s3d_mmd
         for ( auto& i : step(size) )
         {
           mmd::MeshVertex &v = node.mesh.vertices[i];
-          Float2 pos = WriteTextureVertex(vertexImage, v, vPos);
+          auto it = faceMorphVertex.find(v.vertexNum);
+          Float2 pos = WriteTextureVertex(vertexImage, v, vPos, it != faceMorphVertex.end() ? it->second.vertex : Array<Float4>{});
           vertex[i] = { v.position, v.normal, pos };
         }
         m_edges.push_back(mmd::Node{ Mesh({ vertex, node.mesh.indices }), node.material });
@@ -245,10 +310,12 @@ namespace s3d_mmd
     void draw()
     {
       mmd::Shader::init();
-      auto vsAttach = ShaderAttach(mmd::Shader::vsInstance());
+      auto vsAttach = ShaderAttach(mmd::Shader::vs());
       if ( !vsAttach ) return;
-      auto vsForwardAttach = ShaderForwardAttach(mmd::Shader::vsInstance());
+      auto vsForwardAttach = ShaderForwardAttach(mmd::Shader::vs());
       if ( !vsForwardAttach ) return;
+
+      // ボーンをGPUに送信
       ConstantBuffer<mmd::ConstantBoneData> data;
       PhysicsUpdate(worlds);
       m_bones->CalcWorld(Mat4x4::Identity(), worlds);
@@ -258,6 +325,15 @@ namespace s3d_mmd
       }
       Graphics3D::SetConstant(ShaderStage::Vertex, 1, data);
       Graphics3D::SetConstantForward(ShaderStage::Vertex, 1, data);
+
+      // 表情モーフの重みをGPUに送信
+      ConstantBuffer<std::array<Float4, 1024>> morphData{ {} };
+      for ( auto& i : step(static_cast<int>(m_faceMorph.faceNum.size())) )
+      {
+        morphData.get()[i].x = m_faceMorph.weight[i];
+      }
+      Graphics3D::SetConstant(ShaderStage::Vertex, 2, morphData);
+      Graphics3D::SetConstantForward(ShaderStage::Vertex, 2, morphData);
       Graphics3D::SetTexture(ShaderStage::Vertex, 1, m_vertexTexture);
       const auto rasterizerState = Graphics3D::GetRasterizerState();
       const auto rasterizerStateForawrt = Graphics3D::GetRasterizerStateForward();
@@ -270,17 +346,16 @@ namespace s3d_mmd
     void drawEdge() const
     {
       mmd::EdgeShader::init();
-      const auto attach_vs = ShaderAttach(mmd::EdgeShader::vsInstance());
-      if ( !attach_vs ) return;
-      const auto attach_ps = ShaderAttach(mmd::EdgeShader::psInstance());
-      if ( !attach_ps ) return;
-      const auto rasterizerState = Graphics3D::GetRasterizerState();
-      Graphics3D::SetRasterizerState(RasterizerState::SolidCullFront);
-      for ( const auto& node : m_edges )
+      if ( auto attach = ShaderAttach(mmd::EdgeShader::vs(), mmd::EdgeShader::ps()) )
       {
-        node.mesh.draw();
+        const auto rasterizerState = Graphics3D::GetRasterizerState();
+        Graphics3D::SetRasterizerState(RasterizerState::SolidCullFront);
+        for ( const auto& node : m_edges )
+        {
+          node.mesh.draw();
+        }
+        Graphics3D::SetRasterizerState(rasterizerState);
       }
-      Graphics3D::SetRasterizerState(rasterizerState);
     }
 #ifdef USE_BULLET_PHYSICS
     MmdPhysics m_mmdPhysics;
@@ -297,6 +372,7 @@ namespace s3d_mmd
     String m_name;
     String m_comment;
     std::shared_ptr<mmd::Bones> m_bones;
+    mmd::FaceMorph m_faceMorph;
     Texture m_vertexTexture;
     Array<Mat4x4> worlds;
 

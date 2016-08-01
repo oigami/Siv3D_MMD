@@ -84,10 +84,11 @@ namespace s3d_mmd
   Array<mmd::MeshVertex> CreateVertices(const pmd::Vertices &Vertices)
   {
     Array<mmd::MeshVertex> meshVertices;
-    meshVertices.reserve(Vertices.size());
-    for ( auto& i : Vertices )
+    meshVertices.resize(Vertices.size());
+    for ( auto& i : step(Vertices.size()) )
     {
-      meshVertices.push_back(CreateVertex(i));
+      meshVertices[i] = (CreateVertex(Vertices[i]));
+      meshVertices[i].vertexNum = i;
     }
     return meshVertices;
   }
@@ -217,6 +218,7 @@ namespace s3d_mmd
       m_comment = loader.getComment();
       m_rigidBodies = loader.getRigidBodies();
       m_joints = loader.getJoints();
+      m_skinData = loader.getSkinData();
       m_handle = createHandle();
     }
     Pimpl() :m_handle(NullHandleID)
@@ -236,6 +238,7 @@ namespace s3d_mmd
 
     pmd::RigidBodies m_rigidBodies;
     pmd::Joints m_joints;
+    pmd::SkinData m_skinData;
     String m_modelName;
     String m_comment;
     HandleIDType m_handle;
@@ -308,6 +311,11 @@ namespace s3d_mmd
   const pmd::Joints & MMDModel::joints() const
   {
     return  m_handle->m_joints;
+  }
+
+  const pmd::SkinData MMDModel::skinData() const
+  {
+    return m_handle->m_skinData;
   }
 
   const String& MMDModel::name() const

@@ -13,6 +13,7 @@
 #include <memory>
 #include "MMDModel.h"
 #include "MMDBone.h"
+#include "MMDMorph.h"
 #include "VMDController.h"
 #include "BulletPhysics.h"
 namespace s3d_mmd
@@ -37,6 +38,7 @@ namespace s3d_mmd
     void drawEdge(double edgeSize) const;
 
     std::shared_ptr<mmd::Bones> bones() const;
+    mmd::FaceMorph& morphs() const;
     const String &name() const;
     const String &comment() const;
     const Texture &vertexTexture() const;

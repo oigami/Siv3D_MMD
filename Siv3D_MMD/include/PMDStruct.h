@@ -73,7 +73,9 @@ namespace s3d_mmd
     struct SkinVertexData
     {
       std::uint32_t skin_vert_index; // 表情用の頂点の番号(頂点リストにある番号)
-      float skin_vert_pos[3];
+      Float3 skin_vert_pos;
+      static_assert(std::is_pod<Float3>::value, "");
+      static_assert(sizeof(Float3) == sizeof(float[3]), "");
     };
 
     struct BoneDispName

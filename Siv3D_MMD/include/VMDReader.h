@@ -146,6 +146,7 @@ namespace s3d_mmd
 
     int last_frame;
     std::map<std::string, std::shared_ptr<Array<vmd::KeyFrame>>> keyFrames;
+    Array<vmd::Morph> vmdSkins;
   public:
 
     /// <summary>VMDファイルからデータを取り出す</summary>
@@ -169,5 +170,6 @@ namespace s3d_mmd
     /// <returns>モーションの最終フレーム</returns>
     int GetLastFrame() { return last_frame; }
 
+    const Array<vmd::Morph>& getMorph() const { return vmdSkins; }
   };
 }

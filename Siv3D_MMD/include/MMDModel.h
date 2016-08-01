@@ -33,6 +33,7 @@ namespace s3d_mmd
       std::array<int, 2> boneNum;
       Float4 boneWeight;
       bool isEdge;
+      int vertexNum;
     };
 
     struct MeshData
@@ -105,6 +106,8 @@ namespace s3d_mmd
     const pmd::RigidBodies& rigidBodies() const;
 
     const pmd::Joints& joints() const;
+
+    const pmd::SkinData skinData() const;
 
     const String& name()const;
     const String& comment()const;

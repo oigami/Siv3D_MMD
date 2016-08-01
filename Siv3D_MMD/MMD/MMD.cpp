@@ -1,4 +1,4 @@
-﻿#include "../include/MMD.h"
+#include "../include/MMD.h"
 #include "../include/MMDModel.h"
 #include "detail/mmd_pimpl.h"
 #ifdef USE_BULLET_PHYSICS
@@ -55,6 +55,11 @@ namespace s3d_mmd
     return m_handle->m_bones;
   }
 
+  mmd::FaceMorph & MMD::morphs() const
+  {
+    return m_handle->m_faceMorph;
+  }
+
   const String & MMD::name() const
   {
     return m_handle->m_name;
@@ -71,6 +76,7 @@ namespace s3d_mmd
   {
     auto bones = m_mmd.bones();
     m_vmd.UpdateBone(*bones);
+    m_vmd.UpdateMorph(m_mmd.morphs());
     {
       m_mmd.draw();
     }

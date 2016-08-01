@@ -72,7 +72,15 @@ namespace s3d_mmd
 
   class VMD::Pimpl
   {
-
+    struct Morph
+    {
+      uint32 frameNo;
+      float weight;
+      bool operator<(const Morph& m)const
+      {
+        return frameNo < m.frameNo;
+      }
+    };
     Array<uint32> m_nowFrameNumber;
     bool m_blendFlag;
     bool m_isFrameEnd;  /// <summary> フレームが終了したか true:終了 </summary>
@@ -113,6 +121,32 @@ namespace s3d_mmd
 
     /// <summary> キーフレームの名前とデータ </summary>
     std::unordered_map<std::string, KeyFrameData> m_keyFrameData;
+    struct MorphData
+    {
+      const Morph& getNowFrame() const
+      {
+        return (m_morph)[m_nowFrameNum];
+      }
+
+      const Morph& getNextFrame() const
+      {
+        return (m_morph)[m_nowFrameNum + 1];
+      }
+
+      bool haveNextFrame() const
+      {
+        return m_nowFrameNum + 1 < m_morph.size();
+      }
+
+      bool haveNowFrame() const
+      {
+        return m_nowFrameNum < m_morph.size();
+      }
+
+      Array<Morph> m_morph;
+      int m_nowFrameNum;
+    };
+    std::unordered_map<std::string, MorphData> m_morphData;
     Array<Mat4x4> worlds;
 
   public:
@@ -134,6 +168,15 @@ namespace s3d_mmd
 
       m_isFrameEnd = true;
       m_loopEnd = data.GetLastFrame();
+
+      for ( auto& i : data.getMorph() )
+      {
+        m_morphData[i.name].m_morph.push_back(Morph{ i.frameNo,i.weight });
+      }
+      for ( auto& i : m_morphData )
+      {
+        sort(i.second.m_morph.begin(), i.second.m_morph.end());
+      }
     }
     Pimpl() = default;
 
@@ -141,6 +184,7 @@ namespace s3d_mmd
     void UpdateIK(mmd::Bones &bones, const mmd::Ik &ik) const;		// IKボーン影響下ボーンの行列を更新
     void UpdateBone(mmd::Bones &bons)const;
     void UpdateTime();
+    void UpdateMorph(mmd::FaceMorph& m_morph)const;
 
     void setTime(int frameCount)
     {
@@ -362,8 +406,12 @@ namespace s3d_mmd
         for ( auto& i : m_keyFrameData )
         {
           KeyFrameData &keyData = i.second;
-          const size_t keyframe_size = keyData.m_keyFrames->size();
           keyData.m_nowFrameNum = 0;
+        }
+        for ( auto& i : m_morphData )
+        {
+          auto& data = i.second;
+          data.m_nowFrameNum = 0;
         }
         m_nowTime = m_loopStart;
       }
@@ -380,7 +428,40 @@ namespace s3d_mmd
         if ( m_nowTime > t1 ) ++nowFrameNum;
       }
     }
+    for ( auto& i : m_morphData )
+    {
+      auto& data = i.second;
+      const size_t size = data.m_morph.size();
+      int &nowFrameNum = data.m_nowFrameNum;
+      if ( data.haveNextFrame() )
+      {
+        const auto &frame = data.m_morph;
+        const uint32 t1 = frame[nowFrameNum + 1].frameNo;
+        if ( m_nowTime > t1 ) ++nowFrameNum;
+      }
+    }
   }
+
+  void VMD::Pimpl::UpdateMorph(mmd::FaceMorph & morph) const
+  {
+    for ( auto& i : m_morphData )
+    {
+      if ( !i.second.haveNowFrame() )continue;
+      auto it = morph.faceNum.find(Widen(i.first));
+      if ( it == morph.faceNum.end() )
+        continue;
+      auto now = i.second.getNowFrame();
+      float w = now.weight;
+      if ( i.second.haveNextFrame() )
+      {
+        auto& next = i.second.getNextFrame();
+        float t = float(m_nowTime - now.frameNo) / (next.frameNo - now.frameNo);
+        w = Math::Lerp(now.weight, next.weight, t);
+      }
+      morph.weight[it->second] = w;
+    }
+  }
+
 
   VMD::VMD()
   {
@@ -396,6 +477,10 @@ namespace s3d_mmd
   void VMD::UpdateBone(mmd::Bones &bones) const
   {
     m_handle->UpdateBone(bones);
+  }
+  void VMD::UpdateMorph(mmd::FaceMorph & m_morph) const
+  {
+    m_handle->UpdateMorph(m_morph);
   }
   void VMD::UpdateTime() const
   {
