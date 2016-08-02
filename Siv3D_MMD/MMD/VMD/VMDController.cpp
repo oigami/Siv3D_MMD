@@ -120,7 +120,7 @@ namespace s3d_mmd
     };
 
     /// <summary> キーフレームの名前とデータ </summary>
-    std::unordered_map<std::string, KeyFrameData> m_keyFrameData;
+    std::unordered_map<String, KeyFrameData> m_keyFrameData;
     struct MorphData
     {
       const Morph& getNowFrame() const
@@ -313,7 +313,7 @@ namespace s3d_mmd
         // ターゲットのローカル方向（注目ボーン基準）
         Vector localTargetDir = XMVector3Normalize(localTargetPos);
 
-        const auto findIt = bones[attentionIdx].name.find("ひざ") != std::string::npos;
+        const auto findIt = bones[attentionIdx].name.indexOf(L"ひざ") != std::string::npos;
 
         float p;
         XMStoreFloat(&p, XMVector3Dot(localEffectorDir, localTargetDir));

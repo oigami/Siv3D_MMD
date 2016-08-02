@@ -123,7 +123,7 @@ namespace s3d_mmd
     struct KeyFrame
     {
 
-      std::string boneName; /// <summary>ボーン名</summary>
+      String boneName; /// <summary>ボーン名</summary>
       int frameNo;          /// <summary>フレーム番号</summary>
       Vec3 position;        /// <summary>位置</summary>
       Quaternion rotation;  /// <summary>回転</summary>
@@ -145,7 +145,7 @@ namespace s3d_mmd
   {
 
     int last_frame;
-    std::map<std::string, std::shared_ptr<Array<vmd::KeyFrame>>> keyFrames;
+    std::unordered_map<String, std::shared_ptr<Array<vmd::KeyFrame>>> keyFrames;
     Array<vmd::Morph> vmdSkins;
   public:
 
@@ -156,12 +156,12 @@ namespace s3d_mmd
     /// <summary>ボーン名に応じたキーフレームを返す</summary>
     /// <param name="bone_name">ボーン名</param>
     /// <returns>キーフレーム</returns>
-    std::shared_ptr<Array<vmd::KeyFrame>> getKeyFrames(const std::string& bone_name);
+    std::shared_ptr<Array<vmd::KeyFrame>> getKeyFrames(const String& bone_name);
 
     /// <summary>ボーン名に応じたキーフレームを返す</summary>
     /// <param name="bone_name">ボーン名</param>
     /// <returns>キーフレーム</returns>
-    std::map<std::string, std::shared_ptr<Array<vmd::KeyFrame>>> getKeyFrames()
+    std::unordered_map<String, std::shared_ptr<Array<vmd::KeyFrame>>> getKeyFrames()
     {
       return keyFrames;
     }

@@ -57,19 +57,33 @@ namespace s3d_mmd
 
       class EdgeShader
       {
+        constexpr static auto edgePath = L"Data/Shaders/MMD3DEdge.hlsl";
+        static void Compile(const wchar *outPath, ShaderType type)
+        {
+          if ( !FileSystem::Exists(outPath) )
+            Shader::Compile(edgePath, outPath, type);
+        }
       public:
 
         static void init()
         {
           if ( m_isInit ) return;
-          m_vsEdge = VertexShader{ L"Data/Shaders/MMD3DEdge.hlsl",true };
-          if ( m_vsEdge.isEmpty() )
-            Println(L"MMD vertex shader compile error");
 
-          m_psEdge = PixelShader{ L"Data/Shaders/MMD3DEdge.hlsl" ,true };
-          if ( m_psEdge.isEmpty() )
-            Println(L"MMD pixel shader compile error");
+          {
+            constexpr auto edgeVSCompiledPath = L"Data/Shaders/MMD3DEdge.vs";
+            Compile(edgeVSCompiledPath, ShaderType::VS_4_0);
+            m_vsEdge = VertexShader{ edgeVSCompiledPath };
+            if ( m_vsEdge.isEmpty() )
+              Println(L"MMD vertex shader compile error");
+          }
 
+          {
+            constexpr auto edgePSCompiledPath = L"Data/Shaders/MMD3DEdge.ps";
+            Compile(edgePSCompiledPath, ShaderType::PS_4_0);
+            m_psEdge = PixelShader{ edgePSCompiledPath };
+            if ( m_psEdge.isEmpty() )
+              Println(L"MMD pixel shader compile error");
+          }
           m_isInit = true;
         }
 
@@ -94,21 +108,38 @@ namespace s3d_mmd
       PixelShader EdgeShader::m_psEdge;
       bool EdgeShader::m_isInit = false;
 
-      class Shader
+      class MMDShader
       {
+        constexpr static auto mmdShaderPath = L"Data/Shaders/MMD.hlsl";
+        static void Compile(const wchar *outPath, ShaderType type)
+        {
+          if ( !FileSystem::Exists(outPath) )
+          {
+            Shader::Compile(mmdShaderPath, outPath, type);
+          }
+        }
       public:
 
         static void init()
         {
           if ( m_isInit ) return;
-          m_vs = VertexShader{ L"Data/Shaders/MMD.hlsl",true };
-          if ( m_vs.isEmpty() )
-            Println(L"MMD VMD vertex shader compile error");
 
-          m_ps = PixelShader{ L"Data/Shaders/MMD.hlsl" ,true };
-          if ( m_ps.isEmpty() )
-            Println(L"MMD VMD pixel shader compile error");
+          {
+            constexpr auto vsPath = L"Data/Shaders/MMD.vs";
+            Compile(vsPath, ShaderType::VS_4_0);
+            m_vs = VertexShader{ vsPath };
+            if ( m_vs.isEmpty() )
+              Println(L"MMD VMD vertex shader compile error");
+          }
 
+          {
+            constexpr auto psPath = L"Data/Shaders/MMD.ps";
+            Compile(psPath, ShaderType::VS_4_0);
+            m_ps = PixelShader{ psPath };
+            if ( m_ps.isEmpty() )
+              Println(L"MMD VMD pixel shader compile error");
+
+          }
           m_isInit = true;
         }
 
@@ -129,9 +160,9 @@ namespace s3d_mmd
         static bool m_isInit;
       };
 
-      VertexShader Shader::m_vs;
-      PixelShader Shader::m_ps;
-      bool Shader::m_isInit = false;
+      VertexShader MMDShader::m_vs;
+      PixelShader MMDShader::m_ps;
+      bool MMDShader::m_isInit = false;
 
       struct ConstantBoneData
       {
@@ -309,10 +340,10 @@ namespace s3d_mmd
 
     void draw()
     {
-      mmd::Shader::init();
-      auto vsAttach = ShaderAttach(mmd::Shader::vs());
+      mmd::MMDShader::init();
+      auto vsAttach = ShaderAttach(mmd::MMDShader::vs());
       if ( !vsAttach ) return;
-      auto vsForwardAttach = ShaderForwardAttach(mmd::Shader::vs());
+      auto vsForwardAttach = ShaderForwardAttach(mmd::MMDShader::vs());
       if ( !vsForwardAttach ) return;
 
       // ボーンをGPUに送信

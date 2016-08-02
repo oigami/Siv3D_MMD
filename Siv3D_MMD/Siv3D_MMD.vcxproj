@@ -175,7 +175,7 @@
     <ClCompile Include="BulletPhysics\BulletSphere.cpp" />
     <ClCompile Include="BulletPhysics\detail\BulletDebug.cpp" />
     <ClCompile Include="BulletPhysics\detail\BulletPhysicsDetail.cpp" />
-    <ClCompile Include="include\MMDMorph.cpp" />
+    <ClCompile Include="MMD\MMDMorph.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MMD\MMD.cpp" />
     <ClCompile Include="MMD\MMDBone.cpp" />

@@ -6,6 +6,12 @@ namespace s3d_mmd
 {
   namespace mmd
   {
+    using RigidBodies = pmd::RigidBodies;
+
+    using Joints = pmd::Joints;
+
+    using SkinData = pmd::SkinData;
+
     struct Material
     {
 
@@ -103,11 +109,11 @@ namespace s3d_mmd
 
     std::shared_ptr<mmd::Bones> bones() const;
 
-    const pmd::RigidBodies& rigidBodies() const;
+    const mmd::RigidBodies& rigidBodies() const;
 
-    const pmd::Joints& joints() const;
+    const mmd::Joints& joints() const;
 
-    const pmd::SkinData skinData() const;
+    const mmd::SkinData skinData() const;
 
     const String& name()const;
     const String& comment()const;

@@ -23,20 +23,26 @@ namespace s3d_mmd
 
       // KeyFramesに格納
       last_frame = 0;
-      for ( const auto& i : vmdMotions )
+      for ( const auto& bone : vmdMotions )
       {
         vmd::KeyFrame keyFrame;
-        keyFrame.boneName = i.boneName;
-        keyFrame.frameNo = i.frameNo;
+        size_t endPos = 0;
+        for ( int i = 0; i < sizeof(bone.boneName); i++ )
+        {
+          if ( bone.boneName[i] == L'\0' )break;
+          endPos++;
+        }
+        keyFrame.boneName = Widen({ bone.boneName, endPos });
+        keyFrame.frameNo = bone.frameNo;
         keyFrame.frameNo *= frame_rate / mmd_frame_rate;
         last_frame = std::max(last_frame, keyFrame.frameNo);
-        keyFrame.position = Vec3(i.location[0], i.location[1], i.location[2]);
-        keyFrame.rotation = Quaternion(i.rotation[0], i.rotation[1], i.rotation[2], i.rotation[3]);
-        keyFrame.bezie_x = vmd::Bezie(i.interpolation[0], i.interpolation[4], i.interpolation[8], i.interpolation[12]);
-        keyFrame.bezie_y = vmd::Bezie(i.interpolation[1], i.interpolation[5], i.interpolation[9], i.interpolation[13]);
-        keyFrame.bezie_z = vmd::Bezie(i.interpolation[2], i.interpolation[6], i.interpolation[10], i.interpolation[14]);
-        keyFrame.bezie_r = vmd::Bezie(i.interpolation[3], i.interpolation[7], i.interpolation[11], i.interpolation[15]);
-        getKeyFrames(i.boneName)->push_back(std::move(keyFrame));
+        keyFrame.position = Vec3(bone.location[0], bone.location[1], bone.location[2]);
+        keyFrame.rotation = Quaternion(bone.rotation[0], bone.rotation[1], bone.rotation[2], bone.rotation[3]);
+        keyFrame.bezie_x = vmd::Bezie(bone.interpolation[0], bone.interpolation[4], bone.interpolation[8], bone.interpolation[12]);
+        keyFrame.bezie_y = vmd::Bezie(bone.interpolation[1], bone.interpolation[5], bone.interpolation[9], bone.interpolation[13]);
+        keyFrame.bezie_z = vmd::Bezie(bone.interpolation[2], bone.interpolation[6], bone.interpolation[10], bone.interpolation[14]);
+        keyFrame.bezie_r = vmd::Bezie(bone.interpolation[3], bone.interpolation[7], bone.interpolation[11], bone.interpolation[15]);
+        getKeyFrames(keyFrame.boneName)->push_back(std::move(keyFrame));
       }
 
       for ( auto& it : keyFrames )
@@ -59,7 +65,7 @@ namespace s3d_mmd
   /// <summary>ボーン名に応じたキーフレームを返す</summary>
   /// <param name="bone_name">ボーン名</param>
   /// <returns>キーフレーム</returns>
-  std::shared_ptr<Array<vmd::KeyFrame>> VMDReader::getKeyFrames(const std::string & bone_name)
+  std::shared_ptr<Array<vmd::KeyFrame>> VMDReader::getKeyFrames(const String& bone_name)
   {
     auto &frame = keyFrames[bone_name];
     if ( frame == nullptr )

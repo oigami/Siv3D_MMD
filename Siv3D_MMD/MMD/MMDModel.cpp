@@ -38,25 +38,18 @@ namespace s3d_mmd
   mmd::Material CreateMaterial(const pmd::Material &pmdMaterial, const FilePath &m_filepath)
   {
     mmd::Material material;
-    material.ambient.a = 1;
-    material.ambient.r = pmdMaterial.mirror_color[0];
-    material.ambient.g = pmdMaterial.mirror_color[1];
-    material.ambient.b = pmdMaterial.mirror_color[2];
-    material.diffuse.a = pmdMaterial.alpha;
-    material.diffuse.r = pmdMaterial.diffuse_color[0];
-    material.diffuse.g = pmdMaterial.diffuse_color[1];
-    material.diffuse.b = pmdMaterial.diffuse_color[2];
-    material.specular.a = pmdMaterial.specularity;
-    material.specular.r = pmdMaterial.specular_color[0];
-    material.specular.g = pmdMaterial.specular_color[1];
-    material.specular.b = pmdMaterial.specular_color[2];
+
+    auto ToColorF = [](const float(&f)[3], float alpha) { return ColorF(f[0], f[1], f[2], alpha); };
+
+    material.ambient = ToColorF(pmdMaterial.mirror_color, 1.0f);
+    material.diffuse = ToColorF(pmdMaterial.diffuse_color, pmdMaterial.alpha);
+    material.specular = ToColorF(pmdMaterial.specular_color, pmdMaterial.specularity);
 
     material.isEdge = pmdMaterial.edge_flag != 0;
     const float alpha = pmdMaterial.alpha;
     material.isCullNone = alpha + alphaEps < 1.0;
     if ( pmdMaterial.texture_file_name[0] != '\0' )
     {
-
       //TODO: スフィアに未対応
       String filename = Widen({ pmdMaterial.texture_file_name,sizeof(pmdMaterial.texture_file_name) });
       const size_t pos = filename.lastIndexOf(L'*');
@@ -70,10 +63,10 @@ namespace s3d_mmd
   }
   mmd::MeshVertex CreateVertex(const pmd::Vertex &vertex)
   {
-    mmd::MeshVertex v{};
-    v.position.set(vertex.pos[0], vertex.pos[1], vertex.pos[2]);
-    v.texcoord.set(vertex.uv[0], vertex.uv[1]);
-    v.normal.set(vertex.normal_vec[0], vertex.normal_vec[1], vertex.normal_vec[2]);
+    mmd::MeshVertex v;
+    v.position = vertex.pos;
+    v.texcoord = vertex.uv;
+    v.normal = vertex.normal_vec;
     v.boneNum[0] = vertex.bone_num[0];
     v.boneNum[1] = vertex.bone_num[1];
     v.boneWeight.set(vertex.bone_weight / 100.0f, 1 - vertex.bone_weight / 100.0f, 0, 0);
@@ -87,7 +80,7 @@ namespace s3d_mmd
     meshVertices.resize(Vertices.size());
     for ( auto& i : step(Vertices.size()) )
     {
-      meshVertices[i] = (CreateVertex(Vertices[i]));
+      meshVertices[i] = CreateVertex(Vertices[i]);
       meshVertices[i].vertexNum = i;
     }
     return meshVertices;
@@ -194,7 +187,7 @@ namespace s3d_mmd
 
       char boneName[21] = { 0 };	// ボーン名が20byteのときのために最後に0を追加
       memcpy(boneName, item.bone_name, 20);
-      bone.name = boneName;
+      bone.name = Widen(boneName);
       bone.id = i;
       bone.type = item.bone_type;
       const Mat4x4 modelLocalInitMat = Mat4x4::Translate(item.bone_head_pos[0], item.bone_head_pos[1], item.bone_head_pos[2]);
@@ -221,8 +214,7 @@ namespace s3d_mmd
       m_skinData = loader.getSkinData();
       m_handle = createHandle();
     }
-    Pimpl() :m_handle(NullHandleID)
-    {}
+    Pimpl() :m_handle(NullHandleID) {}
 
     void release()
     {
@@ -245,8 +237,7 @@ namespace s3d_mmd
     Texture vertexTexture;
   };
 
-  MMDModel::MMDModel()
-  {}
+  MMDModel::MMDModel() {}
 
   MMDModel::MMDModel(const FilePath & path)
   {

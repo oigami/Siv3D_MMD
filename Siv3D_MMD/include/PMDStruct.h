@@ -8,6 +8,12 @@ namespace s3d_mmd
 
 #pragma pack(push, 1)
 
+    static_assert(std::is_pod<Float3>::value, "");
+    static_assert(sizeof(Float3) == sizeof(float[3]), "");
+
+    static_assert(std::is_pod<Float2>::value, "");
+    static_assert(sizeof(Float2) == sizeof(float[2]), "");
+
     /// PMD構造体定義
     struct Header
     {
@@ -19,9 +25,9 @@ namespace s3d_mmd
 
     struct Vertex
     {
-      float pos[3];
-      float normal_vec[3];
-      float uv[2];
+      Float3 pos;
+      Float3 normal_vec;
+      Float2 uv;
       std::uint16_t bone_num[2];
       std::uint8_t bone_weight;
       std::uint8_t edge_flag;
@@ -74,8 +80,7 @@ namespace s3d_mmd
     {
       std::uint32_t skin_vert_index; // 表情用の頂点の番号(頂点リストにある番号)
       Float3 skin_vert_pos;
-      static_assert(std::is_pod<Float3>::value, "");
-      static_assert(sizeof(Float3) == sizeof(float[3]), "");
+
     };
 
     struct BoneDispName
