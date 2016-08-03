@@ -10,10 +10,10 @@ struct VS_INPUT
 };
 struct TexVertex
 {
-  int2 idx;
-  float3 morphWeight;
+  float4 pos;
   float2 w;
   float2 tex;
+  int2 idx;
 };
 Texture2D texVertex1 : register(t1);
 SamplerState DiffuseSampler
@@ -26,29 +26,36 @@ SamplerState DiffuseSampler
 //頂点シェーダ
 cbuffer BoneBuff: register(b1)
 {
-  row_major float4x4 BoneMatrix[256];
+  float4x4 BoneMatrix[256];
 }
 cbuffer MorphBuff : register(b2)
 {
   float4 morphWeight[1024];
 }
-TexVertex GetVertex(float2 pos)
+TexVertex GetVertex(float2 pos, float4 vertexPos)
 {
   TexVertex ret;
-  int3 vPos = int3((int) (pos.x), (int) (pos.y), 0);
-  ret.idx = texVertex1.Load(vPos).xy;
+  int4 vPos = int4((pos.x), (pos.y), 0, 0);
+  ret.idx = texVertex1.Load(vPos.xyz).xy;
+
   vPos.x += 1;
-  ret.w = texVertex1.Load(vPos).xy;
+  ret.w = texVertex1.Load(vPos.xyz).xy;
+
   vPos.x += 1;
-  ret.tex = texVertex1.Load(vPos).xy;
-  vPos.x += 1;
-  int n = texVertex1.Load(vPos).r;
-  ret.morphWeight = (float3)0;
-  while ( n-- )
+  float3 tex_and_n = texVertex1.Load(vPos.xyz).xyz;
+  ret.tex = tex_and_n.xy;
+  vPos.w = asint(tex_and_n.z);
+
+  ret.pos = vertexPos;
+  while ( vPos.w )
   {
-    vPos.x += 1;
-    float4 data = texVertex1.Load(vPos);
-    ret.morphWeight += data.rgb * morphWeight[(int) data.a].x;
+    [unroll] for ( int i = 16 - 1; i >= 0; i-- )
+    {
+      vPos.x += 1;
+      float4 data = texVertex1.Load(vPos.xyz);
+      ret.pos.xyz += data.rgb * morphWeight[asint(data.a)].x;
+    }
+    vPos.w -= 16;
   }
   return ret;
 }
@@ -69,7 +76,6 @@ struct PS_OUTPUT
   float4 normal : SV_Target2;
 };
 
-
 cbuffer vscbMesh0 : register(b0)
 {
   row_major float4x4 g_viewProjectionMatrix;
@@ -77,25 +83,19 @@ cbuffer vscbMesh0 : register(b0)
 // 頂点シェーダ
 VS_OUTPUT VS(VS_INPUT input)
 {
-  VS_OUTPUT Out = (VS_OUTPUT) 0;
-  TexVertex v = GetVertex(input.tex);
-  float4x4 comb = (float4x4)0;
-  comb += BoneMatrix[v.idx.x] * v.w.x;
-  comb += BoneMatrix[v.idx.y] * v.w.y;
+  TexVertex v = GetVertex(input.tex, input.pos);
+  float4x3 comb = (float4x3)BoneMatrix[v.idx.x] * v.w.x;
+  comb += (float4x3)BoneMatrix[v.idx.y] * v.w.y;
 
   //comb += BoneMatrix[v.idx[3]] * (1.0f - w[0] - w[1] - w[2]);
-  //input.pos.w = 1;
-  float4 pos = input.pos;
-  pos.xyz += v.morphWeight;
-  //float4 pos = float4(In.pos, 1.0);
-  float4 normal_head = mul(pos + float4(input.normal, 0), comb);
-  pos = mul(pos, comb);
-  float3 normal = normalize(normal_head.xyz - pos.xyz);
-  Out.normal = normal;
-  Out.pos = mul(pos, g_viewProjectionMatrix);
+  const float3 normal_head = mul(float4(v.pos.xyz + input.normal, v.pos.w), comb);
+  const float3 pos = mul(v.pos, comb);
+
+  VS_OUTPUT Out;
+  Out.pos = mul(float4(pos, v.pos.w), g_viewProjectionMatrix);
+  Out.normal = normalize(normal_head.xyz - pos.xyz);
   Out.color = input.diffuseColor;
-  Out.worldPosition = Out.pos.xyz;
-  //Out.color.a=1.0;
+  Out.worldPosition = pos;
   Out.tex = v.tex;
   return Out;
 }
@@ -119,16 +119,3 @@ PS_OUTPUT PS(VS_OUTPUT input)
   output.normal = float4(input.normal, 1);
   return output;
 }
-
-/*
-// テクニック
-technique BlendTech {
-pass P0	{
-VertexShader = compile vs_2_0 BlendVS();
-PixelShader = compile ps_2_0 BlendPS(true);
-}
-pass P1	{
-VertexShader = compile vs_2_0 BlendVS();
-PixelShader = compile ps_2_0 BlendPS(false);
-}
-}*/

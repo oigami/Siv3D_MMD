@@ -180,11 +180,14 @@ namespace s3d_mmd
   {
   public:
 
-    Float2 WriteTextureVertex(ImageRGBA32F &vertexImage, const mmd::MeshVertex &v, int &vPos, const Array<Float4>& m_morph)
+    Float2 WriteTextureVertex(ImageRGBA32F &vertexImage, const mmd::MeshVertex &v, int &vPos, Array<Float4> morph)
     {
       int x = vPos % 1016;
       int y = vPos / 1016;
-      const int dataSize = (3 + m_morph.size() + 1);
+      int resize = morph.size() % 16;
+      if ( resize != 0 )
+        morph.resize(morph.size() + 16 - resize);
+      const int dataSize = (3 + morph.size() + 1);
       if ( 1024 < x + dataSize )
       {
         vPos += -x + vertexImage.width;
@@ -196,13 +199,14 @@ namespace s3d_mmd
 
       image[x] = RGBA32F(v.boneNum[0], v.boneNum[1], 0.0f, 0.0f);
       image[x + 1] = RGBA32F(v.boneWeight.x, v.boneWeight.y, v.boneWeight.z, v.boneWeight.w);
-      image[x + 2] = RGBA32F(v.texcoord.x, v.texcoord.y, 0.0f, 0.0f);
+      int f = morph.size();
+      image[x + 2] = RGBA32F(v.texcoord.x, v.texcoord.y, *reinterpret_cast<float*>(&f), 0.0f);
 
-      image[x + 3].r = m_morph.size();
-      int now = x + 3;
-      for ( auto& i : m_morph )
+      int now = x + 2;
+      for ( auto& i : morph )
       {
-        image[++now] = RGBA32F(i.x, i.y, i.z, i.w);
+        f = i.w;
+        image[++now] = RGBA32F(i.x, i.y, i.z, *reinterpret_cast<float*>(&f));
       }
       vPos += dataSize;
       return{ x + 0.1, y + 0.1 };
@@ -353,7 +357,7 @@ namespace s3d_mmd
         m_bones->CalcWorld(Mat4x4::Identity(), worlds);
         for ( auto& i : step(static_cast<int>(worlds.size())) )
         {
-          data->bones[i] = worlds[i];
+          data->bones[i] = worlds[i].transposed();
         }
         Graphics3D::SetConstant(ShaderStage::Vertex, 1, data);
         Graphics3D::SetConstantForward(ShaderStage::Vertex, 1, data);

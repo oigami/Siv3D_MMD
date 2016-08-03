@@ -38,7 +38,7 @@ namespace s3d_mmd
 
     class Bones
     {
-
+      std::unordered_map<String, int> m_boneNameIndex;
       Array<mmd::Bone> m_bones;
       Array<mmd::Ik> m_ikData;
       void InitMatCalc(mmd::Bone* me, const Matrix &parentoffsetMat);

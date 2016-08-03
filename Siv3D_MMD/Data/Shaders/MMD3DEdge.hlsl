@@ -43,7 +43,7 @@ cbuffer vscbMesh0 : register(b0)
 }
 cbuffer BoneBuff : register(b1)
 {
-  row_major float4x4 BoneMatrix[256];
+  float4x4 BoneMatrix[256];
 }
 cbuffer MorphBuff : register(b2)
 {

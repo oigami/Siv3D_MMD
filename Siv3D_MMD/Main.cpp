@@ -39,8 +39,6 @@ void Main()
     //bone10.extraBoneMat *= Quaternion(10_deg, 0, 0, 1).toMatrix();
     model.draw(vmd);
     auto mat = model.bones()->CalcBoneMatML(3);
-    DirectX::XMFLOAT4 xmpos;
-    DirectX::XMStoreFloat4(&xmpos, mat.r[0]);
     camera.lookat = mat.transform(Vec3(0, 0, 0));
     camera.pos = mat.transform(Vec3(0, 0, -10));
 
