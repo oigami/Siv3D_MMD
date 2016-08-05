@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../../include/MMD.h"
+#include <MMD/MMD.h>
 #include "../../ShaderAttacher.h"
 namespace s3d_mmd
 {

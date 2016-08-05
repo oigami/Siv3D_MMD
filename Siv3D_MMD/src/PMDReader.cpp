@@ -1,4 +1,4 @@
-﻿#include "../include/PMDReader.h"
+﻿#include <MMD/PMDReader.h>
 #include "ReaderHelper.h"
 namespace s3d_mmd
 {
@@ -78,5 +78,6 @@ namespace s3d_mmd
   }
 
   PMDReader::~PMDReader()
-  {}
+  {
+  }
 }

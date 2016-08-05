@@ -1,4 +1,4 @@
-﻿#include "../include/BulletPhysics.h"
+﻿#include <MMD/BulletPhysics.h>
 
 namespace s3d_bullet
 {

@@ -1,6 +1,6 @@
 ﻿#include <memory>
-#include "../include/BulletRigidBody.h"
-#include "../include/BulletPhysics.h"
+#include <MMD/BulletRigidBody.h>
+#include <MMD/BulletPhysics.h>
 #include "detail/Siv3DBulletConverter.h"
 
 namespace s3d_bullet

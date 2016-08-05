@@ -1,4 +1,4 @@
-﻿#include "../include/BulletBox.h"
+﻿#include <MMD/BulletBox.h>
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
 
 namespace s3d_bullet
@@ -13,8 +13,7 @@ namespace s3d_bullet
       std::shared_ptr<btBoxShape> box;
       float m_mass;
     };
-    Box::Box(const Float3 & size) :Box(size.x, size.y, size.z)
-    {}
+    Box::Box(const Float3 & size) :Box(size.x, size.y, size.z) {}
 
     Box::Box(float width, float height, float depth)
     {

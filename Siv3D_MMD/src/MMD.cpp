@@ -1,5 +1,5 @@
-#include "../include/MMD.h"
-#include "../include/MMDModel.h"
+#include <MMD/MMD.h>
+#include <MMD/MMDModel.h>
 #include "detail/mmd_pimpl.h"
 #ifdef USE_BULLET_PHYSICS
 #include "MMDPhysics.h"

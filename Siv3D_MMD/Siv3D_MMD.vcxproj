@@ -175,15 +175,16 @@
     <ClCompile Include="BulletPhysics\BulletSphere.cpp" />
     <ClCompile Include="BulletPhysics\detail\BulletDebug.cpp" />
     <ClCompile Include="BulletPhysics\detail\BulletPhysicsDetail.cpp" />
-    <ClCompile Include="MMD\MMDMorph.cpp" />
+    <ClCompile Include="src\MMDMorph.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="MMD\MMD.cpp" />
-    <ClCompile Include="MMD\MMDBone.cpp" />
-    <ClCompile Include="MMD\MMDModel.cpp" />
-    <ClCompile Include="MMD\MMDPhysics.cpp" />
-    <ClCompile Include="MMD\PMDReader.cpp" />
-    <ClCompile Include="MMD\VMD\VMDController.cpp" />
-    <ClCompile Include="MMD\VMD\VMDReader.cpp" />
+    <ClCompile Include="src\MMD.cpp" />
+    <ClCompile Include="src\MMDBone.cpp" />
+    <ClCompile Include="src\MMDModel.cpp" />
+    <ClCompile Include="src\MMDPhysics.cpp" />
+    <ClCompile Include="src\PMDReader.cpp" />
+    <ClCompile Include="src\VMD\VMDController.cpp" />
+    <ClCompile Include="src\VMD\VMDReader.cpp" />
+    <ClCompile Include="src\VMD\vmd_controller_pimpl.cpp" />
     <ClCompile Include="stdafx\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -291,25 +292,26 @@
     <Font Include="Example\YomogiFont.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\BulletBox.h" />
-    <ClInclude Include="include\BulletCapsule.h" />
-    <ClInclude Include="include\BulletRigidBody.h" />
-    <ClInclude Include="include\BulletSphere.h" />
+    <ClInclude Include="MMD\BulletBox.h" />
+    <ClInclude Include="MMD\BulletCapsule.h" />
+    <ClInclude Include="MMD\BulletRigidBody.h" />
+    <ClInclude Include="MMD\BulletSphere.h" />
     <ClInclude Include="BulletPhysics\detail\BulletDebug.h" />
     <ClInclude Include="BulletPhysics\detail\BulletPhysicsDetail.h" />
     <ClInclude Include="BulletPhysics\detail\Siv3DBulletConverter.h" />
-    <ClInclude Include="include\BulletPhysics.h" />
-    <ClInclude Include="include\MMD.h" />
-    <ClInclude Include="include\MMDMorph.h" />
-    <ClInclude Include="include\MMDModel.h" />
-    <ClInclude Include="include\MMDBone.h" />
-    <ClInclude Include="include\PMDReader.h" />
-    <ClInclude Include="include\PMDStruct.h" />
-    <ClInclude Include="include\VMDController.h" />
-    <ClInclude Include="include\VMDReader.h" />
-    <ClInclude Include="MMD\MMDPhysics.h" />
-    <ClInclude Include="MMD\ReaderHelper.h" />
-    <ClInclude Include="MMD\detail\mmd_pimpl.h" />
+    <ClInclude Include="MMD\BulletPhysics.h" />
+    <ClInclude Include="MMD\MMD.h" />
+    <ClInclude Include="MMD\MMDMorph.h" />
+    <ClInclude Include="MMD\MMDModel.h" />
+    <ClInclude Include="MMD\MMDBone.h" />
+    <ClInclude Include="MMD\PMDReader.h" />
+    <ClInclude Include="MMD\PMDStruct.h" />
+    <ClInclude Include="MMD\VMDController.h" />
+    <ClInclude Include="MMD\VMDReader.h" />
+    <ClInclude Include="src\MMDPhysics.h" />
+    <ClInclude Include="src\ReaderHelper.h" />
+    <ClInclude Include="src\detail\mmd_pimpl.h" />
+    <ClInclude Include="src\VMD\vmd_controller_pimpl.h" />
     <ClInclude Include="ShaderAttacher.h" />
     <ClInclude Include="stdafx\stdafx.h" />
   </ItemGroup>

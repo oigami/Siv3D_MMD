@@ -1,4 +1,4 @@
-﻿#include "../include/MMD.h"
+﻿#include <MMD/MMD.h>
 #ifdef USE_BULLET_PHYSICS
 #include "MmdPhysics.h"
 #include "../BulletPhysics/detail/Siv3DBulletConverter.h"

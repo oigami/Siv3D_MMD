@@ -1,5 +1,5 @@
-﻿#include "../include/BulletPhysics.h"
-#include "../include/BulletRigidBody.h"
+﻿#include <MMD/BulletPhysics.h>
+#include <MMD/BulletRigidBody.h>
 #include "detail/Siv3DBulletConverter.h"
 #include "detail/BulletPhysicsDetail.h"
 
@@ -61,7 +61,6 @@ namespace s3d_bullet
     m_pimpl->bulletDatail.addRigidBody(body.m_rigidBody.get(), group, mask);
   }
 
-  void BulletPhysics::removeRigidBody()
-  {}
+  void BulletPhysics::removeRigidBody() {}
 
 }

@@ -1,7 +1,7 @@
 ﻿#ifndef LIB_COMPILE
 # include <Siv3D.hpp>
-#include "include/MMD.h"
-#include "include/BulletPhysics.h"
+#include "MMD/MMD.h"
+#include "MMD/BulletPhysics.h"
 using namespace s3d_mmd;
 #include <iostream>
 
@@ -16,6 +16,7 @@ void Main()
   Println(model.comment());
   using namespace s3d_bullet;
   const VMD vmd(L"Data/きしめん.vmd");
+  vmd.play();
   const Mesh meshGround(MeshData::Plane({ 40, 40 }, { 6, 6 }));
 
   //Bone &bone10 = model.bones()->get(10);

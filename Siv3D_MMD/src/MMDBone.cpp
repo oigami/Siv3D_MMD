@@ -1,5 +1,5 @@
 ﻿#include <Siv3D.hpp>
-#include "../include/MMDBone.h"
+#include <MMD/MMDBone.h>
 namespace s3d_mmd
 {
   namespace mmd

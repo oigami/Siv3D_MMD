@@ -1,5 +1,5 @@
-﻿#include "../include/MMDModel.h"
-#include "../include/PMDReader.h"
+﻿#include <MMD/MMDModel.h>
+#include <MMD/PMDReader.h>
 namespace s3d_mmd
 {
   namespace

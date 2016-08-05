@@ -20,8 +20,10 @@ namespace s3d_mmd
     void UpdateBone(mmd::Bones &bones) const;
     void UpdateMorph(mmd::FaceMorph& m_morph)const;
     void UpdateTime() const;
-    void setTime(int frameCount) const;
+    void setTime(MillisecondsF time) const;
 
     void IsLoop(bool loop, int startTime)const;
+
+    void play() const;
   };
 }
