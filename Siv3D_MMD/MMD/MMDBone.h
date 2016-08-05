@@ -41,35 +41,36 @@ namespace s3d_mmd
       std::unordered_map<String, int> m_boneNameIndex;
       Array<mmd::Bone> m_bones;
       Array<mmd::Ik> m_ikData;
-      void InitMatCalc(mmd::Bone* me, const Matrix &parentoffsetMat);
+      void initMatCalc(mmd::Bone* me, const Matrix &parentoffsetMat);
 
-      void CalcWorld(const mmd::Bone& me, const Mat4x4 &parentWorldMat, Array<Mat4x4> &worlds) const;
+      void calcWorld(const mmd::Bone& me, const Mat4x4 &parentWorldMat, Array<Mat4x4> &worlds) const;
 
     public:
 
-      Bones(const Array<mmd::Ik> &ikData) : m_ikData(ikData) {}
+      Bones(Array<Bone> bones, Array<mmd::Ik> ikData);
       Bones() = default;
 
       Array<mmd::Bone>::iterator begin() { return m_bones.begin(); }
       Array<mmd::Bone>::iterator end() { return m_bones.end(); }
-      void resize(size_t size) { m_bones.resize(size); }
+
       const int size() const { return static_cast<int>(m_bones.size()); }
 
       // InitMatをボーンローカル座標系に変換する再帰関数
-      void InitMatCalc();
+      void initMatCalc();
 
       //ワールド変換行列の配列を計算する再帰関数
-      void CalcWorld(const Mat4x4 &world, Array<Mat4x4> &worlds) const;
+      void calcWorld(const Mat4x4 &world, Array<Mat4x4> &worlds) const;
 
       // モデルローカル座標系でのボーン行列を計算
-      Mat4x4 CalcBoneMatML(int index) const;
+      Mat4x4 calcBoneMatML(int index) const;
+      Optional<Mat4x4> calcBoneMatML(const String& boneName) const;
 
-      Mat4x4 CalcParentBoneMat(int index)const
-      {
-        if ( m_bones[index].parent == -1 ) return Mat4x4::Identity();
-        return CalcBoneMatML(m_bones[index].parent);
-      };
+      Mat4x4 calcParentBoneMat(int index) const;
+      Optional<Mat4x4> calcParentBoneMat(const String& boneName) const;
+
       const Array<Ik> &ikData() const { return m_ikData; }
+
+      Optional<int> getBoneIndex(const String& boneName) const;
 
       mmd::Bone &get(int i) { return m_bones[i]; }
       const mmd::Bone &operator[](int i) const { return m_bones[i]; }

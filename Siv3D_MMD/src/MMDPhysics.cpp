@@ -227,7 +227,7 @@ namespace s3d_mmd
       {
         // ボーン追従タイプの剛体にボーン行列を設定
         // ボーンの移動量を剛体の初期姿勢に適用したものが剛体の現在の姿勢
-        const XMMATRIX mxm = m_rigidMat[i - count] * m_bones->CalcBoneMatML(m_rigidbodyRelatedBoneIndex[i]);
+        const XMMATRIX mxm = m_rigidMat[i - count] * m_bones->calcBoneMatML(m_rigidbodyRelatedBoneIndex[i]);
         rigidBodie.MoveRigidBody(mxm);
         bone.extraBoneControl = false;
         break;
@@ -249,7 +249,7 @@ namespace s3d_mmd
         Mat4x4 rigidWorld = m_initOffsetMat[i - count] * rigidBodie.getWorld();
 
         // ボーン位置あわせタイプの剛体の位置移動量にボーンの位置移動量を設定
-        Mat4x4 boneParentMat = m_bones->CalcParentBoneMat(m_rigidbodyRelatedBoneIndex[i]);
+        Mat4x4 boneParentMat = m_bones->calcParentBoneMat(m_rigidbodyRelatedBoneIndex[i]);
         const Mat4x4 boneMat = bone.boneMat * boneParentMat;
         rigidWorld.r[3] = boneMat.r[3];
         Mat4x4 inv = boneParentMat.inverse();
@@ -265,7 +265,7 @@ namespace s3d_mmd
 
       }
     }
-    m_bones->CalcWorld(mat, boneWorld);
+    m_bones->calcWorld(mat, boneWorld);
   }
 
   // private : 剛体のワールド変換行列を作成

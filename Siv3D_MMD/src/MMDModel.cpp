@@ -159,7 +159,7 @@ namespace s3d_mmd
   }
   mmd::Bones CreateBones(const Array<pmd::Bone> &pmdBones, const pmd::IkData &ikData)
   {
-    mmd::Bones bones(CreateIkData(ikData));
+    Array<mmd::Bone> bones;
     const int size = static_cast<int>(pmdBones.size());
     bones.resize(size);
     for ( int i : step(size) )
@@ -194,8 +194,7 @@ namespace s3d_mmd
       bone.initMatML = bone.boneMatML = bone.initMat = modelLocalInitMat;	// モデルローカル座標系
       bone.offsetMat = XMMatrixInverse(0, modelLocalInitMat);
     }
-    bones.InitMatCalc();
-    return bones;
+    return{ std::move(bones), CreateIkData(ikData) };
   }
 
   class MMDModel::Pimpl

@@ -354,7 +354,7 @@ namespace s3d_mmd
       {
         ConstantBuffer<mmd::ConstantBoneData> data;
         PhysicsUpdate(worlds);
-        m_bones->CalcWorld(Mat4x4::Identity(), worlds);
+        m_bones->calcWorld(Mat4x4::Identity(), worlds);
         for ( auto& i : step(static_cast<int>(worlds.size())) )
         {
           data->bones[i] = worlds[i].transposed();

@@ -147,16 +147,16 @@ namespace s3d_mmd
   {
     Vector localEffectorPos = DirectX::XMVectorSet(0, 0, 0, 0);
     Vector localTargetPos = DirectX::XMVectorSet(0, 0, 0, 0);
-    Mat4x4 targetMat = bones.CalcBoneMatML(ikData.ik_bone_index);
+    Mat4x4 targetMat = bones.calcBoneMatML(ikData.ik_bone_index);
 
     for ( int i : step_backward(ikData.iterations) )
     {
       for ( auto& attentionIdx : ikData.ik_child_bone_index )
       {
         using namespace DirectX;
-        Mat4x4 effectorMat = bones.CalcBoneMatML(ikData.ik_target_bone_index);
+        Mat4x4 effectorMat = bones.calcBoneMatML(ikData.ik_target_bone_index);
         XMVECTOR Determinant;
-        const Mat4x4 invCoord = XMMatrixInverse(&Determinant, bones.CalcBoneMatML(attentionIdx));
+        const Mat4x4 invCoord = XMMatrixInverse(&Determinant, bones.calcBoneMatML(attentionIdx));
         localEffectorPos = XMVector3TransformCoord(effectorMat.r[3], invCoord); // 注目ボーン基準に変換
         localTargetPos = XMVector3TransformCoord(targetMat.r[3], invCoord);     // 注目ボーン基準に変換
 
