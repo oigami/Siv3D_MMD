@@ -19,11 +19,6 @@ namespace s3d_mmd
       return val;
     }
 
-    float Clamp(float val, float min, float max)
-    {
-      return std::min(std::max(min, val), max);
-    }
-
     class EulerAngles
     {
       enum class Type
@@ -156,7 +151,7 @@ namespace s3d_mmd
         using namespace DirectX;
         Mat4x4 effectorMat = bones.calcBoneMatML(ikData.ik_target_bone_index);
         XMVECTOR Determinant;
-        const Mat4x4 invCoord = XMMatrixInverse(&Determinant, bones.calcBoneMatML(attentionIdx));
+        const auto invCoord = XMMatrixInverse(&Determinant, bones.calcBoneMatML(attentionIdx));
         localEffectorPos = XMVector3TransformCoord(effectorMat.r[3], invCoord); // 注目ボーン基準に変換
         localTargetPos = XMVector3TransformCoord(targetMat.r[3], invCoord);     // 注目ボーン基準に変換
 
@@ -172,7 +167,7 @@ namespace s3d_mmd
         XMStoreFloat(&p, XMVector3Dot(localEffectorDir, localTargetDir));
         if ( p > 1 - 1.0e-8f ) continue; // 計算誤差により1を越えるとacos()が発散するので注意!
         const float limitAngle = ikData.control_weight;
-        const float angle = detail::Clamp(acos(p), -limitAngle, limitAngle);
+        const float angle = Clamp(acos(p), -limitAngle, limitAngle);
 
         if ( angle == 0.f ) continue;
         Vector axis = XMVector3Normalize(XMVector3Cross(localEffectorDir, localTargetDir));
@@ -189,8 +184,8 @@ namespace s3d_mmd
           detail::EulerAngles eulerAngle(rot.toMatrix());
 
           eulerAngle.x = detail::IKRotateLimit(eulerAngle.x, Radians(-180.f), Radians(-10.f));
-          eulerAngle.y = detail::IKRotateLimit(eulerAngle.y, Radians(0.f), Radians(0.f));
-          eulerAngle.z = detail::IKRotateLimit(eulerAngle.z, Radians(0.f), Radians(0.f));
+          eulerAngle.y = 0;
+          eulerAngle.z = 0;
           local = eulerAngle.CreateRot();
 
           bones[attentionIdx].boneMat = local * XMMatrixTranslationFromVector(xmboneMatBL.r[3]);
@@ -222,28 +217,31 @@ namespace s3d_mmd
       if ( keyData.haveNowFrame() )
       {
         const auto &nowFrame = keyData.getNowFrame();
-        const int t0 = nowFrame.frameNo;
-        Quaternion boneRot = nowFrame.rotation;
-        Vec3 bonePos = nowFrame.position;
         if ( keyData.haveNextFrame() )
         {
 
-          //次のフレームとの間の位置を計算する
-          const Vec3 &p0 = bonePos;
           const vmd::KeyFrame &next = keyData.getNextFrame();
-          const int t1 = next.frameNo;
-          const Vec3 &p1 = next.position;
-          float s = (float) (msToFrameCount(m_nowTime.ms()) - t0) / float(t1 - t0);
-          boneRot = Math::Slerp(boneRot, next.rotation, next.bezie_r.GetY(s));
-          bonePos.x = p0.x + (p1.x - p0.x) * next.bezie_x.GetY(s);
-          bonePos.y = p0.y + (p1.y - p0.y) * next.bezie_y.GetY(s);
-          bonePos.z = p0.z + (p1.z - p0.z) * next.bezie_z.GetY(s);
+          //次のフレームとの間の位置を計算する
+          const auto& p0 = nowFrame.position;
+          const auto& p1 = next.position;
+          const int& t0 = nowFrame.frameNo;
+          const int& t1 = next.frameNo;
+          const float& s = (float) (msToFrameCount(m_nowTime.ms()) - t0) / float(t1 - t0);
+          const auto rot = Math::Slerp(nowFrame.rotation, next.rotation, next.bezie_r.GetY(s)).toMatrix();
+          auto bonePos = p0 + (p1 - p0) * XMVectorSet(next.bezie_x.GetY(s), next.bezie_y.GetY(s), next.bezie_z.GetY(s), 0);
+
+          // 親ボーン座標系のボーン行列を求める
+          const auto trans = XMMatrixTranslationFromVector(bonePos);
+          i.boneMat = rot * trans * i.initMat;
+        }
+        else
+        {
+          // 親ボーン座標系のボーン行列を求める
+          const auto rot = nowFrame.rotation.toMatrix();
+          const auto trans = XMMatrixTranslationFromVector(nowFrame.position);
+          i.boneMat = rot * trans * i.initMat;
         }
 
-        // 親ボーン座標系のボーン行列を求める
-        const XMMATRIX rot = boneRot.toMatrix();
-        const Mat4x4 trans = Mat4x4::Translate(bonePos.x, bonePos.y, bonePos.z);
-        i.boneMat = rot * trans * i.initMat;
       }
     }
     UpdateIK(bones);

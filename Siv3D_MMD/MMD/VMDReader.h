@@ -93,39 +93,23 @@ namespace s3d_mmd
 
       Float2 p1, p2; /// 制御点
 
+      mutable float pre_x;
+      mutable float pre_out;
     public:
 
       Bezie() = default;
       Bezie(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2);
       float GetY(float x) const;	/// xにおけるyを取得
 
-      float newton(float t, float x) const
-      {
-        auto  f = [&](float t, float x)
-        {
-          return 3 * (1 - t) * (1 - t) * t * p1.x + 3 * (1 - t) * t * t * p2.x + t * t * t - x;
-        };
-        auto fd = [&](float t)
-        {
-          return 3 * t * t * (3 * (p1.x - p2.x) + 1) + 6 * t * (p2.x - 2 * p1.x) + 3 * p1.x;
-        };
-        constexpr int N = 16;
-        for ( int i = N - 1; i >= 0; --i )
-        {
-          float t1 = t - f(t, x) / fd(t);
-          if ( fabs(t1 - t) < 1e-6 ) break;
-          t = t1;
-        }
-        return t;
-      }
+      float newton(float t, float x) const;
     };
 
     struct KeyFrame
     {
 
+      DirectX::XMVECTOR position;        /// <summary>位置</summary>
       String boneName; /// <summary>ボーン名</summary>
       int frameNo;          /// <summary>フレーム番号</summary>
-      Vec3 position;        /// <summary>位置</summary>
       Quaternion rotation;  /// <summary>回転</summary>
       Bezie bezie_x;
       Bezie bezie_y;

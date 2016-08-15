@@ -10,39 +10,69 @@ namespace s3d_mmd
   {
     Bezie::Bezie(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2)
     {
-      p1.x = x1 / 127.0f;
-      p1.y = y1 / 127.0f;
-      p2.x = x2 / 127.0f;
-      p2.y = y2 / 127.0f;
+      p1.x = x1 / 127.0f * 3.0f;
+      p1.y = y1 / 127.0f * 3.0f;
+      p2.x = x2 / 127.0f * 3.0f;
+      p2.y = y2 / 127.0f * 3.0f;
+      pre_x = 0.0f;
+      pre_out = 0.0f;
     }
+
 
     /// http://d.hatena.ne.jp/edvakf/20111016/1318716097
     /// 二分探索
+
     float Bezie::GetY(float x) const
     {
       //return newton(0.5f, x);
-      float t = 0.5f;
-      float t1, t2, t3;
-
-      constexpr int N = 16; // 計算繰り返し回数
-      for ( int i = 0; i < N; ++i )
+      float l, r;
+      if ( pre_x <= x )
       {
-        const float s = 1 - t;
-        t1 = s * s * t * 3.0f;
-        t2 = s * t * t * 3.0f;
-        t3 = t * t * t;
-        float ft = t1 * p1.x + t2 * p2.x + t3 - x;
-        if ( fabs(ft) < 1e-6 ) break; // 誤差が定数以内なら終了
-        if ( ft > 0 )
-        { // 範囲を変更して再計算
-          t -= 1.0f / (4 << i);
-        }
-        else
-        {
-          t += 1.0f / (4 << i);
-        }
+        l = pre_out;
+        r = 1.0f;
       }
-      return t1 * p1.y + t2 * p2.y + t3;
+      else
+      {
+        l = 0.0f;
+        r = pre_out;
+      }
+      float t, s;
+      constexpr int N = 16; // 計算繰り返し回数
+      for ( int i = N - 1; i >= 0; --i )
+      {
+        t = (l + r) / 2.0f;
+        s = 1.0f - t;
+        // s * s * t * 3 * p1.x + s * t * t * 3 * p2.x + t * t * t
+        float ft = t * (s * (s * p1.x + t * p2.x) + t * t);
+        //if ( fabs(ft) < 1e-6 ) break; // 誤差が定数以内なら終了
+        if ( ft > x )
+          r = t;
+        else
+          l = t;
+      }
+      pre_x = x;
+      pre_out = l;
+      return s * (t * (s * p1.y + t * p2.y)) + t * t * t;
+    }
+
+    float Bezie::newton(float t, float x) const
+    {
+      auto  f = [&](float t, float x)
+      {
+        return 3 * (1 - t) * (1 - t) * t * p1.x + 3 * (1 - t) * t * t * p2.x + t * t * t - x;
+      };
+      auto fd = [&](float t)
+      {
+        return 3 * t * t * (3 * (p1.x - p2.x) + 1) + 6 * t * (p2.x - 2 * p1.x) + 3 * p1.x;
+      };
+      constexpr int N = 16;
+      for ( int i = N - 1; i >= 0; --i )
+      {
+        float t1 = t - f(t, x) / fd(t);
+        if ( fabs(t1 - t) < 1e-6 ) break;
+        t = t1;
+      }
+      return t;
     }
   }
 

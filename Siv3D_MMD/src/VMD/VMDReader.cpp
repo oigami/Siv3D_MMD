@@ -36,7 +36,7 @@ namespace s3d_mmd
         keyFrame.frameNo = bone.frameNo;
         keyFrame.frameNo *= frame_rate / mmd_frame_rate;
         last_frame = std::max(last_frame, keyFrame.frameNo);
-        keyFrame.position = Vec3(bone.location[0], bone.location[1], bone.location[2]);
+        keyFrame.position = DirectX::XMVectorSet(bone.location[0], bone.location[1], bone.location[2], 0);
         keyFrame.rotation = Quaternion(bone.rotation[0], bone.rotation[1], bone.rotation[2], bone.rotation[3]);
         keyFrame.bezie_x = vmd::Bezie(bone.interpolation[0], bone.interpolation[4], bone.interpolation[8], bone.interpolation[12]);
         keyFrame.bezie_y = vmd::Bezie(bone.interpolation[1], bone.interpolation[5], bone.interpolation[9], bone.interpolation[13]);

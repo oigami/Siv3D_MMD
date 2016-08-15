@@ -63,7 +63,7 @@ namespace s3d_mmd
 
       for ( int parent = index; parent = m_bones[parent].parent, parent != -1;)
       {
-        ret *= m_bones[parent].boneMat;
+        ret = XMMatrixMultiply(ret, m_bones[parent].boneMat);
       }
       return ret;
       /*auto &bone = m_bones[index];
