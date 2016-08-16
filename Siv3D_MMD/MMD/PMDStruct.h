@@ -62,7 +62,7 @@ namespace s3d_mmd
       std::uint16_t ik_target_bone_index; // IKボーンの位置にこのボーンを一致させるようにIK処理が行われる
       std::uint8_t ik_child_bone_length;  // IKチェーンの長さ
       std::uint16_t iterations;           // 再帰演算回数
-      float control_weight;               // ボーンの単位制限角 1.0 → 4.0[rad]。また「ひざ」を含むボーン名をもつボーンはX軸方向にしか動かない制限がある。
+      float control_weight;               // ボーンの単位制限角 1.0 → 3.14(pi)[rad]。また「ひざ」を含むボーン名をもつボーンはX軸方向にしか動かない制限がある。
 
                                           // unsigned short ik_child_bone_index[ik_chain_length]; // IK影響下のボーン番号 (配列の大きさが変化)
     };
