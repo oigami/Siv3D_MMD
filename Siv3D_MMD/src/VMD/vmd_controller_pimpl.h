@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <MMD/VMDController.h>
 #include <MMD/PMDStruct.h>
+#include <MMD/mmd_motion.h>
 namespace s3d_mmd
 {
 
@@ -23,27 +24,27 @@ namespace s3d_mmd
       {
         KeyFrameData() :m_nowFrameNum(0) {}
 
-        const vmd::KeyFrame& getNowFrame() const
+        const vmd::BoneFrame& getNowFrame() const
         {
-          return (*m_keyFrames)[m_nowFrameNum];
+          return m_keyFrames[m_nowFrameNum];
         }
 
-        const vmd::KeyFrame& getNextFrame() const
+        const vmd::BoneFrame& getNextFrame() const
         {
-          return (*m_keyFrames)[m_nowFrameNum + 1];
+          return m_keyFrames[m_nowFrameNum + 1];
         }
 
         bool haveNextFrame() const
         {
-          return m_nowFrameNum + 1 < m_keyFrames->size();
+          return m_nowFrameNum + 1 < m_keyFrames.size();
         }
 
         bool haveNowFrame() const
         {
-          return m_nowFrameNum < m_keyFrames->size();
+          return m_nowFrameNum < m_keyFrames.size();
         }
 
-        std::shared_ptr<Array<vmd::KeyFrame>> m_keyFrames;
+        Array<vmd::BoneFrame> m_keyFrames;
         int m_nowFrameNum;
       };
 
@@ -94,7 +95,7 @@ namespace s3d_mmd
 
   public:
 
-    Pimpl(VMDReader &data);
+    Pimpl(mmd::MMDMotion& data);
     Pimpl() = default;
 
     void UpdateIK(mmd::Bones &bones) const;		// IKボーン影響下ボーンの行列を更新

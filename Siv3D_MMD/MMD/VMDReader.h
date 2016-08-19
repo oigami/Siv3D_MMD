@@ -1,159 +1,72 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
+#include <src/ReaderHelper.h>
+#include <MMD/vmd_struct.h>
 namespace s3d_mmd
 {
-  namespace vmd
-  {
-
-#pragma pack(push, 1)
-
-    //http://harigane.at.webry.info/201103/article_1.html
-
-    /// VMD構造体定義
-    struct Header
-    {
-      char vmdHeader[30];
-      char vmdModelName[20];
-    };
-
-    struct Bone
-    {
-      char boneName[15];
-      std::uint32_t frameNo;
-      float location[3]; // 移動量
-      float rotation[4]; // モデルローカル座標系
-      std::uint8_t interpolation[64];
-    };
-
-    struct Morph
-    {
-      char name[15];
-      std::uint32_t frameNo;
-      float m_weight;
-    };
-
-    struct Camera
-    {
-      std::uint32_t frameNo;   // フレーム番号
-      float distance;          // 目標点とカメラの距離(目標点がカメラ前面でマイナス)
-      float x;                 // 目標点のX軸位置
-      float y;                 // 目標点のY軸位置
-      float z;                 // 目標点のZ軸位置
-      float rx;                // カメラのx軸回転(rad)(MMD数値入力のマイナス値)
-      float ry;                // カメラのy軸回転(rad)
-      float rz;                // カメラのz軸回転(rad)
-      std::uint8_t bezier[24]; // 補間パラメータ
-      std::uint32_t viewAngle; // 視野角(deg)
-      std::uint8_t parth;      // パースペクティブ, 0:ON, 1:OFF
-    };
-
-    struct Light
-    {
-      std::uint32_t frame; // フレーム番号
-      float r;             // 照明色赤(MMD入力値を256で割った値)
-      float g;             // 照明色緑(MMD入力値を256で割った値)
-      float b;             // 照明色青(MMD入力値を256で割った値)
-      float x;             // 照明x位置(MMD入力値)
-      float y;             // 照明y位置(MMD入力値)
-      float z;             // 照明z位置(MMD入力値)
-    };
-
-    struct SelfShadow
-    {
-      std::uint32_t frame; // フレーム番号
-      std::uint8_t type;   // セルフシャドウ種類, 0:OFF, 1:mode1, 2:mode2
-      float distance;      // シャドウ距離(MMD入力値Lを(10000-L)/100000とした値)
-    };
-
-    struct InfoIk
-    {
-      char name[20];       // "右足ＩＫ\0"などのIKボーン名の文字列 20byte
-      std::uint8_t on_off; // IKのon/off, 0:OFF, 1:ON
-    };
-
-    struct ShowIkWithoutArray
-    {
-      std::uint32_t frame;    // フレーム番号
-      std::uint8_t show;      // モデル表示, 0:OFF, 1:ON
-      std::uint32_t ik_count; // 記録するIKの数
-
-      //InfoIK ik[ik_count];  // IK on/off情報配列
-    };
-
-#pragma pack(pop)
-
-    struct ShowIk : ShowIkWithoutArray
-    {
-      Array<InfoIk> ik;
-    };
-
-    /// 0～1に規格化されたベジェ曲線
-    class Bezie
-    {
-
-      Float2 p1, p2; /// 制御点
-
-      mutable float pre_x;
-      mutable float pre_out;
-    public:
-
-      Bezie() = default;
-      Bezie(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2);
-      float GetY(float x) const;	/// xにおけるyを取得
-
-      float newton(float t, float x) const;
-    };
-
-    struct KeyFrame
-    {
-
-      DirectX::XMVECTOR position;        /// <summary>位置</summary>
-      String boneName; /// <summary>ボーン名</summary>
-      int frameNo;          /// <summary>フレーム番号</summary>
-      Quaternion rotation;  /// <summary>回転</summary>
-      Bezie bezie_x;
-      Bezie bezie_y;
-      Bezie bezie_z;
-      Bezie bezie_r;
-
-      // フレーム番号で比較
-      bool operator<(const KeyFrame &k) const
-      {
-        return frameNo < k.frameNo;
-      }
-
-    };
-  }
-
   class VMDReader
   {
 
-    int last_frame;
-    std::unordered_map<String, std::shared_ptr<Array<vmd::KeyFrame>>> keyFrames;
-    Array<vmd::Morph> vmdSkins;
+    int m_lastFrame;
+    vmd::Header header;
+    Array<vmd::Bone> keyFrames;
+    Array<vmd::Morph> morphFrames;
+    Array<vmd::Camera> cameraFrames;
+    Array<vmd::SelfShadow> selfShadowFrames;
+    Array<vmd::ShowIk> showIKs;
+    std::shared_ptr<IReader> reader_;
+    FilePath path_;
+    bool is_opened_;
+    bool openImpl(std::shared_ptr<IReader> reader);
   public:
+
+    VMDReader();
 
     /// <summary>VMDファイルからデータを取り出す</summary>
     /// <param name="file_name"></param>
-    VMDReader(const FilePath &file_name);
+    VMDReader(const FilePath& file_name);
 
-    /// <summary>ボーン名に応じたキーフレームを返す</summary>
-    /// <param name="bone_name">ボーン名</param>
-    /// <returns>キーフレーム</returns>
-    std::shared_ptr<Array<vmd::KeyFrame>> getKeyFrames(const String& bone_name);
+    /// <summary>VMDファイルからデータを取り出す</summary>
+    /// <param name="file_name"></param>
+    template<class Reader, class = std::enable_if_t<std::is_base_of<IReader, Reader>::value>>
+    VMDReader(Reader&& reader) { open(std::move(reader)); }
 
-    /// <summary>ボーン名に応じたキーフレームを返す</summary>
-    /// <param name="bone_name">ボーン名</param>
-    /// <returns>キーフレーム</returns>
-    std::unordered_map<String, std::shared_ptr<Array<vmd::KeyFrame>>> getKeyFrames()
-    {
-      return keyFrames;
-    }
+    bool open(const FilePath& file_name);
+
+    template<class Reader, class = std::enable_if_t<std::is_base_of<IReader, Reader>::value>>
+    bool open(Reader&& reader) { return open(std::make_shared<Reader>(std::move(reader))); }
+
+    bool open(std::shared_ptr<IReader> reader);
+
+    void close();
+
+    bool hasChanged()const;
+
+    bool isEmpty() const;
+
+    bool reload();
+
+    bool isOpened()const;
+    explicit operator bool() const { return isOpened(); }
+
+    const FilePath& path()const { return path_; }
+
+    const vmd::Header& getHeader()const { return header; }
 
     /// <summary>モーションの最終フレームを返す</summary>
     /// <returns>モーションの最終フレーム</returns>
-    int GetLastFrame() { return last_frame; }
+    int getLastFrame() { return m_lastFrame; }
 
-    const Array<vmd::Morph>& getMorph() const { return vmdSkins; }
+    double getVersion() const;
+
+    const Array<vmd::Bone>& getKeyFrames()const { return keyFrames; }
+
+    const Array<vmd::Morph>& getMorphFrames() const { return morphFrames; }
+
+    const Array<vmd::Camera>& getCameraFrames() const { return cameraFrames; }
+
+    const Array<vmd::SelfShadow>& getSelfShadowFrames() const { return selfShadowFrames; }
+
+    const Array<vmd::ShowIk>& getShowIk() const { return showIKs; }
   };
 }

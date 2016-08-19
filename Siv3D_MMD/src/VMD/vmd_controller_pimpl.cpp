@@ -1,4 +1,5 @@
 ﻿#include <src/VMD/vmd_controller_pimpl.h>
+#include <MMD/mmd_motion.h>
 namespace s3d_mmd
 {
   namespace detail
@@ -109,7 +110,7 @@ namespace s3d_mmd
   }
 
 
-  VMD::Pimpl::Pimpl(VMDReader & data)
+  VMD::Pimpl::Pimpl(mmd::MMDMotion & data)
   {
     m_loopBegin = SecondsF::zero();
     m_loopEnd = SecondsF::zero();
@@ -122,7 +123,7 @@ namespace s3d_mmd
 
     m_isFrameEnd = true;
 
-    for ( auto& i : data.getMorph() )
+    for ( auto& i : data.getMorphFrames() )
     {
       m_morphData[i.name].m_morph.push_back(vmd::detail::Morph{ i.frameNo,i.m_weight });
     }
@@ -214,7 +215,7 @@ namespace s3d_mmd
         if ( keyData.haveNextFrame() )
         {
 
-          const vmd::KeyFrame &next = keyData.getNextFrame();
+          const vmd::BoneFrame &next = keyData.getNextFrame();
           //次のフレームとの間の位置を計算する
           const auto& p0 = nowFrame.position;
           const auto& p1 = next.position;
@@ -262,11 +263,11 @@ namespace s3d_mmd
     for ( auto& i : m_keyFrameData )
     {
       vmd::detail::KeyFrameData &keyData = i.second;
-      const size_t keyframe_size = keyData.m_keyFrames->size();
+      const size_t keyframe_size = keyData.m_keyFrames.size();
       int &nowFrameNum = keyData.m_nowFrameNum;
       if ( nowFrameNum + 1 < keyframe_size )
       {
-        const Array<vmd::KeyFrame> &key_frame = *keyData.m_keyFrames;
+        const Array<vmd::BoneFrame> &key_frame = keyData.m_keyFrames;
         const uint32 t1 = key_frame[nowFrameNum + 1].frameNo;
         if ( frameCount > t1 ) ++nowFrameNum;
       }

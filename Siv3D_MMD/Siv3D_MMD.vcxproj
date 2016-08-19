@@ -175,6 +175,7 @@
     <ClCompile Include="BulletPhysics\BulletSphere.cpp" />
     <ClCompile Include="BulletPhysics\detail\BulletDebug.cpp" />
     <ClCompile Include="BulletPhysics\detail\BulletPhysicsDetail.cpp" />
+    <ClCompile Include="src\mmd_motion.cpp" />
     <ClCompile Include="src\MMDMorph.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="src\MMD.cpp" />
@@ -308,7 +309,9 @@
     <ClInclude Include="MMD\PMDStruct.h" />
     <ClInclude Include="MMD\VMDController.h" />
     <ClInclude Include="MMD\VMDReader.h" />
+    <ClInclude Include="MMD\vmd_struct.h" />
     <ClInclude Include="src\MMDPhysics.h" />
+    <ClInclude Include="MMD\mmd_motion.h" />
     <ClInclude Include="src\ReaderHelper.h" />
     <ClInclude Include="src\detail\mmd_pimpl.h" />
     <ClInclude Include="src\VMD\vmd_controller_pimpl.h" />

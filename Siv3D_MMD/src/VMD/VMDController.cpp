@@ -4,6 +4,7 @@
 #include <MMD/VMDController.h>
 #include "../ReaderHelper.h"
 #include <src/VMD/vmd_controller_pimpl.h>
+#include <MMD/mmd_motion.h>
 namespace s3d_mmd
 {
   namespace vmd
@@ -85,7 +86,7 @@ namespace s3d_mmd
 
   VMD::VMD(const FilePath & filename)
   {
-    m_handle = std::make_shared<Pimpl>(VMDReader(filename));
+    m_handle = std::make_shared<Pimpl>(mmd::MMDMotion(filename));
   }
 
   VMD::~VMD() {}
