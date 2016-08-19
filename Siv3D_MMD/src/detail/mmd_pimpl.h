@@ -61,7 +61,7 @@ namespace s3d_mmd
         static void Compile(const wchar *outPath, ShaderType type)
         {
           if ( !FileSystem::Exists(outPath) )
-            Shader::Compile(edgePath, outPath, type);
+          Shader::Compile(edgePath, outPath, type);
         }
       public:
 
@@ -184,6 +184,7 @@ namespace s3d_mmd
     {
       int x = vPos % 1016;
       int y = vPos / 1016;
+      assert(y < 1016);
       int resize = morph.size() % 16;
       if ( resize != 0 )
         morph.resize(morph.size() + 16 - resize);
@@ -196,20 +197,20 @@ namespace s3d_mmd
       }
 
       auto image = vertexImage[y];
-
-      image[x] = RGBA32F(v.boneNum[0], v.boneNum[1], 0.0f, 0.0f);
+      auto asFloat = [](int a) { return *reinterpret_cast<float*>(&a); };
+      assert(v.boneNum[0] < 256 && v.boneNum[1] < 256);
+      image[x] = RGBA32F(asFloat(v.boneNum[0]), asFloat(v.boneNum[1]), 0.0f, 0.0f);
       image[x + 1] = RGBA32F(v.boneWeight.x, v.boneWeight.y, v.boneWeight.z, v.boneWeight.w);
       int f = morph.size();
-      image[x + 2] = RGBA32F(v.texcoord.x, v.texcoord.y, *reinterpret_cast<float*>(&f), 0.0f);
+      image[x + 2] = RGBA32F(v.texcoord.x, v.texcoord.y, asFloat(f), 0.0f);
 
       int now = x + 2;
       for ( auto& i : morph )
       {
-        f = i.w;
-        image[++now] = RGBA32F(i.x, i.y, i.z, *reinterpret_cast<float*>(&f));
+        image[++now] = RGBA32F(i.x, i.y, i.z, asFloat(static_cast<int>(i.w)));
       }
       vPos += dataSize;
-      return{ x + 0.1, y + 0.1 };
+      return{ asFloat(x), asFloat(y) };
     }
 
     Pimpl(const MMDModel& model)
@@ -218,6 +219,11 @@ namespace s3d_mmd
 #endif
     {
       m_bones = model.bones();
+      if ( m_bones->size() >= 256 )
+      {
+        Println(L"ボーンのサイズが多すぎる");
+        return;
+      }
       m_name = model.name();
       m_comment = model.comment();
 #ifdef USE_BULLET_PHYSICS
@@ -376,6 +382,7 @@ namespace s3d_mmd
       }
 
       Graphics3D::SetTexture(ShaderStage::Vertex, 1, m_vertexTexture);
+      return;
       const auto rasterizerState = Graphics3D::GetRasterizerState();
       const auto rasterizerStateForawrt = Graphics3D::GetRasterizerStateForward();
       draw(m_nodes.nodeCullBack, RasterizerState::SolidCullBack);

@@ -8,9 +8,10 @@ struct VS_INPUT
 };
 struct TexVertex
 {
+  float4 pos;
+  float2 w;
+  float2 tex;
   int2 idx;
-  float3 blend;
-  float3 morphWeight;
 };
 Texture2D texVertex1 : register(t1);
 SamplerState DiffuseSampler
@@ -49,23 +50,29 @@ cbuffer MorphBuff : register(b2)
 {
   float4 morphWeight[1024];
 }
-TexVertex GetVertex(float2 pos)
+TexVertex GetVertex(float2 pos, float4 vertexPos)
 {
   TexVertex ret;
-  int3 vPos = int3((int) (pos.x), (int) (pos.y), 0);
-  ret.idx = texVertex1.Load(vPos).xy;
+  int4 vPos = int4(asint(pos.x), asint(pos.y), 0, 0);
+  ret.idx = asint(texVertex1.Load(vPos.xyz).xy);
+
   vPos.x += 1;
-  ret.blend = texVertex1.Load(vPos).xyz;
-  ret.blend.z = 0;
+  ret.w = texVertex1.Load(vPos.xyz).xy;
+
   vPos.x += 1;
-  vPos.x += 1;
-  int n = texVertex1.Load(vPos).r;
-  ret.morphWeight = (float3)0;
-  while ( n-- )
+  float3 tex_and_n = texVertex1.Load(vPos.xyz).xyz;
+  ret.tex = tex_and_n.xy;
+  vPos.w = asint(tex_and_n.z);
+
+  ret.pos = vertexPos;
+  while ( vPos.w )
   {
-    vPos.x += 1;
-    float4 data = texVertex1.Load(vPos);
-    ret.morphWeight += data.rgb * morphWeight[(int) data.a].x;
+    [unroll] for ( int i = 16 - 1; i >= 0; i-- )
+    {
+      vPos.xw += int2(1, -1);
+      float4 data = texVertex1.Load(vPos.xyz);
+      ret.pos.xyz += data.rgb * morphWeight[asint(data.a)].x;
+    }
   }
   return ret;
 }
@@ -74,20 +81,18 @@ TexVertex GetVertex(float2 pos)
 VS_OUTPUT VS(VS_INPUT input)
 {
   VS_OUTPUT output;
-  TexVertex v = GetVertex(input.tex);
-  float3 w = v.blend;
-  float4x4 comb = (float4x4)0;
-  comb += BoneMatrix[v.idx.x] * w.x;
-  comb += BoneMatrix[v.idx.y] * w.y;
-  float4 pos = mul(input.pos + float4(v.morphWeight, 0), comb);
-  //float4 pos = float4(In.pos, 1.0);
-  float4 normal_head = mul(input.pos + float4(input.normal, 0), comb);
-  float3 normal = normalize(normal_head.xyz - pos.xyz);
-  output.normal = normal;
-  output.pos = mul(pos + float4(input.normal * 0.03, 0), g_viewProjectionMatrix);
-  output.color = input.diffuseColor;
+  TexVertex v = GetVertex(input.tex, input.pos);
+  float4x3 comb = (float4x3)BoneMatrix[v.idx.x] * v.w.x;
+  comb += (float4x3)BoneMatrix[v.idx.y] * v.w.y;
+  v.pos.xyz += input.normal.xyz * 0.03;
+
+  float4 pos = float4(mul(v.pos, comb), v.pos.w);
+  float3 normal_head = mul(v.pos + float4(input.normal, 0), comb);
+
+  output.normal = normalize(normal_head.xyz - pos.xyz);
+  output.pos = mul(pos, g_viewProjectionMatrix);
   output.tex = input.tex;
-  output.worldPosition = output.pos.xyz;
+  output.worldPosition = pos.xyz;
   //output.normal = norm.xyz;
   return output;
 }
@@ -107,7 +112,7 @@ cbuffer pscbMesh0 : register(b0)
 PS_OUTPUT PS(VS_OUTPUT input)
 {
   PS_OUTPUT output;
-  output.color = float4(0, 0, 0, 1);
+  output.color = float4(0.0, 0.0, 0.0, 1.0);
   output.depth = distance(g_cameraPosition.xyz, input.worldPosition);
   output.normal = float4(input.normal, 1);
   return output;

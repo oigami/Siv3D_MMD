@@ -35,8 +35,8 @@ cbuffer MorphBuff : register(b2)
 TexVertex GetVertex(float2 pos, float4 vertexPos)
 {
   TexVertex ret;
-  int4 vPos = int4((pos.x), (pos.y), 0, 0);
-  ret.idx = texVertex1.Load(vPos.xyz).xy;
+  int4 vPos = int4(asint(pos.x), asint(pos.y), 0, 0);
+  ret.idx = asint(texVertex1.Load(vPos.xyz).xy);
 
   vPos.x += 1;
   ret.w = texVertex1.Load(vPos.xyz).xy;
@@ -51,11 +51,10 @@ TexVertex GetVertex(float2 pos, float4 vertexPos)
   {
     [unroll] for ( int i = 16 - 1; i >= 0; i-- )
     {
-      vPos.x += 1;
+      vPos.xw += int2(1, -1);
       float4 data = texVertex1.Load(vPos.xyz);
       ret.pos.xyz += data.rgb * morphWeight[asint(data.a)].x;
     }
-    vPos.w -= 16;
   }
   return ret;
 }
@@ -89,13 +88,13 @@ VS_OUTPUT VS(VS_INPUT input)
 
   //comb += BoneMatrix[v.idx[3]] * (1.0f - w[0] - w[1] - w[2]);
   const float3 normal_head = mul(float4(v.pos.xyz + input.normal, v.pos.w), comb);
-  const float3 pos = mul(v.pos, comb);
+  const float4 pos = float4(mul(v.pos, comb), v.pos.w);
 
   VS_OUTPUT Out;
-  Out.pos = mul(float4(pos, v.pos.w), g_viewProjectionMatrix);
+  Out.pos = mul(pos, g_viewProjectionMatrix);
   Out.normal = normalize(normal_head.xyz - pos.xyz);
   Out.color = input.diffuseColor;
-  Out.worldPosition = pos;
+  Out.worldPosition = pos.xyz;
   Out.tex = v.tex;
   return Out;
 }
