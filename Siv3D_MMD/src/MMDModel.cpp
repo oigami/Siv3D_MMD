@@ -106,7 +106,7 @@ namespace s3d_mmd
       Array<uint32_t> indices(face_vertex_len), edgeIndices;
       Array<mmd::MeshVertex> vertices, edgeVertices;
       vertices.reserve(face_vertex_len);
-      const bool isEdge = item.edge_flag != 0;
+      const bool isEdge = material.isEdge;
       if ( isEdge ) edgeIndices.resize(face_vertex_len);
       for ( auto& i : step(face_vertex_len) )
       {
@@ -122,13 +122,17 @@ namespace s3d_mmd
         const auto edgeIter = edgeIndex.insert(faceIndex);
         if ( edgeIter.second )
         {
-          if ( pmdVertices[faceIndex].edge_flag == 0 )
+          if ( meshVertices[faceIndex].isEdge )
           {
             edgeVertices.push_back(meshVertex);
           }
           else
           {
-            edgeVertices.push_back({ meshVertex.position, Float3(0, 0, 0), meshVertex.texcoord });
+            edgeVertices.push_back({ meshVertex.position,
+                                   Float3(0.0f, 0.0f, 0.0f), meshVertex.texcoord,
+                                   meshVertex.boneNum, meshVertex.boneWeight,
+                                   meshVertex.isEdge, meshVertex.vertexNum
+            });
           }
         }
         edgeIndices[i] = edgeIter.first;
