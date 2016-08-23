@@ -116,9 +116,9 @@ namespace s3d_mmd
     m_loopEnd = SecondsF::zero();
     m_isLoop = false;
     m_isFrameEnd = true;
-    for ( auto& i : data.getKeyFrames() )
+    for ( auto& i : data.getBoneFrames() )
     {
-      m_keyFrameData[i.first].m_keyFrames = i.second;
+      m_keyFrameData[i.first].m_keyFrames = i.second.createFrames();
     }
 
     m_isFrameEnd = true;
@@ -221,7 +221,7 @@ namespace s3d_mmd
           const auto& p1 = next.position;
           const int& t0 = nowFrame.frameNo;
           const int& t1 = next.frameNo;
-          const float& s = (float) (msToFrameCount(m_nowTime.ms()) - t0) / float(t1 - t0);
+          const float& s = (float)(msToFrameCount(m_nowTime.ms()) - t0) / float(t1 - t0);
           const auto rot = Math::Slerp(nowFrame.rotation, next.rotation, next.bezie_r.GetY(s)).toMatrix();
           auto bonePos = XMVectorMultiplyAdd(XMVectorSubtract(p1, p0), XMVectorSet(next.bezie_x.GetY(s), next.bezie_y.GetY(s), next.bezie_z.GetY(s), 0), p0);
 

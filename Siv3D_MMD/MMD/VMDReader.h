@@ -8,12 +8,13 @@ namespace s3d_mmd
   {
 
     int m_lastFrame;
-    vmd::Header header;
-    Array<vmd::Bone> keyFrames;
-    Array<vmd::Morph> morphFrames;
-    Array<vmd::Camera> cameraFrames;
-    Array<vmd::SelfShadow> selfShadowFrames;
-    Array<vmd::ShowIk> showIKs;
+    vmd_struct::Header header;
+    Array<vmd_struct::Bone> keyFrames;
+    Array<vmd_struct::Morph> morphFrames;
+    Array<vmd_struct::Camera> cameraFrames;
+    Array<vmd_struct::Light> lightFrame;
+    Array<vmd_struct::SelfShadow> selfShadowFrames;
+    Array<vmd_struct::ShowIk> showIKs;
     std::shared_ptr<IReader> reader_;
     FilePath path_;
     bool is_opened_;
@@ -51,7 +52,7 @@ namespace s3d_mmd
 
     const FilePath& path()const { return path_; }
 
-    const vmd::Header& getHeader()const { return header; }
+    const vmd_struct::Header& getHeader()const { return header; }
 
     /// <summary>モーションの最終フレームを返す</summary>
     /// <returns>モーションの最終フレーム</returns>
@@ -59,14 +60,18 @@ namespace s3d_mmd
 
     double getVersion() const;
 
-    const Array<vmd::Bone>& getKeyFrames()const { return keyFrames; }
+    const Array<vmd_struct::Bone>& getBoneFrames()const { return keyFrames; }
 
-    const Array<vmd::Morph>& getMorphFrames() const { return morphFrames; }
+    const Array<vmd_struct::Morph>& getMorphFrames() const { return morphFrames; }
 
-    const Array<vmd::Camera>& getCameraFrames() const { return cameraFrames; }
+    const Array<vmd_struct::Camera>& getCameraFrames() const { return cameraFrames; }
 
-    const Array<vmd::SelfShadow>& getSelfShadowFrames() const { return selfShadowFrames; }
+    const Array<vmd_struct::SelfShadow>& getSelfShadowFrames() const { return selfShadowFrames; }
 
-    const Array<vmd::ShowIk>& getShowIk() const { return showIKs; }
+    const Array<vmd_struct::Light>& getLightFrames() const { return lightFrame; }
+
+    const Array<vmd_struct::ShowIk>& getShowIk() const { return showIKs; }
+
+    String getModelName() const;
   };
 }

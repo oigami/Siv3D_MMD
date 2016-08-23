@@ -2,7 +2,7 @@
 #include <Siv3D.hpp>
 namespace s3d_mmd
 {
-  namespace vmd
+  namespace vmd_struct
   {
     static_assert(std::is_pod<Float2>::value, "");
     static_assert(std::is_pod<Float3>::value, "");
@@ -21,6 +21,7 @@ namespace s3d_mmd
 
     struct Bone
     {
+      using CountType = std::uint32_t;
       char boneName[15];
       std::uint32_t frameNo;
       Float3 location;  // 移動量
@@ -29,18 +30,25 @@ namespace s3d_mmd
       Vector4D<std::uint8_t> y1; // 軸の補完パラメータ (x,y,z,r)
       Vector4D<std::uint8_t> x2; // 軸の補完パラメータ (x,y,z,r)
       Vector4D<std::uint8_t> y2; // 軸の補完パラメータ (x,y,z,r)
-      std::uint8_t _interpolation[64 - 4 * 4];
+
+      std::array<std::uint8_t, 16> _interpolation1;
+      std::array<std::uint8_t, 16> _interpolation2;
+      std::array<std::uint8_t, 16> _interpolation3;
     };
 
     struct Morph
     {
+      using CountType = std::uint32_t;
       char name[15];
       std::uint32_t frameNo;
       float m_weight;
+
+      bool operator<(const Morph& m)const { return frameNo < m.frameNo; }
     };
 
     struct Camera
     {
+      using CountType = std::uint32_t;
       std::uint32_t frameNo;   // フレーム番号
       float distance;          // 目標点とカメラの距離(目標点がカメラ前面でマイナス)
       Float3 lookAtPos;        // 目標点
@@ -52,20 +60,22 @@ namespace s3d_mmd
 
     struct Light
     {
-      std::uint32_t frame; // フレーム番号
-      float r;             // 照明色赤(MMD入力値を256で割った値)
-      float g;             // 照明色緑(MMD入力値を256で割った値)
-      float b;             // 照明色青(MMD入力値を256で割った値)
-      float x;             // 照明x位置(MMD入力値)
-      float y;             // 照明y位置(MMD入力値)
-      float z;             // 照明z位置(MMD入力値)
+      using CountType = std::uint32_t;
+      std::uint32_t frameNo; // フレーム番号
+      float r;               // 照明色赤(MMD入力値を256で割った値)
+      float g;               // 照明色緑(MMD入力値を256で割った値)
+      float b;               // 照明色青(MMD入力値を256で割った値)
+      float x;               // 照明x位置(MMD入力値)
+      float y;               // 照明y位置(MMD入力値)
+      float z;               // 照明z位置(MMD入力値)
     };
 
     struct SelfShadow
     {
-      std::uint32_t frame; // フレーム番号
-      std::uint8_t type;   // セルフシャドウ種類, 0:OFF, 1:mode1, 2:mode2
-      float distance;      // シャドウ距離(MMD入力値Lを(10000-L)/100000とした値)
+      using CountType = std::uint32_t;
+      std::uint32_t frameNo; // フレーム番号
+      std::uint8_t type;     // セルフシャドウ種類, 0:OFF, 1:mode1, 2:mode2
+      float distance;        // シャドウ距離(MMD入力値Lを(10000-L)/100000とした値)
     };
 
     struct InfoIk
@@ -76,7 +86,8 @@ namespace s3d_mmd
 
     struct ShowIkWithoutArray
     {
-      std::uint32_t frame;    // フレーム番号
+      using CountType = std::uint32_t;
+      std::uint32_t frameNo;  // フレーム番号
       std::uint8_t show;      // モデル表示, 0:OFF, 1:ON
       std::uint32_t ik_count; // 記録するIKの数
 
@@ -90,6 +101,9 @@ namespace s3d_mmd
       Array<InfoIk> ik;
     };
 
+  }
+  namespace vmd
+  {
     /// 0～1に規格化されたベジェ曲線
     class Bezie
     {
@@ -105,15 +119,20 @@ namespace s3d_mmd
       float GetY(float x) const;	/// xにおけるyを取得
 
       float newton(float t, float x) const;
+
+      const Float2& getP1()const { return p1; }
+      const Float2& getP2()const { return p2; }
     };
 
     struct BoneFrame
     {
+      BoneFrame() = default;
+      String set(const vmd_struct::Bone& boneFrame);
+      vmd_struct::Bone Convert(const String& boneName);
 
-      DirectX::XMVECTOR position;        /// <summary>位置</summary>
-      String boneName; /// <summary>ボーン名</summary>
-      int frameNo;          /// <summary>フレーム番号</summary>
-      Quaternion rotation;  /// <summary>回転</summary>
+      DirectX::XMVECTOR position; /// <summary>位置</summary>
+      int frameNo;                /// <summary>フレーム番号</summary>
+      Quaternion rotation;        /// <summary>回転</summary>
       Bezie bezie_x;
       Bezie bezie_y;
       Bezie bezie_z;

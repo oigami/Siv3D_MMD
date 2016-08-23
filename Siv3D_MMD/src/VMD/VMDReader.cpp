@@ -2,6 +2,14 @@
 #include <src/ReaderHelper.h>
 namespace s3d_mmd
 {
+  namespace
+  {
+    template<class Type>
+    bool ReadSizeAndArray(IReader& reader, std::vector<Type>& arr)
+    {
+      return s3d_mmd::ReadSizeAndArray<typename Type::CountType>(reader, arr);
+    }
+  }
   bool VMDReader::reload()
   {
     if ( !path_.isEmpty )
@@ -25,28 +33,27 @@ namespace s3d_mmd
     constexpr char headerTypeData[] = "Vocaloid Motion Data ";
     if ( strncmp(headerTypeData, header.vmdHeader, sizeof(headerTypeData) - 1) != 0 ) return false;
 
-    if ( !ReadSizeAndArray<uint32>(ifs, keyFrames) ) return false;
+    if ( !ReadSizeAndArray(ifs, keyFrames) ) return false;
 
-    if ( !ReadSizeAndArray<uint32>(ifs, morphFrames) ) return false;
+    if ( !ReadSizeAndArray(ifs, morphFrames) ) return false;
 
-    if ( !ReadSizeAndArray<uint32>(ifs, cameraFrames) ) return false;
+    if ( !ReadSizeAndArray(ifs, cameraFrames) ) return false;
 
-    Array<vmd::Light> lightFrame;
-    if ( !ReadSizeAndArray<uint32>(ifs, lightFrame) ) return false;
+    if ( !ReadSizeAndArray(ifs, lightFrame) ) return false;
 
     // MMDv6.19以前で保存されたVMDはここまで
 
-    if ( !ReadSizeAndArray<uint32>(ifs, selfShadowFrames) ) return true;
+    if ( !ReadSizeAndArray(ifs, selfShadowFrames) ) return true;
 
     // MMDv7.39.x64以前で保存されたVMDはここまで
 
     {
-      uint32 showIKCount;
+      vmd_struct::ShowIkWithoutArray::CountType showIKCount;
       if ( !ifs.read(showIKCount) ) return true;
       showIKs.resize(showIKCount);
       for ( auto& i : showIKs )
       {
-        if ( !ifs.read(static_cast<vmd::ShowIkWithoutArray&>(i)) ) return false;
+        if ( !ifs.read(static_cast<vmd_struct::ShowIkWithoutArray&>(i)) ) return false;
         i.ik.resize(i.ik_count);
         if ( !ifs.read(i.ik.data(), i.ik_count) ) return false;
       }
@@ -119,6 +126,20 @@ namespace s3d_mmd
   double VMDReader::getVersion() const
   {
     return 0.0;
+  }
+
+  String VMDReader::getModelName() const
+  {
+    int endPos = sizeof(header.vmdModelName);
+    for ( int i = 0; i < sizeof(header.vmdModelName); i++ )
+    {
+      if ( header.vmdModelName[i] == '\0' )
+      {
+        endPos = i;
+        break;
+      }
+    }
+    return Widen(std::string(header.vmdModelName, endPos));
   }
 
 }

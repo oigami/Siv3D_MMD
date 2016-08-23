@@ -4,7 +4,7 @@
 #include "MMD/BulletPhysics.h"
 using namespace s3d_mmd;
 #include <iostream>
-
+#include <MMD/mmd_motion.h>
 
 void Main()
 {
@@ -15,10 +15,12 @@ void Main()
   Println(model.name());
   Println(model.comment());
   using namespace s3d_bullet;
-  const VMD vmd(L"Data/きしめん.vmd");
-  vmd.play();
   const Mesh meshGround(MeshData::Plane({ 40, 40 }, { 6, 6 }));
 
+  mmd::MMDMotion motion(VMDReader(L"Data/きしめん.vmd"));
+  motion.saveVMD(L"Data/きしめん.vmd.sav");
+  const VMD vmd(L"Data/きしめん.vmd.sav");
+  vmd.play();
   //Bone &bone10 = model.bones()->get(10);
   //bone10.extraBoneControl = true;
   const Font font(30);

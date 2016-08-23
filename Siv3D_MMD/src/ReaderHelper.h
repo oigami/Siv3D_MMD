@@ -29,4 +29,16 @@ namespace s3d_mmd
     if ( !reader.read(num) ) return false;
     return ReadArray(reader, num, arr);
   }
+
+
+
+  template<class SizeType, class Type>
+  bool WriteSizeAndArray(IWriter& writer, std::vector<Type>& arr)
+  {
+    SizeType num = static_cast<SizeType>(arr.size());
+    if ( writer.write(num) != sizeof(SizeType) )
+      return false;
+    const auto arr_size = sizeof(Type) * num;
+    return writer.write(arr.data(), arr_size) == arr_size;
+  }
 }

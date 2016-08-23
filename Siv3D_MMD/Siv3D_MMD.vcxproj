@@ -76,10 +76,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_lib|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SIV3D_20160110)\Inc;$(ProjectDir)lib\bullet3-2.83.7\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SIV3D_20160110)\Inc;$(ProjectDir)lib\bullet3-2.83.7\src;$(ProjectDir);$(IncludePath)</IncludePath>
     <LibraryPath>$(SIV3D_20160110)\Lib;$(ProjectDir)lib\bullet3-2.83.7\lib;$(LibraryPath)</LibraryPath>
-    <OutDir>A:\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>A:\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_lib|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -175,6 +173,8 @@
     <ClCompile Include="BulletPhysics\BulletSphere.cpp" />
     <ClCompile Include="BulletPhysics\detail\BulletDebug.cpp" />
     <ClCompile Include="BulletPhysics\detail\BulletPhysicsDetail.cpp" />
+    <ClCompile Include="src\VMD\vmd_struct.cpp" />
+    <ClCompile Include="src\VMD\vmd_writer.cpp" />
     <ClCompile Include="src\mmd_motion.cpp" />
     <ClCompile Include="src\MMDMorph.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -310,6 +310,7 @@
     <ClInclude Include="MMD\VMDController.h" />
     <ClInclude Include="MMD\VMDReader.h" />
     <ClInclude Include="MMD\vmd_struct.h" />
+    <ClInclude Include="MMD\vmd_writer.h" />
     <ClInclude Include="src\MMDPhysics.h" />
     <ClInclude Include="MMD\mmd_motion.h" />
     <ClInclude Include="src\ReaderHelper.h" />
@@ -332,6 +333,7 @@
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AssemblyCode</AssemblerOutput>
       <AssemblerOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dddd.h</AssemblerOutputFile>
       <EnableDebuggingInformation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</EnableDebuggingInformation>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_lib|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Data\Shaders\MMD3DEdge.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
@@ -340,6 +342,7 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AssemblyCode</AssemblerOutput>
       <AssemblerOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">eeee.h</AssemblerOutputFile>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_lib|x64'">true</ExcludedFromBuild>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
