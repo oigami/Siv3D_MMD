@@ -1,5 +1,6 @@
 ﻿#include <src/VMD/vmd_controller_pimpl.h>
 #include <MMD/mmd_motion.h>
+#include <MMD/math_util.h>
 namespace s3d_mmd
 {
   namespace detail
@@ -20,92 +21,6 @@ namespace s3d_mmd
       return val;
     }
 
-    class EulerAngles
-    {
-      enum class Type
-      {
-        XYZ, YZX, ZXY
-      };
-      static bool IsGimballock(float val)
-      {
-        constexpr float eps = 1.0e-4f;
-        if ( val < -1 + eps || 1 - eps < val )
-        {
-          return true;
-        }
-        return false;
-      }
-      bool CreateXYZ(const Mat4x4 &rot)
-      {
-        using namespace DirectX;
-        y = -asinf(XMVectorGetZ(rot.r[0]));
-        if ( IsGimballock(y) ) return false;
-        x = atan2f(XMVectorGetZ(rot.r[1]), XMVectorGetZ(rot.r[2]));
-        z = atan2f(XMVectorGetY(rot.r[0]), XMVectorGetX(rot.r[0]));
-        type = Type::XYZ;
-        return true;
-      }
-      bool CreateYZX(const Mat4x4 &rot)
-      {
-        using namespace DirectX;
-        z = -asinf(XMVectorGetX(rot.r[1]));
-        if ( IsGimballock(z) ) return false;
-        x = atan2f(XMVectorGetX(rot.r[2]), XMVectorGetX(rot.r[0]));
-        y = atan2f(XMVectorGetZ(rot.r[1]), XMVectorGetY(rot.r[1]));
-        type = Type::YZX;
-        return true;
-      }
-      bool CreateZXY(const Mat4x4 &rot)
-      {
-        using namespace DirectX;
-        x = -asinf(XMVectorGetY(rot.r[2]));
-        if ( IsGimballock(x) ) return false;
-        y = atan2f(XMVectorGetX(rot.r[2]), XMVectorGetZ(rot.r[2]));
-        z = atan2f(XMVectorGetY(rot.r[0]), XMVectorGetY(rot.r[1]));
-        type = Type::ZXY;
-        return true;
-      }
-      Mat4x4 CreateX() const
-      {
-        return DirectX::XMMatrixRotationX(x);
-      }
-      Mat4x4 CreateY() const
-      {
-        return DirectX::XMMatrixRotationY(y);
-      }
-      Mat4x4 CreateZ() const
-      {
-        return DirectX::XMMatrixRotationZ(z);
-      }
-      Type type;
-    public:
-      float x, y, z;
-
-
-      EulerAngles(const Mat4x4 &rot)
-      {
-        if ( !CreateXYZ(rot) )
-          if ( !CreateYZX(rot) )
-            if ( !CreateZXY(rot) )Println(L"error");
-      }
-
-      Mat4x4 CreateRot() const
-      {
-        Mat4x4 rot;
-        using namespace DirectX;
-        switch ( type )
-        {
-        case Type::XYZ:
-          return CreateX() * CreateY() * CreateZ();
-        case Type::ZXY:
-          return CreateZ() * CreateX() * CreateY();
-        case Type::YZX:
-          return CreateY() * CreateZ() * CreateX();
-        }
-        assert(0);
-        return Mat4x4::Identity();
-      }
-    };
 
   }
 
@@ -177,7 +92,7 @@ namespace s3d_mmd
         if ( bone.name.includes(L"ひざ") )
         {
           const Vector& rv = DirectX::XMQuaternionRotationMatrix(local);
-          detail::EulerAngles eulerAngle(Quaternion(rv).normalize().toMatrix());
+          math::EulerAngles eulerAngle(Quaternion(rv).normalize().toMatrix());
 
           eulerAngle.x = detail::IKRotateLimit(eulerAngle.x, Radians(-180.f), Radians(-10.f));
           eulerAngle.y = 0;
@@ -221,7 +136,7 @@ namespace s3d_mmd
           const auto& p1 = next.position;
           const int& t0 = nowFrame.frameNo;
           const int& t1 = next.frameNo;
-          const float& s = (float)(msToFrameCount(m_nowTime.ms()) - t0) / float(t1 - t0);
+          const float& s = (float) (msToFrameCount(m_nowTime.ms()) - t0) / float(t1 - t0);
           const auto rot = Math::Slerp(nowFrame.rotation, next.rotation, next.bezie_r.GetY(s)).toMatrix();
           auto bonePos = XMVectorMultiplyAdd(XMVectorSubtract(p1, p0), XMVectorSet(next.bezie_x.GetY(s), next.bezie_y.GetY(s), next.bezie_z.GetY(s), 0), p0);
 

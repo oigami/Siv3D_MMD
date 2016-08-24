@@ -301,6 +301,7 @@
     <ClInclude Include="BulletPhysics\detail\BulletPhysicsDetail.h" />
     <ClInclude Include="BulletPhysics\detail\Siv3DBulletConverter.h" />
     <ClInclude Include="MMD\BulletPhysics.h" />
+    <ClInclude Include="MMD\math_util.h" />
     <ClInclude Include="MMD\MMD.h" />
     <ClInclude Include="MMD\MMDMorph.h" />
     <ClInclude Include="MMD\MMDModel.h" />

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
+#include <MMD/math_util.h>
 namespace s3d_mmd
 {
   namespace vmd_struct
@@ -132,7 +133,7 @@ namespace s3d_mmd
 
       DirectX::XMVECTOR position; /// <summary>位置</summary>
       int frameNo;                /// <summary>フレーム番号</summary>
-      Quaternion rotation;        /// <summary>回転</summary>
+      Quaternion rotation; /// <summary>回転</summary>
       Bezie bezie_x;
       Bezie bezie_y;
       Bezie bezie_z;
