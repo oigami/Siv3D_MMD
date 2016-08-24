@@ -214,3 +214,9 @@ ModelManifest.xml
 */lib/*/*.bat
 ExampleA/
 *log.html
+Siv3d_MMD/Data/初音ミク/
+Siv3D_MMD/Data/初音ミクXS改変雪桜-1.1/
+*.vs
+*.ps
+*.vmd
+Siv3D_MMD.VC.db
