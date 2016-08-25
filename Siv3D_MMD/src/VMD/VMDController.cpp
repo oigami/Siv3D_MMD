@@ -86,7 +86,13 @@ namespace s3d_mmd
 
   VMD::VMD(const FilePath & filename)
   {
-    m_handle = std::make_shared<Pimpl>(mmd::MMDMotion(filename));
+    mmd::MMDMotion motion(filename);
+    m_handle = std::make_shared<Pimpl>(motion);
+  }
+
+  VMD::VMD(mmd::MMDMotion & motion)
+  {
+    m_handle = std::make_shared<Pimpl>(motion);
   }
 
   VMD::~VMD() {}
@@ -112,14 +118,54 @@ namespace s3d_mmd
     UpdateTime();
   }
 
-  void VMD::IsLoop(bool loop, int startTime) const
+  bool VMD::isLoop() const
   {
-    m_handle->setLoopBySec(loop, SecondsF(startTime));
+    return m_handle->isLoop();
+  }
+
+  void VMD::setLoop(bool loop) const
+  {
+    return m_handle->setLoop(loop);
+  }
+
+  void VMD::setLoopBySec(bool loop, const SecondsF & loopBegin, const SecondsF & loopEnd) const
+  {
+    return m_handle->setLoopBySec(loop, loopBegin, loopEnd);
+  }
+
+  void VMD::setPosSec(const SecondsF & pos) const
+  {
+    return m_handle->setPosSec(pos);
+  }
+
+  void VMD::SetPosFrame(const int frameNo)
+  {
+    return m_handle->SetPosFrame(frameNo);
   }
 
   void VMD::play() const
   {
     m_handle->play();
+  }
+
+  void VMD::pause() const
+  {
+    return m_handle->pause();
+  }
+
+  void VMD::stop() const
+  {
+    return m_handle->stop();
+  }
+
+  bool VMD::isPlaying() const
+  {
+    return m_handle->isPlaying();
+  }
+
+  bool VMD::isPaused() const
+  {
+    return m_handle->isPaused();
   }
 
 

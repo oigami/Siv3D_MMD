@@ -234,6 +234,14 @@ namespace s3d_mmd
   void VMD::Pimpl::stop()
   {
     m_nowTime.reset();
+    for ( auto& i : m_keyFrameData )
+    {
+      i.second.m_nowFrameNum = 0;
+    }
+    for ( auto& i : m_morphData )
+    {
+      i.second.m_nowFrameNum = 0;
+    }
   }
 
   bool VMD::Pimpl::isPlaying() const { return m_nowTime.isActive(); }
@@ -262,6 +270,11 @@ namespace s3d_mmd
   void VMD::Pimpl::setPosSec(const SecondsF & pos)
   {
     m_nowTime.set(pos);
+  }
+
+  void VMD::Pimpl::SetPosFrame(const int frameNo)
+  {
+    m_nowTime.set(SecondsF(frameNo / 60.0));
   }
 
 }

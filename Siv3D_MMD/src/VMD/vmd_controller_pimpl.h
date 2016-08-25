@@ -100,7 +100,7 @@ namespace s3d_mmd
 
     void UpdateIK(mmd::Bones &bones) const;		// IKボーン影響下ボーンの行列を更新
     void UpdateIK(mmd::Bones &bones, const mmd::Ik &ik) const;		// IKボーン影響下ボーンの行列を更新
-    void UpdateBone(mmd::Bones &bons)const;
+    void UpdateBone(mmd::Bones &bons);
     void UpdateTime();
     void UpdateMorph(mmd::FaceMorph& m_morph)const;
 
@@ -123,6 +123,12 @@ namespace s3d_mmd
     void setLoopBySec(bool loop, const SecondsF& loopBegin, const SecondsF& loopEnd = SecondsF::zero());
 
     void setPosSec(const SecondsF& pos);
+
+    /// <summary>
+    /// 再生位置を変更する（60fps)
+    /// </summary>
+    /// <param name="frameNo"></param>
+    void SetPosFrame(const int frameNo);
 
     SecondsF lengthSec() const;
     SecondsF lengthFrame() const;
