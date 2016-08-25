@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 namespace s3d_mmd
 {
   namespace math
@@ -70,9 +70,10 @@ namespace s3d_mmd
 
       EulerAngles(const Mat4x4 &rot)
       {
-        if ( !CreateZXY(rot) )
+        if ( !CreateXYZ(rot) )
           if ( !CreateYZX(rot) )
-            if ( !CreateXYZ(rot) )Println(L"error");
+            //if ( !CreateZXY(rot) ) // x が90度以内に制限されると膝が上がらなくなってしまう
+            Println(L"error");
       }
 
       Mat4x4 CreateRot() const
