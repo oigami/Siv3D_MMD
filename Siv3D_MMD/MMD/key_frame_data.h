@@ -64,6 +64,9 @@ namespace s3d_mmd
 
       struct MorphFrame :IKeyFrameData
       {
+
+        String set(const vmd_struct::Morph& morph);
+        vmd_struct::Morph convert(const String& name) const;
         float m_weight;
 
         float calcFrame() const

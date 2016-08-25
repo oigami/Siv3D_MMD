@@ -4,6 +4,15 @@ namespace s3d_mmd
 {
   namespace mmd
   {
+    namespace
+    {
+      template<int n>void ConvertString(char(&out)[n], const String& in)
+      {
+        std::string name = Narrow(in);
+        name.resize(n);
+        strncpy(out, name.c_str(), n);
+      }
+    }
     namespace key_frame
     {
       constexpr int frame_rate = 60;     // 本プログラムのフレームレート
@@ -82,12 +91,34 @@ namespace s3d_mmd
         }
 
         {
-          std::string name = Narrow(boneName);
-          name.resize(sizeof(res.boneName));
-          strncpy(res.boneName, name.c_str(), sizeof(res.boneName));
+          ConvertString(res.boneName, boneName);
         }
 
         return res;
+      }
+
+      String MorphFrame::set(const vmd_struct::Morph & morph)
+      {
+        m_weight = morph.m_weight;
+        frameNo = morph.frameNo;
+        frameNo *= frame_rate / mmd_frame_rate;
+        size_t endPos = 0;
+        for ( int i = 0; i < sizeof(morph.name); i++ )
+        {
+          if ( morph.name[i] == L'\0' )break;
+          endPos++;
+        }
+        return Widen({ morph.name, endPos });
+      }
+
+      vmd_struct::Morph MorphFrame::convert(const String & name) const
+      {
+        vmd_struct::Morph morph;
+        ConvertString(morph.name, name);
+        morph.frameNo = frameNo;
+        morph.frameNo /= frame_rate / mmd_frame_rate;
+        morph.m_weight = m_weight;
+        return morph;
       }
 
     }

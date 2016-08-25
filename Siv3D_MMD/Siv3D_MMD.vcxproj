@@ -175,7 +175,7 @@
     <ClCompile Include="BulletPhysics\detail\BulletDebug.cpp" />
     <ClCompile Include="BulletPhysics\detail\BulletPhysicsDetail.cpp" />
     <ClCompile Include="src\math_util.cpp" />
-    <ClCompile Include="src\VMD\vmd_struct.cpp" />
+    <ClCompile Include="src\key_frame_data.cpp" />
     <ClCompile Include="src\VMD\vmd_writer.cpp" />
     <ClCompile Include="src\mmd_motion.cpp" />
     <ClCompile Include="src\MMDMorph.cpp" />

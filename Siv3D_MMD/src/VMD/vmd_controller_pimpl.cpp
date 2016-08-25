@@ -22,21 +22,14 @@ namespace s3d_mmd
     m_isLoop = false;
     m_isFrameEnd = true;
     for ( auto& i : data.getBoneFrames() )
-    {
       m_keyFrameData[i.first].m_keyFrames = i.second.createFrames();
-    }
 
     for ( auto& i : data.getMorphFrames() )
     {
-      mmd::key_frame::MorphFrame frame;
-      frame.m_weight = i.m_weight;
-      frame.frameNo = i.frameNo;
-      m_morphData[i.name].m_keyFrames.push_back(frame);
+      m_morphData[i.first].m_keyFrames = i.second;
+      sort(m_morphData[i.first].m_keyFrames.begin(), m_morphData[i.first].m_keyFrames.end());
     }
-    for ( auto& i : m_morphData )
-    {
-      sort(i.second.m_keyFrames.begin(), i.second.m_keyFrames.end());
-    }
+
   }
 
   // IKボーン影響下ボーンの行列を更新
@@ -138,7 +131,7 @@ namespace s3d_mmd
     for ( auto& i : m_morphData )
     {
       if ( !i.second.haveNowFrame() ) continue;
-      if ( auto index = morph.getFaceIndex(Widen(i.first)) )
+      if ( auto index = morph.getFaceIndex(i.first) )
         morph.setWeight(*index, i.second.calcFrame());
     }
   }

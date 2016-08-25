@@ -122,7 +122,7 @@ namespace s3d_mmd
     /// <summary> キーフレームの名前とデータ </summary>
     std::unordered_map<String, vmd::detail::KeyFrameData<mmd::BoneFrame>> m_keyFrameData;
 
-    std::unordered_map<std::string, vmd::detail::MorphData> m_morphData;
+    std::unordered_map<String, vmd::detail::MorphData> m_morphData;
 
     void resetFrame();
   public:

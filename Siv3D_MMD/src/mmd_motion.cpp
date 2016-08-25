@@ -16,8 +16,12 @@ namespace s3d_mmd
       }
 
       m_modelName = reader.getModelName();
-
-      m_morphs = reader.getMorphFrames();
+      for ( auto& morph : reader.getMorphFrames() )
+      {
+        key_frame::MorphFrame morphFrame;
+        String name = morphFrame.set(morph);
+        m_morphs[name].push_back(morphFrame);
+      }
 
       m_cameras = reader.getCameraFrames();
 
@@ -39,8 +43,10 @@ namespace s3d_mmd
 
     void MMDMotion::sort()
     {
-
-      std::sort(m_morphs.begin(), m_morphs.end());
+      for ( auto& i : m_morphs )
+      {
+        std::sort(i.second.begin(), i.second.end());
+      }
     }
 
     /// <summary>
@@ -75,7 +81,12 @@ namespace s3d_mmd
       }
 
       writer.modelName = m_modelName;
-      writer.morphFrame = m_morphs;
+      for ( auto& i : m_morphs )
+      {
+        for ( auto& j : i.second )
+          writer.morphFrame.push_back(j.convert(i.first));
+
+      }
       writer.cameraFrame = m_cameras;
       writer.lightFrame = m_lights;
       writer.selfShadowFrame = m_selfShadows;

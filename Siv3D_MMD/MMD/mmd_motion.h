@@ -62,7 +62,7 @@ namespace s3d_mmd
     };
 
 
-    using MorphKeyFrame = vmd_struct::Morph;
+    using MorphKeyFrame = key_frame::MorphFrame;
     using CameraKeyFrame = vmd_struct::Camera;
     using LightKeyFrame = vmd_struct::Light;
     using SelfShadowKeyFrame = vmd_struct::SelfShadow;
@@ -79,7 +79,7 @@ namespace s3d_mmd
 
       std::unordered_map<String, BoneFrames>& getBoneFrames() { return m_keyFrames; }
 
-      Array<MorphKeyFrame>& getMorphFrames() { return m_morphs; }
+      std::unordered_map<String, Array<MorphKeyFrame>>& getMorphFrames() { return m_morphs; }
 
       void sort();
 
@@ -102,7 +102,7 @@ namespace s3d_mmd
 
       std::unordered_map<String, BoneFrames> m_keyFrames;
 
-      Array<MorphKeyFrame> m_morphs;
+      std::unordered_map<String, Array<MorphKeyFrame>> m_morphs;
 
       Array<CameraKeyFrame> m_cameras;
 
