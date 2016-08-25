@@ -61,7 +61,7 @@ namespace s3d_mmd
         static void Compile(const wchar *outPath, ShaderType type)
         {
           if ( !FileSystem::Exists(outPath) )
-          Shader::Compile(edgePath, outPath, type);
+            Shader::Compile(edgePath, outPath, type);
         }
       public:
 
@@ -348,7 +348,7 @@ namespace s3d_mmd
       draw(nodes);
     }
 
-    void draw()
+    void draw(const Mat4x4& worldMat)
     {
       mmd::MMDShader::init();
       auto vsAttach = ShaderAttach(mmd::MMDShader::vs());
@@ -360,7 +360,7 @@ namespace s3d_mmd
       {
         ConstantBuffer<mmd::ConstantBoneData> data;
         PhysicsUpdate(worlds);
-        m_bones->calcWorld(Mat4x4::Identity(), worlds);
+        m_bones->calcWorld(worldMat, worlds);
         for ( auto& i : step(static_cast<int>(worlds.size())) )
         {
           data->bones[i] = worlds[i].transposed();
@@ -382,7 +382,7 @@ namespace s3d_mmd
       }
 
       Graphics3D::SetTexture(ShaderStage::Vertex, 1, m_vertexTexture);
-      return;
+
       const auto rasterizerState = Graphics3D::GetRasterizerState();
       const auto rasterizerStateForawrt = Graphics3D::GetRasterizerStateForward();
       draw(m_nodes.nodeCullBack, RasterizerState::SolidCullBack);

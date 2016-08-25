@@ -4,9 +4,9 @@
 //#define USE_BULLET_PHYSICS
 #ifndef MAKE_SIV3D_MMD_EXE
 #ifdef NDEBUG
-#pragma comment(lib, "Siv3d_MMD")
+#pragma comment(lib, "MMD/lib/Siv3d_MMD")
 #else
-#pragma comment(lib, "Siv3d_MMD_d")
+#pragma comment(lib, "MMD/lib/Siv3d_MMD_d")
 #endif // NDEBUG
 #endif // MAKE_SIV3D_MMD_EXE
 
@@ -16,6 +16,7 @@
 #include "MMDMorph.h"
 #include "VMDController.h"
 #include "BulletPhysics.h"
+#include <MMD/mmd_motion.h>
 namespace s3d_mmd
 {
 
@@ -32,8 +33,8 @@ namespace s3d_mmd
     ~MMD();
 
 
-    void draw() const;
-    void draw(const VMD &vmd) const;
+    void draw(const Mat4x4& worldMat = Mat4x4::Identity()) const;
+    void draw(const VMD &vmd, const Mat4x4& worldMat = Mat4x4::Identity()) const;
     void draw(double edgeSize) const;
     void drawEdge(double edgeSize) const;
 
@@ -59,7 +60,7 @@ namespace s3d_mmd
   public:
 
     DrawableVMD(const MMD &mmd, const VMD &vmd);
-    void draw() const;
+    void draw(const Mat4x4& worldMat = Mat4x4::Identity()) const;
 
   };
 

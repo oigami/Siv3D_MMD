@@ -30,14 +30,14 @@ namespace s3d_mmd
     m_handle->drawEdge();
   }
 
-  void MMD::draw() const
+  void MMD::draw(const Mat4x4& worldMat) const
   {
-    m_handle->draw();
+    m_handle->draw(worldMat);
   }
 
-  void MMD::draw(const VMD &vmd) const
+  void MMD::draw(const VMD &vmd, const Mat4x4& worldMat) const
   {
-    DrawableVMD(*this, vmd).draw();
+    DrawableVMD(*this, vmd).draw(worldMat);
   }
 
   const Texture & MMD::vertexTexture() const
@@ -72,13 +72,13 @@ namespace s3d_mmd
 
   DrawableVMD::DrawableVMD(const MMD &mmd, const VMD &vmd) :m_mmd(mmd), m_vmd(vmd) {}
 
-  void DrawableVMD::draw() const
+  void DrawableVMD::draw(const Mat4x4& worldMat) const
   {
     auto bones = m_mmd.bones();
     m_vmd.UpdateBone(*bones);
     m_vmd.UpdateMorph(m_mmd.morphs());
     {
-      m_mmd.draw();
+      m_mmd.draw(worldMat);
     }
     {
       m_mmd.drawEdge(1.0);

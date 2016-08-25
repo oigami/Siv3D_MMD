@@ -72,6 +72,7 @@ namespace s3d_mmd
 
       Optional<int> getBoneIndex(const String& boneName) const;
 
+      const mmd::Bone &get(int i) const { return m_bones[i]; }
       mmd::Bone &get(int i) { return m_bones[i]; }
       const mmd::Bone &operator[](int i) const { return m_bones[i]; }
       mmd::Bone &operator[](int i) { return m_bones[i]; }
