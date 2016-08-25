@@ -95,5 +95,25 @@ namespace s3d_mmd
 
     };
 
+    /// /// 0～1に規格化されたベジェ曲線
+    class Bezie
+    {
+
+      Float2 p1, p2; /// 制御点
+
+      mutable float pre_x;
+      mutable float pre_out;
+    public:
+
+      Bezie() = default;
+      Bezie(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2);
+      float GetY(float x) const;	/// xにおけるyを取得
+
+      float newton(float t, float x) const;
+
+      const Float2& getP1()const { return p1; }
+      const Float2& getP2()const { return p2; }
+    };
+
   }
 }

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <MMD/VMDController.h>
 #include <MMD/PMDStruct.h>
+#include <MMD/key_frame_data.h>
 #include <MMD/mmd_motion.h>
 namespace s3d_mmd
 {
@@ -9,27 +10,19 @@ namespace s3d_mmd
   {
     namespace detail
     {
-      struct Morph
-      {
-        uint32 frameNo;
-        float m_weight;
-        bool operator<(const Morph& m)const
-        {
-          return frameNo < m.frameNo;
-        }
-      };
+
 
       /// キーフレームアニメーション
-      struct KeyFrameData
+      template<class T> struct KeyFrameData
       {
         KeyFrameData() :m_nowFrameNum(0) {}
 
-        const vmd::BoneFrame& getNowFrame() const
+        const T& getNowFrame() const
         {
           return m_keyFrames[m_nowFrameNum];
         }
 
-        const vmd::BoneFrame& getNextFrame() const
+        const T& getNextFrame() const
         {
           return m_keyFrames[m_nowFrameNum + 1];
         }
@@ -44,35 +37,12 @@ namespace s3d_mmd
           return m_nowFrameNum < m_keyFrames.size();
         }
 
-        Array<vmd::BoneFrame> m_keyFrames;
+        Array<T> m_keyFrames;
         int m_nowFrameNum;
       };
 
-      struct MorphData
-      {
-        const Morph& getNowFrame() const
-        {
-          return (m_morph)[m_nowFrameNum];
-        }
+      using MorphData = KeyFrameData<mmd::key_frame::MorphFrame>;
 
-        const Morph& getNextFrame() const
-        {
-          return (m_morph)[m_nowFrameNum + 1];
-        }
-
-        bool haveNextFrame() const
-        {
-          return m_nowFrameNum + 1 < m_morph.size();
-        }
-
-        bool haveNowFrame() const
-        {
-          return m_nowFrameNum < m_morph.size();
-        }
-
-        Array<Morph> m_morph;
-        int m_nowFrameNum;
-      };
     }
   }
 
@@ -89,10 +59,11 @@ namespace s3d_mmd
 
 
     /// <summary> キーフレームの名前とデータ </summary>
-    std::unordered_map<String, vmd::detail::KeyFrameData> m_keyFrameData;
+    std::unordered_map<String, vmd::detail::KeyFrameData<mmd::BoneFrame>> m_keyFrameData;
 
     std::unordered_map<std::string, vmd::detail::MorphData> m_morphData;
 
+    void resetFrame();
   public:
 
     Pimpl(mmd::MMDMotion& data);
@@ -113,8 +84,6 @@ namespace s3d_mmd
     bool isPlaying()const;
 
     bool isPaused()const;
-
-    void setTime(MillisecondsF time);
 
     bool isLoop()const;
 

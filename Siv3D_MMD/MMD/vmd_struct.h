@@ -103,49 +103,4 @@ namespace s3d_mmd
     };
 
   }
-  namespace vmd
-  {
-    /// 0～1に規格化されたベジェ曲線
-    class Bezie
-    {
-
-      Float2 p1, p2; /// 制御点
-
-      mutable float pre_x;
-      mutable float pre_out;
-    public:
-
-      Bezie() = default;
-      Bezie(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2);
-      float GetY(float x) const;	/// xにおけるyを取得
-
-      float newton(float t, float x) const;
-
-      const Float2& getP1()const { return p1; }
-      const Float2& getP2()const { return p2; }
-    };
-
-    struct BoneFrame
-    {
-      BoneFrame() = default;
-      String set(const vmd_struct::Bone& boneFrame);
-      vmd_struct::Bone Convert(const String& boneName);
-
-      DirectX::XMVECTOR position; /// <summary>位置</summary>
-      int frameNo;                /// <summary>フレーム番号 60fps</summary>
-      Quaternion rotation;        /// <summary>回転</summary>
-      Bezie bezie_x;
-      Bezie bezie_y;
-      Bezie bezie_z;
-      Bezie bezie_r;
-
-      // フレーム番号で比較
-      bool operator<(const BoneFrame &k) const
-      {
-        return frameNo < k.frameNo;
-      }
-
-    };
-  }
-
 }

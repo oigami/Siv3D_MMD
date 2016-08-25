@@ -3,6 +3,35 @@
 #include <MMD/math_util.h>
 namespace s3d_mmd
 {
+  void VMD::Pimpl::resetFrame()
+  {
+    auto nowFrameNo = msToFrameCount(m_nowTime.ms());
+
+    // 今のフレームに近いものを探す
+    auto Run = [nowFrameNo](auto i)
+    {
+      auto& keyFrames = i.second.m_keyFrames;
+      assert(keyFrames.size() != 0);
+
+      std::remove_reference_t<decltype(keyFrames[0])> findFrame; findFrame.frameNo = nowFrameNo;
+      auto frame = std::upper_bound(keyFrames.begin(), keyFrames.end(), findFrame);
+
+      if ( frame != keyFrames.begin() ) --frame;
+
+      i.second.m_nowFrameNum = std::distance(keyFrames.begin(), frame);
+    };
+
+    for ( auto& i : m_keyFrameData )
+    {
+      Run(i);
+    }
+
+    for ( auto& i : m_morphData )
+    {
+      Run(i);
+    }
+  }
+
   VMD::Pimpl::Pimpl(mmd::MMDMotion & data)
   {
     m_loopBegin = SecondsF::zero();
@@ -18,11 +47,14 @@ namespace s3d_mmd
 
     for ( auto& i : data.getMorphFrames() )
     {
-      m_morphData[i.name].m_morph.push_back(vmd::detail::Morph{ i.frameNo,i.m_weight });
+      mmd::key_frame::MorphFrame frame;
+      frame.m_weight = i.m_weight;
+      frame.frameNo = i.frameNo;
+      m_morphData[i.name].m_keyFrames.push_back(frame);
     }
     for ( auto& i : m_morphData )
     {
-      sort(i.second.m_morph.begin(), i.second.m_morph.end());
+      sort(i.second.m_keyFrames.begin(), i.second.m_keyFrames.end());
     }
   }
 
@@ -102,7 +134,7 @@ namespace s3d_mmd
         if ( keyData.haveNextFrame() )
         {
 
-          const vmd::BoneFrame &next = keyData.getNextFrame();
+          const auto &next = keyData.getNextFrame();
           //次のフレームとの間の位置を計算する
           const auto& p0 = nowFrame.position;
           const auto& p1 = next.position;
@@ -133,25 +165,17 @@ namespace s3d_mmd
     {
       if ( m_loopEnd != SecondsF::zero() && m_nowTime.elapsed() >= m_loopEnd )
       {
-        for ( auto& i : m_keyFrameData )
-        {
-          i.second.m_nowFrameNum = 0;
-        }
-        for ( auto& i : m_morphData )
-        {
-          i.second.m_nowFrameNum = 0;
-        }
-        m_nowTime.set(m_loopBegin);
+        setPosSec(m_loopBegin);
       }
     }
     for ( auto& i : m_keyFrameData )
     {
-      vmd::detail::KeyFrameData &keyData = i.second;
+      auto &keyData = i.second;
       const size_t keyframe_size = keyData.m_keyFrames.size();
       int &nowFrameNum = keyData.m_nowFrameNum;
       if ( nowFrameNum + 1 < keyframe_size )
       {
-        const Array<vmd::BoneFrame> &key_frame = keyData.m_keyFrames;
+        const Array<mmd::key_frame::BoneFrame> &key_frame = keyData.m_keyFrames;
         const uint32 t1 = key_frame[nowFrameNum + 1].frameNo;
         if ( frameCount > t1 ) ++nowFrameNum;
       }
@@ -159,11 +183,11 @@ namespace s3d_mmd
     for ( auto& i : m_morphData )
     {
       auto& data = i.second;
-      const size_t size = data.m_morph.size();
+      const size_t size = data.m_keyFrames.size();
       int &nowFrameNum = data.m_nowFrameNum;
       if ( data.haveNextFrame() )
       {
-        const auto &frame = data.m_morph;
+        const auto &frame = data.m_keyFrames;
         const uint32 t1 = frame[nowFrameNum + 1].frameNo;
         if ( frameCount > t1 ) ++nowFrameNum;
       }
@@ -203,24 +227,12 @@ namespace s3d_mmd
   void VMD::Pimpl::stop()
   {
     m_nowTime.reset();
-    for ( auto& i : m_keyFrameData )
-    {
-      i.second.m_nowFrameNum = 0;
-    }
-    for ( auto& i : m_morphData )
-    {
-      i.second.m_nowFrameNum = 0;
-    }
+    resetFrame();
   }
 
   bool VMD::Pimpl::isPlaying() const { return m_nowTime.isActive(); }
 
   bool VMD::Pimpl::isPaused() const { return m_nowTime.isPaused(); }
-
-  void VMD::Pimpl::setTime(MillisecondsF time)
-  {
-    m_nowTime.set(time);
-  }
 
   bool VMD::Pimpl::isLoop() const { return m_isLoop; }
 
@@ -239,11 +251,13 @@ namespace s3d_mmd
   void VMD::Pimpl::setPosSec(const SecondsF & pos)
   {
     m_nowTime.set(pos);
+    resetFrame();
   }
 
   void VMD::Pimpl::SetPosFrame(const int frameNo)
   {
     m_nowTime.set(SecondsF(frameNo / 60.0));
+    resetFrame();
   }
 
 }

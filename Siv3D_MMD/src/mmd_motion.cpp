@@ -10,7 +10,7 @@ namespace s3d_mmd
 
       for ( const auto& bone : reader.getBoneFrames() )
       {
-        vmd::BoneFrame keyFrame;
+        key_frame::BoneFrame keyFrame;
         String bonename = keyFrame.set(bone);
         m_keyFrames[bonename].add(std::move(keyFrame));
       }

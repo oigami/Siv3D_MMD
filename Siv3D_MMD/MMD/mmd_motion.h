@@ -1,11 +1,12 @@
 ﻿#pragma once
 #include <MMD/VMDReader.h>
+#include <MMD/key_frame_data.h>
 namespace s3d_mmd
 {
   namespace mmd
   {
 
-    using BoneFrame = vmd::BoneFrame;
+    using BoneFrame = key_frame::BoneFrame;
     class BoneFrames
     {
       using FrameData = BoneFrame;
