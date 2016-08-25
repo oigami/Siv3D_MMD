@@ -7,8 +7,6 @@ namespace s3d_mmd
   {
     MMDMotion::MMDMotion(const VMDReader & reader)
     {
-      constexpr int frame_rate = 60;     // 本プログラムのフレームレート
-      constexpr int mmd_frame_rate = 30; // MMDのフレームレート
 
       for ( const auto& bone : reader.getBoneFrames() )
       {
@@ -186,6 +184,12 @@ namespace s3d_mmd
       if ( p.second )
         return *p.first;
       return none;
+    }
+
+    Array<BoneFrames::FrameData>& BoneFrames::frames()
+    {
+      sort();
+      return m_frames;
     }
 
     Array<BoneFrames::FrameData> BoneFrames::createFrames() const

@@ -55,6 +55,8 @@ namespace s3d_mmd
 
       Optional<const BoneFrame&> getFrame(int frameNo);
 
+      Array<FrameData>& frames();
+
       Array<FrameData> createFrames() const;
     };
 
