@@ -7,29 +7,12 @@ namespace s3d_mmd
   {
     auto nowFrameNo = msToFrameCount(m_nowTime.ms());
 
-    // 今のフレームに近いものを探す
-    auto Run = [nowFrameNo](auto i)
-    {
-      auto& keyFrames = i.second.m_keyFrames;
-      assert(keyFrames.size() != 0);
-
-      std::remove_reference_t<decltype(keyFrames[0])> findFrame; findFrame.frameNo = nowFrameNo;
-      auto frame = std::upper_bound(keyFrames.begin(), keyFrames.end(), findFrame);
-
-      if ( frame != keyFrames.begin() ) --frame;
-
-      i.second.m_nowFrameNum = std::distance(keyFrames.begin(), frame);
-    };
-
     for ( auto& i : m_keyFrameData )
-    {
-      Run(i);
-    }
+      i.second.resetFrame(nowFrameNo);
 
     for ( auto& i : m_morphData )
-    {
-      Run(i);
-    }
+      i.second.resetFrame(nowFrameNo);
+
   }
 
   VMD::Pimpl::Pimpl(mmd::MMDMotion & data)
@@ -42,8 +25,6 @@ namespace s3d_mmd
     {
       m_keyFrameData[i.first].m_keyFrames = i.second.createFrames();
     }
-
-    m_isFrameEnd = true;
 
     for ( auto& i : data.getMorphFrames() )
     {
@@ -125,35 +106,13 @@ namespace s3d_mmd
       i.boneMat = i.initMat;
       auto it = m_keyFrameData.find(i.name);
       if ( it == m_keyFrameData.end() ) continue;
-      const auto &keyData = it->second;
 
-      // キーフレーム補完
-      if ( keyData.haveNowFrame() )
-      {
-        const auto &nowFrame = keyData.getNowFrame();
-        if ( keyData.haveNextFrame() )
-        {
+      const auto& frame = it->second.calcFrame();
 
-          const auto &next = keyData.getNextFrame();
-          //次のフレームとの間の位置を計算する
-          const auto& p0 = nowFrame.position;
-          const auto& p1 = next.position;
-          const int& t0 = nowFrame.frameNo;
-          const int& t1 = next.frameNo;
-          const float& s = (float) (msToFrameCount(m_nowTime.ms()) - t0) / float(t1 - t0);
-          const auto rot = Math::Slerp(nowFrame.rotation, next.rotation, next.bezie_r.GetY(s));
-          auto bonePos = XMVectorMultiplyAdd(XMVectorSubtract(p1, p0), XMVectorSet(next.bezie_x.GetY(s), next.bezie_y.GetY(s), next.bezie_z.GetY(s), 0), p0);
+      // 親ボーン座標系のボーン行列を求める
+      i.boneMat = DirectX::XMMatrixAffineTransformation(DirectX::g_XMOne, DirectX::g_XMZero,
+                                                        frame.rotation.component, frame.position) * i.initMat;
 
-          // 親ボーン座標系のボーン行列を求める
-          i.boneMat = DirectX::XMMatrixAffineTransformation(DirectX::g_XMOne, DirectX::g_XMZero, rot.component, bonePos) * i.initMat;
-        }
-        else
-        {
-          // 親ボーン座標系のボーン行列を求める
-          i.boneMat = DirectX::XMMatrixAffineTransformation(DirectX::g_XMOne, DirectX::g_XMZero, nowFrame.rotation.component, nowFrame.position) * i.initMat;
-        }
-
-      }
     }
     UpdateIK(bones);
   }
@@ -161,56 +120,26 @@ namespace s3d_mmd
   void VMD::Pimpl::UpdateTime()
   {
     const auto frameCount = msToFrameCount(m_nowTime.ms());
-    if ( m_isLoop )
-    {
-      if ( m_loopEnd != SecondsF::zero() && m_nowTime.elapsed() >= m_loopEnd )
-      {
-        setPosSec(m_loopBegin);
-      }
-    }
+
+    // ループチェック
+    if ( m_isLoop && m_loopEnd != SecondsF::zero() && m_nowTime.elapsed() >= m_loopEnd )
+      setPosSec(m_loopBegin);
+
     for ( auto& i : m_keyFrameData )
-    {
-      auto &keyData = i.second;
-      const size_t keyframe_size = keyData.m_keyFrames.size();
-      int &nowFrameNum = keyData.m_nowFrameNum;
-      if ( nowFrameNum + 1 < keyframe_size )
-      {
-        const Array<mmd::key_frame::BoneFrame> &key_frame = keyData.m_keyFrames;
-        const uint32 t1 = key_frame[nowFrameNum + 1].frameNo;
-        if ( frameCount > t1 ) ++nowFrameNum;
-      }
-    }
+      i.second.updateFrame(frameCount);
+
     for ( auto& i : m_morphData )
-    {
-      auto& data = i.second;
-      const size_t size = data.m_keyFrames.size();
-      int &nowFrameNum = data.m_nowFrameNum;
-      if ( data.haveNextFrame() )
-      {
-        const auto &frame = data.m_keyFrames;
-        const uint32 t1 = frame[nowFrameNum + 1].frameNo;
-        if ( frameCount > t1 ) ++nowFrameNum;
-      }
-    }
+      i.second.updateFrame(frameCount);
+
   }
 
   void VMD::Pimpl::UpdateMorph(mmd::FaceMorph & morph) const
   {
     for ( auto& i : m_morphData )
     {
-      if ( !i.second.haveNowFrame() )continue;
+      if ( !i.second.haveNowFrame() ) continue;
       if ( auto index = morph.getFaceIndex(Widen(i.first)) )
-      {
-        auto now = i.second.getNowFrame();
-        float w = now.m_weight;
-        if ( i.second.haveNextFrame() )
-        {
-          auto& next = i.second.getNextFrame();
-          float t = float(msToFrameCount(m_nowTime.ms()) - now.frameNo) / (next.frameNo - now.frameNo);
-          w = Math::Lerp(w, next.m_weight, t);
-        }
-        morph.setWeight(*index, w);
-      }
+        morph.setWeight(*index, i.second.calcFrame());
     }
   }
 

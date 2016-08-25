@@ -13,35 +13,96 @@ namespace s3d_mmd
 
 
       /// キーフレームアニメーション
-      template<class T> struct KeyFrameData
+      template<
+        class T /* IKeyFrameData を継承
+                   auto calcFrame() const;
+                   auto calcFrame(int nowFrameNo, const T& next) const; があること */
+      > struct KeyFrameData
       {
-        KeyFrameData() :m_nowFrameNum(0) {}
+        KeyFrameData() :m_nowFrameIndex(0), m_nowFrameNo(0) {}
 
         const T& getNowFrame() const
         {
-          return m_keyFrames[m_nowFrameNum];
+          return m_keyFrames[m_nowFrameIndex];
         }
 
         const T& getNextFrame() const
         {
-          return m_keyFrames[m_nowFrameNum + 1];
+          return m_keyFrames[m_nowFrameIndex + 1];
         }
 
         bool haveNextFrame() const
         {
-          return m_nowFrameNum + 1 < m_keyFrames.size();
+          return m_nowFrameIndex + 1 < m_keyFrames.size();
         }
 
         bool haveNowFrame() const
         {
-          return m_nowFrameNum < m_keyFrames.size();
+          return m_nowFrameIndex < m_keyFrames.size();
+        }
+
+        /// <summary>
+        /// フレーム時間を進ませる
+        /// <para> m_nowFrameIndex &lt; newFrameNo が成り立っていることが必須条件 </para>
+        /// </summary>
+        /// <remarks>
+        /// 計算量 O(N) ただし前回の update から1しか変化がないとき O(1)
+        /// <para> N := フレームの数 </para>
+        /// </remarks>
+        /// <param name="newFrameNo"> 新たなフレーム時間（現在のフレームに依存しない） </param>
+        void updateFrame(int newFrameNo)
+        {
+          while ( haveNextFrame() )
+          {
+            const int t1 = getNextFrame().frameNo;
+            if ( t1 < newFrameNo ) ++m_nowFrameIndex;
+            else break;
+          }
+          m_nowFrameNo = newFrameNo;
+        }
+
+        /// <summary>
+        /// フレーム時間を更新する。
+        /// <para> updateFrame と違い、条件はなし </para>
+        /// </summary>
+        /// <remarks>
+        /// 計算量 O(logN)
+        /// <para> N := フレームの数 </para>
+        /// </remarks>
+        /// <param name="updateFrameNo"> 新たなフレーム時間（現在のフレームに依存しない） </param>
+        void resetFrame(int newFrameNo)
+        {
+          auto& keyFrames = m_keyFrames;
+          assert(keyFrames.size() != 0);
+
+          mmd::key_frame::IKeyFrameData findFrame{ newFrameNo };
+          auto frame = std::upper_bound(keyFrames.begin(), keyFrames.end(), findFrame);
+
+          if ( frame != keyFrames.begin() ) --frame;
+
+          m_nowFrameIndex = static_cast<int>(std::distance(keyFrames.begin(), frame));
+          m_nowFrameNo = newFrameNo;
+        }
+
+        /// <summary>
+        /// 現在のフレームの値を計算する
+        /// </summary>
+        /// <returns></returns>
+        auto calcFrame() const
+        {
+          if ( haveNextFrame() )
+            return m_keyFrames[m_nowFrameIndex].calcFrame(m_nowFrameNo, getNextFrame());
+          return m_keyFrames[m_nowFrameIndex].calcFrame();
         }
 
         Array<T> m_keyFrames;
-        int m_nowFrameNum;
+      private:
+        int m_nowFrameIndex;
+        int m_nowFrameNo;
       };
 
       using MorphData = KeyFrameData<mmd::key_frame::MorphFrame>;
+
 
     }
   }
@@ -49,7 +110,7 @@ namespace s3d_mmd
   class VMD::Pimpl
   {
 
-    static float msToFrameCount(int ms) { return ms * (60.0f / 1000); }
+    static int msToFrameCount(int ms) { return ms * 60 / 1000; }
 
     bool m_isFrameEnd;  /// <summary> フレームが終了したか true:終了 </summary>
     bool m_isLoop;      /// <summary> ループするかどうか </summary>
