@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
-#include <src/ReaderHelper.h>
 #include <MMD/vmd_struct.h>
 namespace s3d_mmd
 {

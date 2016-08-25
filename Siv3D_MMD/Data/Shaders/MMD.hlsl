@@ -1,4 +1,3 @@
-#include "fx_stdafx.h"
 
 struct VS_INPUT
 {
