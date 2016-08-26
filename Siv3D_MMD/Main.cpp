@@ -36,7 +36,6 @@ void Main()
 
     //vmd.setTime(gui.slider(L"frame").valueInt);
     //if (Input::KeyN.pressed)
-    vmd.UpdateTime();
     meshGround.draw();
 
     //bone10.extraBoneMat *= Quaternion(10_deg, 0, 0, 1).toMatrix();

@@ -5,7 +5,7 @@ namespace s3d_mmd
 {
   void VMD::Pimpl::resetFrame()
   {
-    auto nowFrameNo = msToFrameCount(m_nowTime.ms());
+    auto nowFrameNo = getPosFrame();
 
     for ( auto& i : m_keyFrameData )
       i.second.resetFrame(nowFrameNo);
@@ -21,6 +21,7 @@ namespace s3d_mmd
     m_loopEnd = SecondsF::zero();
     m_isLoop = false;
     m_isFrameEnd = true;
+
     for ( auto& i : data.getBoneFrames() )
       m_keyFrameData[i.first].m_keyFrames = i.second.createFrames();
 
@@ -38,11 +39,12 @@ namespace s3d_mmd
     for ( auto& ikData : bones.ikData() )
       UpdateIK(bones, ikData);
   }
+
   void VMD::Pimpl::UpdateIK(mmd::Bones &bones, const mmd::Ik &ikData) const
   {
     Vector localEffectorPos = DirectX::g_XMZero;
     Vector localTargetPos = DirectX::g_XMZero;
-    Mat4x4 targetMat = bones.calcBoneMatML(ikData.ik_bone_index);
+    const Mat4x4& targetMat = bones.calcBoneMatML(ikData.ik_bone_index);
 
     for ( int i = ikData.iterations - 1; i >= 0; i-- )
     {
@@ -50,9 +52,8 @@ namespace s3d_mmd
       {
         auto& bone = bones[attentionIdx];
         using namespace DirectX;
-        Mat4x4 effectorMat = bones.calcBoneMatML(ikData.ik_target_bone_index);
-        XMVECTOR Determinant;
-        const auto invCoord = XMMatrixInverse(&Determinant, bones.calcBoneMatML(attentionIdx));
+        const Mat4x4& effectorMat = bones.calcBoneMatML(ikData.ik_target_bone_index);
+        const auto& invCoord = bones.calcBoneMatML(attentionIdx).inverse();
         localEffectorPos = XMVector3TransformCoord(effectorMat.r[3], invCoord); // 注目ボーン基準に変換
         localTargetPos = XMVector3TransformCoord(targetMat.r[3], invCoord);     // 注目ボーン基準に変換
 
@@ -63,7 +64,7 @@ namespace s3d_mmd
 
         const float& p = XMVectorGetX(XMVector3Dot(localEffectorDir, localTargetDir));
         if ( p >= 1.0f ) continue;
-        float angle = std::min(std::acos(std::max(p, -1.0f)), ikData.control_weight);
+        const float& angle = std::min(std::acos(std::max(p, -1.0f)), ikData.control_weight);
 
         Vector axis = XMVector3Cross(localEffectorDir, localTargetDir);
         if ( bone.name == L"左足" || bone.name == L"右足" )
@@ -97,7 +98,7 @@ namespace s3d_mmd
     for ( auto &i : bones )
     {
       i.boneMat = i.initMat;
-      auto it = m_keyFrameData.find(i.name);
+      const auto it = m_keyFrameData.find(i.name);
       if ( it == m_keyFrameData.end() ) continue;
 
       const auto& frame = it->second.calcFrame();
@@ -112,11 +113,14 @@ namespace s3d_mmd
 
   void VMD::Pimpl::UpdateTime()
   {
-    const auto frameCount = msToFrameCount(m_nowTime.ms());
+    const auto frameCount = getPosFrame();
 
     // ループチェック
     if ( m_isLoop && m_loopEnd != SecondsF::zero() && m_nowTime.elapsed() >= m_loopEnd )
+    {
       setPosSec(m_loopBegin);
+      return;
+    }
 
     for ( auto& i : m_keyFrameData )
       i.second.updateFrame(frameCount);
@@ -176,10 +180,12 @@ namespace s3d_mmd
     resetFrame();
   }
 
-  void VMD::Pimpl::SetPosFrame(const int frameNo)
+  void VMD::Pimpl::setPosFrame(const int frameNo)
   {
     m_nowTime.set(SecondsF(frameNo / 60.0));
     resetFrame();
   }
+
+  int VMD::Pimpl::getPosFrame() { return m_nowTime.ms() * 60 / 1000; }
 
 }

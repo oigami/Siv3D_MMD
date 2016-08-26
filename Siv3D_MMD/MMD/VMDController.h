@@ -21,7 +21,6 @@ namespace s3d_mmd
 
     void UpdateBone(mmd::Bones &bones) const;
     void UpdateMorph(mmd::FaceMorph& m_morph)const;
-    void UpdateTime() const;
 
     void play() const;
 
@@ -32,8 +31,6 @@ namespace s3d_mmd
     bool isPlaying() const;
 
     bool isPaused() const;
-
-    void setTime(MillisecondsF time) const;
 
     bool isLoop() const;
 

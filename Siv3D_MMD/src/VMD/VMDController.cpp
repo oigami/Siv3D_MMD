@@ -36,11 +36,6 @@ namespace s3d_mmd
     m_handle->UpdateMorph(m_morph);
   }
 
-  void VMD::UpdateTime() const
-  {
-    m_handle->UpdateTime();
-  }
-
   bool VMD::isLoop() const
   {
     return m_handle->isLoop();
@@ -63,7 +58,7 @@ namespace s3d_mmd
 
   void VMD::SetPosFrame(const int frameNo)
   {
-    return m_handle->SetPosFrame(frameNo);
+    return m_handle->setPosFrame(frameNo);
   }
 
   void VMD::play() const

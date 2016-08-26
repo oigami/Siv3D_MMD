@@ -6,6 +6,29 @@ namespace s3d_mmd
   {
     namespace
     {
+      constexpr int frame_rate = 60;     // 本プログラムのフレームレート
+      constexpr int mmd_frame_rate = 30; // MMDのフレームレート
+
+      /// <summary>
+      /// MMDのフレーム番号をプログラムのフレーム番号に変換する
+      /// </summary>
+      /// <param name="mmdFrameNo"></param>
+      /// <returns></returns>
+      int ConvertMyFrameNo(int mmdFrameNo)
+      {
+        return mmdFrameNo * (frame_rate / mmd_frame_rate);
+      }
+
+      /// <summary>
+      /// プログラムのフレーム番号をMMDのフレーム番号に変換する
+      /// </summary>
+      /// <param name="myFrameNo"></param>
+      /// <returns></returns>
+      int ConvertMMDFrameNo(int myFrameNo)
+      {
+        return myFrameNo / (frame_rate / mmd_frame_rate);
+      }
+
       template<int n>void ConvertString(char(&out)[n], const String& in)
       {
         std::string name = Narrow(in);
@@ -21,18 +44,16 @@ namespace s3d_mmd
           if ( in[i] == L'\0' )break;
           endPos++;
         }
-        return Widen({ in,endPos });
+        return Widen({ in, endPos });
       }
     }
     namespace key_frame
     {
-      constexpr int frame_rate = 60;     // 本プログラムのフレームレート
-      constexpr int mmd_frame_rate = 30; // MMDのフレームレート
+
       String BoneFrame::set(const vmd_struct::Bone & boneFrame)
       {
 
-        frameNo = boneFrame.frameNo;
-        frameNo *= frame_rate / mmd_frame_rate;
+        frameNo = ConvertMyFrameNo(boneFrame.frameNo);
         position = DirectX::XMVectorSet(boneFrame.location.x, boneFrame.location.y, boneFrame.location.z, 0);
         rotation = Quaternion(boneFrame.rotation.x, boneFrame.rotation.y, boneFrame.rotation.z, boneFrame.rotation.w);
         bezie_x = math::Bezie(boneFrame.x1.x, boneFrame.y1.x, boneFrame.x2.x, boneFrame.y2.x);
@@ -47,8 +68,7 @@ namespace s3d_mmd
       {
         vmd_struct::Bone res{ {} };
 
-        res.frameNo = frameNo;
-        res.frameNo /= frame_rate / mmd_frame_rate;
+        res.frameNo = ConvertMMDFrameNo(frameNo);
 
         {
           const Vector2D<uint8>&
@@ -102,12 +122,31 @@ namespace s3d_mmd
         return res;
       }
 
+      BoneFrame::CalcFrame BoneFrame::calcFrame() const
+      {
+        return{ position, rotation };
+      }
+
+      BoneFrame::CalcFrame BoneFrame::calcFrame(int nowFrameNo, const BoneFrame & next) const
+      {
+        //次のフレームとの間の位置を計算する
+        const auto& p0 = position;
+        const auto& p1 = next.position;
+        const int& t0 = frameNo;
+        const int& t1 = next.frameNo;
+        const float& s = (float) (nowFrameNo - t0) / float(t1 - t0);
+        const auto rot = Math::Slerp(rotation, next.rotation, next.bezie_r.GetY(s));
+        auto bonePos = DirectX::XMVectorMultiplyAdd(DirectX::XMVectorSubtract(p1, p0),
+                                                    DirectX::XMVectorSet(next.bezie_x.GetY(s),
+                                                                         next.bezie_y.GetY(s),
+                                                                         next.bezie_z.GetY(s), 0), p0);
+        return{ bonePos, rot };
+      }
+
       String MorphFrame::set(const vmd_struct::Morph & morph)
       {
         m_weight = morph.m_weight;
-        frameNo = morph.frameNo;
-        frameNo *= frame_rate / mmd_frame_rate;
-
+        frameNo = ConvertMyFrameNo(morph.frameNo);
         return ConvertString(morph.name);
       }
 
@@ -115,10 +154,20 @@ namespace s3d_mmd
       {
         vmd_struct::Morph morph;
         ConvertString(morph.name, name);
-        morph.frameNo = frameNo;
-        morph.frameNo /= frame_rate / mmd_frame_rate;
+        morph.frameNo = ConvertMMDFrameNo(frameNo);
         morph.m_weight = m_weight;
         return morph;
+      }
+
+      float MorphFrame::calcFrame() const
+      {
+        return m_weight;
+      }
+
+      float MorphFrame::calcFrame(int nowFrameNo, const MorphFrame & next) const
+      {
+        const float& t = float(nowFrameNo - frameNo) / (next.frameNo - frameNo);
+        return Math::Lerp(m_weight, next.m_weight, t);
       }
 
     }

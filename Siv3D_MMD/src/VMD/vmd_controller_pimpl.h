@@ -110,7 +110,6 @@ namespace s3d_mmd
   class VMD::Pimpl
   {
 
-    static int msToFrameCount(int ms) { return ms * 60 / 1000; }
 
     bool m_isFrameEnd;  /// <summary> フレームが終了したか true:終了 </summary>
     bool m_isLoop;      /// <summary> ループするかどうか </summary>
@@ -155,10 +154,16 @@ namespace s3d_mmd
     void setPosSec(const SecondsF& pos);
 
     /// <summary>
-    /// 再生位置を変更する（60fps)
+    /// 再生位置を変更する (60fps)
     /// </summary>
     /// <param name="frameNo"></param>
-    void SetPosFrame(const int frameNo);
+    void setPosFrame(const int frameNo);
+
+    /// <summary>
+    /// 現在の再生位置を取得する (60fps)
+    /// </summary>
+    /// <returns></returns>
+    int getPosFrame();
 
     SecondsF lengthSec() const;
     SecondsF lengthFrame() const;
