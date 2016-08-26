@@ -2,7 +2,7 @@
 #include <MMD/mmd_bone.h>
 #include <MMD/pmd_struct.h>
 #include <MMD/vmd_controller.h>
-#include "../ReaderHelper.h"
+#include <src/reader_helper.h>
 #include <src/VMD/vmd_controller_pimpl.h>
 #include <MMD/mmd_motion.h>
 namespace s3d_mmd

@@ -178,15 +178,15 @@
     <ClCompile Include="src\key_frame_data.cpp" />
     <ClCompile Include="src\VMD\vmd_writer.cpp" />
     <ClCompile Include="src\mmd_motion.cpp" />
-    <ClCompile Include="src\MMDMorph.cpp" />
+    <ClCompile Include="src\mmd_morph.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="src\MMD.cpp" />
-    <ClCompile Include="src\MMDBone.cpp" />
-    <ClCompile Include="src\MMDModel.cpp" />
-    <ClCompile Include="src\MMDPhysics.cpp" />
-    <ClCompile Include="src\PMDReader.cpp" />
-    <ClCompile Include="src\VMD\VMDController.cpp" />
-    <ClCompile Include="src\VMD\VMDReader.cpp" />
+    <ClCompile Include="src\mmd.cpp" />
+    <ClCompile Include="src\mmd_bone.cpp" />
+    <ClCompile Include="src\mmd_model.cpp" />
+    <ClCompile Include="src\mmd_physics.cpp" />
+    <ClCompile Include="src\pmd_reader.cpp" />
+    <ClCompile Include="src\VMD\vmd_controller.cpp" />
+    <ClCompile Include="src\VMD\vmd_reader.cpp" />
     <ClCompile Include="src\VMD\vmd_controller_pimpl.cpp" />
     <ClCompile Include="stdafx\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -317,9 +317,9 @@
     <ClInclude Include="MMD\vmd_reader.h" />
     <ClInclude Include="MMD\vmd_struct.h" />
     <ClInclude Include="MMD\vmd_writer.h" />
-    <ClInclude Include="src\MMDPhysics.h" />
+    <ClInclude Include="src\mmd_physics.h" />
     <ClInclude Include="MMD\mmd_motion.h" />
-    <ClInclude Include="src\ReaderHelper.h" />
+    <ClInclude Include="src\reader_helper.h" />
     <ClInclude Include="src\detail\mmd_pimpl.h" />
     <ClInclude Include="src\VMD\vmd_controller_pimpl.h" />
     <ClInclude Include="ShaderAttacher.h" />

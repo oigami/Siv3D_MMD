@@ -1,5 +1,5 @@
 ﻿#include <MMD/pmd_reader.h>
-#include "ReaderHelper.h"
+#include<src/reader_helper.h>
 namespace s3d_mmd
 {
   PMDReader::PMDReader(const FilePath& path)

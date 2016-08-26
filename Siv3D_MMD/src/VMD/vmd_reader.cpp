@@ -1,5 +1,5 @@
 ﻿#include <MMD/vmd_reader.h>
-#include <src/ReaderHelper.h>
+#include <src/reader_helper.h>
 namespace s3d_mmd
 {
   namespace
