@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
-#include "PMDStruct.h"
+#include <MMD/pmd_struct.h>
 namespace s3d_mmd
 {
 

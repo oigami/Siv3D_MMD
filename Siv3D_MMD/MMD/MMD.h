@@ -11,10 +11,10 @@
 #endif // MAKE_SIV3D_MMD_EXE
 
 #include <memory>
-#include "MMDModel.h"
-#include "MMDBone.h"
-#include "MMDMorph.h"
-#include "VMDController.h"
+#include <MMD/mmd_model.h>
+#include <MMD/mmd_bone.h>
+#include <MMD/mmd_morph.h>
+#include <MMD/vmd_controller.h>
 #include "BulletPhysics.h"
 #include <MMD/mmd_motion.h>
 namespace s3d_mmd

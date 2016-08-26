@@ -1,7 +1,7 @@
 ﻿#include <Siv3D.hpp>
-#include <MMD/MMDBone.h>
-#include <MMD/PMDStruct.h>
-#include <MMD/VMDController.h>
+#include <MMD/mmd_bone.h>
+#include <MMD/pmd_struct.h>
+#include <MMD/vmd_controller.h>
 #include "../ReaderHelper.h"
 #include <src/VMD/vmd_controller_pimpl.h>
 #include <MMD/mmd_motion.h>

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <MMD/VMDReader.h>
+#include <MMD/vmd_reader.h>
 #include <MMD/key_frame_data.h>
 namespace s3d_mmd
 {

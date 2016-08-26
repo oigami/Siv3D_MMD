@@ -1,5 +1,5 @@
 #include "stdafx/stdafx.h"
-#include <MMD/MMDMorph.h>
+#include <MMD/mmd_morph.h>
 namespace s3d_mmd
 {
   namespace mmd

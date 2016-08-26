@@ -1,4 +1,4 @@
-﻿#include <MMD/PMDReader.h>
+﻿#include <MMD/pmd_reader.h>
 #include "ReaderHelper.h"
 namespace s3d_mmd
 {

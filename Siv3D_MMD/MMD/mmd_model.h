@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
-#include "PMDStruct.h"
-#include "MMDBone.h"
+#include <MMD/pmd_struct.h>
+#include <MMD/mmd_bone.h>
 namespace s3d_mmd
 {
   namespace mmd

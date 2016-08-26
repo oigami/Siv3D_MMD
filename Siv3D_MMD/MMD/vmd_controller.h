@@ -1,8 +1,7 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
-#include "MMDBone.h"
-#include "MMDMorph.h"
-#include "VMDReader.h"
+#include <MMD/mmd_bone.h>
+#include <MMD/mmd_morph.h>
 #include <MMD/mmd_motion.h>
 namespace s3d_mmd
 {

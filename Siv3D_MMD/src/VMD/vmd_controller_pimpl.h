@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include <MMD/VMDController.h>
-#include <MMD/PMDStruct.h>
+#include <MMD/vmd_controller.h>
+#include <MMD/pmd_struct.h>
 #include <MMD/key_frame_data.h>
 #include <MMD/mmd_motion.h>
 namespace s3d_mmd
