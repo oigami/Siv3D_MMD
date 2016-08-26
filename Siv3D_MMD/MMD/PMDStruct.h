@@ -3,7 +3,7 @@
 #include <vector>
 namespace s3d_mmd
 {
-  namespace pmd
+  namespace pmd_struct
   {
 
 #pragma pack(push, 1)

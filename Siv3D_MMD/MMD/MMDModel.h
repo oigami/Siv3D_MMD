@@ -6,11 +6,11 @@ namespace s3d_mmd
 {
   namespace mmd
   {
-    using RigidBodies = pmd::RigidBodies;
+    using RigidBodies = pmd_struct::RigidBodies;
 
-    using Joints = pmd::Joints;
+    using Joints = pmd_struct::Joints;
 
-    using SkinData = pmd::SkinData;
+    using SkinData = pmd_struct::SkinData;
 
     struct Material
     {
@@ -71,7 +71,7 @@ namespace s3d_mmd
     /// 3D モデルファイルのパス
     /// </param>
     /// <remarks>
-    /// MikuMikuDance pmd形式のみサポートしています。
+    /// MikuMikuDance pmd_struct形式のみサポートしています。
     /// </remarks>
     MMDModel(const FilePath& path);
 

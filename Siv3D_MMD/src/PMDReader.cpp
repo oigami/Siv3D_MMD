@@ -6,7 +6,7 @@ namespace s3d_mmd
   { // ヘッダ
     BinaryReader reader(path);
     if ( !reader.isOpened() ) return;
-    pmd::Header pmdHeader;
+    pmd_struct::Header pmdHeader;
     reader.read(pmdHeader);
     m_modelName = Widen(pmdHeader.model_name);
     m_comment = Widen(pmdHeader.comment);
@@ -22,7 +22,7 @@ namespace s3d_mmd
     m_ikData.resize(numPmdIkData);
     for ( auto& pmdIkData : m_ikData )
     {
-      pmd::IkDataWithoutArray *pmdIkDataWithoutArray = &pmdIkData;
+      pmd_struct::IkDataWithoutArray *pmdIkDataWithoutArray = &pmdIkData;
       reader.read(*pmdIkDataWithoutArray);
       ReadArray(reader, pmdIkData.ik_child_bone_length, pmdIkData.ik_child_bone_index);
     }
@@ -33,7 +33,7 @@ namespace s3d_mmd
     m_skinData.resize(numPmdSkin);
     for ( auto& skinData : m_skinData )
     {
-      pmd::SkinDataWithoutArray *pmdSkinDataWithoutArray = &skinData;
+      pmd_struct::SkinDataWithoutArray *pmdSkinDataWithoutArray = &skinData;
       reader.read(*pmdSkinDataWithoutArray);
       ReadArray(reader, skinData.skin_vert_count, skinData.skin_vert_data);
     }
@@ -55,7 +55,7 @@ namespace s3d_mmd
     // 各種英名
     if ( english_name_compatibility == 1 )
     {
-      pmd::EnglishName tmp;
+      pmd_struct::EnglishName tmp;
       reader.read(tmp.modelName); // モデル名
       reader.read(tmp.comment);   // コメント
       ReadArray(reader, numPmdBone, tmp.boneName); // ボーンリスト
@@ -67,7 +67,7 @@ namespace s3d_mmd
 
     // トゥーンテクスチャリスト
     constexpr int numToonFileName = 10;
-    Array<pmd::ToonTexture> toonFileName;
+    Array<pmd_struct::ToonTexture> toonFileName;
     ReadArray(reader, numToonFileName, toonFileName);
 
     // 剛体データ

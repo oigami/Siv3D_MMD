@@ -35,7 +35,7 @@ namespace s3d_mmd
     };
 
   }
-  mmd::Material CreateMaterial(const pmd::Material &pmdMaterial, const FilePath &m_filepath)
+  mmd::Material CreateMaterial(const pmd_struct::Material &pmdMaterial, const FilePath &m_filepath)
   {
     mmd::Material material;
 
@@ -61,7 +61,7 @@ namespace s3d_mmd
     }
     return material;
   }
-  mmd::MeshVertex CreateVertex(const pmd::Vertex &vertex)
+  mmd::MeshVertex CreateVertex(const pmd_struct::Vertex &vertex)
   {
     mmd::MeshVertex v;
     v.position = vertex.pos;
@@ -74,7 +74,7 @@ namespace s3d_mmd
     v.normal.normalize();
     return v;
   }
-  Array<mmd::MeshVertex> CreateVertices(const pmd::Vertices &Vertices)
+  Array<mmd::MeshVertex> CreateVertices(const pmd_struct::Vertices &Vertices)
   {
     Array<mmd::MeshVertex> meshVertices;
     meshVertices.resize(Vertices.size());
@@ -144,7 +144,7 @@ namespace s3d_mmd
     }
     return{ std::move(nodes), std::move(edgeNodes) };
   }
-  Array<mmd::Ik> CreateIkData(const pmd::IkData & ikData)
+  Array<mmd::Ik> CreateIkData(const pmd_struct::IkData & ikData)
   {
     Array<mmd::Ik> newIkData(ikData.size());
     for ( auto& i : step(static_cast<int>(ikData.size())) )
@@ -161,7 +161,7 @@ namespace s3d_mmd
     }
     return newIkData;
   }
-  mmd::Bones CreateBones(const Array<pmd::Bone> &pmdBones, const pmd::IkData &ikData)
+  mmd::Bones CreateBones(const Array<pmd_struct::Bone> &pmdBones, const pmd_struct::IkData &ikData)
   {
     Array<mmd::Bone> bones;
     const int size = static_cast<int>(pmdBones.size());
@@ -231,9 +231,9 @@ namespace s3d_mmd
     Array<mmd::ModelNode> m_edges;
     std::shared_ptr<mmd::Bones> m_bones;
 
-    pmd::RigidBodies m_rigidBodies;
-    pmd::Joints m_joints;
-    pmd::SkinData m_skinData;
+    pmd_struct::RigidBodies m_rigidBodies;
+    pmd_struct::Joints m_joints;
+    pmd_struct::SkinData m_skinData;
     String m_modelName;
     String m_comment;
     HandleIDType m_handle;
@@ -297,17 +297,17 @@ namespace s3d_mmd
     return m_handle->m_bones;
   }
 
-  const pmd::RigidBodies & MMDModel::rigidBodies() const
+  const pmd_struct::RigidBodies & MMDModel::rigidBodies() const
   {
     return m_handle->m_rigidBodies;
   }
 
-  const pmd::Joints & MMDModel::joints() const
+  const pmd_struct::Joints & MMDModel::joints() const
   {
     return  m_handle->m_joints;
   }
 
-  const pmd::SkinData MMDModel::skinData() const
+  const pmd_struct::SkinData MMDModel::skinData() const
   {
     return m_handle->m_skinData;
   }

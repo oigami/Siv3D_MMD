@@ -7,18 +7,18 @@ namespace s3d_mmd
   class PMDReader
   {
 
-    pmd::Vertices m_vertices;
-    pmd::Faces m_faces;
-    pmd::Materials m_materials;
-    pmd::Bones m_bones;
-    pmd::IkData m_ikData;
-    pmd::RigidBodies m_rigidBodies;
-    pmd::Joints m_joints;
-    pmd::SkinData m_skinData;
-    pmd::SkinIndices m_skinIndices;
-    pmd::BoneDispNames m_boneDispNames;
-    pmd::BoneDisps m_boneDisps;
-    Optional<pmd::EnglishName> m_englishName;
+    pmd_struct::Vertices m_vertices;
+    pmd_struct::Faces m_faces;
+    pmd_struct::Materials m_materials;
+    pmd_struct::Bones m_bones;
+    pmd_struct::IkData m_ikData;
+    pmd_struct::RigidBodies m_rigidBodies;
+    pmd_struct::Joints m_joints;
+    pmd_struct::SkinData m_skinData;
+    pmd_struct::SkinIndices m_skinIndices;
+    pmd_struct::BoneDispNames m_boneDispNames;
+    pmd_struct::BoneDisps m_boneDisps;
+    Optional<pmd_struct::EnglishName> m_englishName;
 
     FilePath m_filepath;
     String m_modelName;
@@ -26,14 +26,14 @@ namespace s3d_mmd
 
   public:
 
-    const pmd::Vertices& getVertices() const { return m_vertices; }
-    const pmd::Faces& getFaces() const { return m_faces; }
-    const pmd::Materials& getMaterials() const { return m_materials; }
-    const pmd::Bones& getBones() const { return m_bones; }
-    const pmd::IkData& getIkData() const { return m_ikData; }
-    const pmd::RigidBodies& getRigidBodies()const { return m_rigidBodies; }
-    const pmd::Joints& getJoints() const { return m_joints; }
-    const pmd::SkinData& getSkinData() const { return m_skinData; }
+    const pmd_struct::Vertices& getVertices() const { return m_vertices; }
+    const pmd_struct::Faces& getFaces() const { return m_faces; }
+    const pmd_struct::Materials& getMaterials() const { return m_materials; }
+    const pmd_struct::Bones& getBones() const { return m_bones; }
+    const pmd_struct::IkData& getIkData() const { return m_ikData; }
+    const pmd_struct::RigidBodies& getRigidBodies()const { return m_rigidBodies; }
+    const pmd_struct::Joints& getJoints() const { return m_joints; }
+    const pmd_struct::SkinData& getSkinData() const { return m_skinData; }
 
 
     const FilePath& getFilePath()const { return m_filepath; }

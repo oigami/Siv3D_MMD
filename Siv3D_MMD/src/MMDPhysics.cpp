@@ -34,8 +34,8 @@ namespace s3d_mmd
   }
 
   void MmdPhysics::Create(std::shared_ptr<mmd::Bones> bones,
-                          const std::vector<pmd::RigidBody>& pmdRigidBodies,
-                          const std::vector<pmd::Joint>& pmdJoints)
+                          const std::vector<pmd_struct::RigidBody>& pmdRigidBodies,
+                          const std::vector<pmd_struct::Joint>& pmdJoints)
   {
     SetBones(bones);
     CreateRigid(pmdRigidBodies);
@@ -68,7 +68,7 @@ namespace s3d_mmd
   /// @param pmdRigidBodies Pmd剛体配列
   /// @param pmdBones Pmdボーン配列
 
-  inline void MmdPhysics::CreateRigid(const std::vector<s3d_mmd::pmd::RigidBody>& pmdRigidBodies)
+  inline void MmdPhysics::CreateRigid(const std::vector<s3d_mmd::pmd_struct::RigidBody>& pmdRigidBodies)
   {
     const int pmdRigidBodiesSize = static_cast<int>(pmdRigidBodies.size());
     m_rigidbodyRelatedBoneIndex.resize(pmdRigidBodiesSize);
@@ -146,7 +146,7 @@ namespace s3d_mmd
     return Float3(val[0], val[1], val[2]);
   }
 
-  void MmdPhysics::CreateJoint(const Array<s3d_mmd::pmd::Joint> &pmdJoints)
+  void MmdPhysics::CreateJoint(const Array<s3d_mmd::pmd_struct::Joint> &pmdJoints)
   {
     const size_t pmdJointsSize = pmdJoints.size();
     m_jointRelatedRigidIndex.reserve(pmdJointsSize);
