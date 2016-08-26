@@ -12,6 +12,17 @@ namespace s3d_mmd
         name.resize(n);
         strncpy(out, name.c_str(), n);
       }
+
+      template<int n>String ConvertString(const char(&in)[n])
+      {
+        size_t endPos = 0;
+        for ( int i = 0; i < n; i++ )
+        {
+          if ( in[i] == L'\0' )break;
+          endPos++;
+        }
+        return Widen({ in,endPos });
+      }
     }
     namespace key_frame
     {
@@ -20,12 +31,6 @@ namespace s3d_mmd
       String BoneFrame::set(const vmd_struct::Bone & boneFrame)
       {
 
-        size_t endPos = 0;
-        for ( int i = 0; i < sizeof(boneFrame.boneName); i++ )
-        {
-          if ( boneFrame.boneName[i] == L'\0' )break;
-          endPos++;
-        }
         frameNo = boneFrame.frameNo;
         frameNo *= frame_rate / mmd_frame_rate;
         position = DirectX::XMVectorSet(boneFrame.location.x, boneFrame.location.y, boneFrame.location.z, 0);
@@ -35,7 +40,7 @@ namespace s3d_mmd
         bezie_z = math::Bezie(boneFrame.x1.z, boneFrame.y1.z, boneFrame.x2.z, boneFrame.y2.z);
         bezie_r = math::Bezie(boneFrame.x1.w, boneFrame.y1.w, boneFrame.x2.w, boneFrame.y2.w);
 
-        return Widen({ boneFrame.boneName, endPos });
+        return ConvertString(boneFrame.boneName);
       }
 
       vmd_struct::Bone BoneFrame::Convert(const String & boneName)
@@ -102,13 +107,8 @@ namespace s3d_mmd
         m_weight = morph.m_weight;
         frameNo = morph.frameNo;
         frameNo *= frame_rate / mmd_frame_rate;
-        size_t endPos = 0;
-        for ( int i = 0; i < sizeof(morph.name); i++ )
-        {
-          if ( morph.name[i] == L'\0' )break;
-          endPos++;
-        }
-        return Widen({ morph.name, endPos });
+
+        return ConvertString(morph.name);
       }
 
       vmd_struct::Morph MorphFrame::convert(const String & name) const
