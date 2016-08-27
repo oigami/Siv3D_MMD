@@ -34,9 +34,16 @@ namespace s3d_mmd
 
 
     void draw(const Mat4x4& worldMat = Mat4x4::Identity()) const;
-    void draw(const VMD &vmd, const Mat4x4& worldMat = Mat4x4::Identity()) const;
+
+    /// <summary>
+    /// ボーンを更新する
+    /// <para> 1フレームに一回呼び出す </para>
+    /// </summary>
+    /// <param name="m_vmd"></param>
+    const MMD& update() const;
+
     void draw(double edgeSize) const;
-    void drawEdge(double edgeSize) const;
+    void drawEdge(double edgeSize, const Mat4x4& worldmat = Mat4x4::Identity()) const;
 
     std::shared_ptr<mmd::Bones> bones() const;
     mmd::FaceMorph& morphs() const;
@@ -44,23 +51,23 @@ namespace s3d_mmd
     const String &comment() const;
     const Texture &vertexTexture() const;
 
+    /// <summary>
+    /// VMDをセットする
+    /// <para> 再生の一時停止等の制御はVMDで行う </para>
+    /// </summary>
+    /// <param name="vmd"></param>
+    void attach(const VMD& vmd) const;
+
+    /// <summary>
+    /// VMDを外す
+    /// <para> ただし姿勢は元のまま維持される </para>
+    /// </summary>
+    void dettach() const;
+
     bool isOpen() const;
   private:
 
     void PhysicsUpdate(Array<Mat4x4> &boneWorld) const;
-
-  };
-
-  class DrawableVMD
-  {
-    friend class MMD;
-    const MMD m_mmd;
-    const VMD m_vmd;
-
-  public:
-
-    DrawableVMD(const MMD &mmd, const VMD &vmd);
-    void draw(const Mat4x4& worldMat = Mat4x4::Identity()) const;
 
   };
 

@@ -110,7 +110,7 @@ namespace s3d_mmd
   class VMD::Pimpl
   {
 
-
+    bool m_isEmpty;     // データがないかどうか
     bool m_isFrameEnd;  /// <summary> フレームが終了したか true:終了 </summary>
     bool m_isLoop;      /// <summary> ループするかどうか </summary>
     SecondsF m_loopBegin; /// <summary> ループする時間 </summary>
@@ -129,8 +129,6 @@ namespace s3d_mmd
     Pimpl(mmd::MMDMotion& data);
     Pimpl() = default;
 
-    void UpdateIK(mmd::Bones &bones) const;		// IKボーン影響下ボーンの行列を更新
-    void UpdateIK(mmd::Bones &bones, const mmd::Ik &ik) const;		// IKボーン影響下ボーンの行列を更新
     void UpdateBone(mmd::Bones &bons);
     void UpdateTime();
     void UpdateMorph(mmd::FaceMorph& m_morph)const;
@@ -167,6 +165,8 @@ namespace s3d_mmd
 
     SecondsF lengthSec() const;
     SecondsF lengthFrame() const;
+
+    bool isEmpty() const;
   };
 
 }

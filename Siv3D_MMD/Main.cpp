@@ -21,6 +21,7 @@ void Main()
   motion.saveVMD(L"Data/きしめん.vmd.sav");
   const VMD vmd(L"Data/きしめん.vmd.sav");
   vmd.play();
+  model.attach(vmd);
   //Bone &bone10 = model.bones()->get(10);
   //bone10.extraBoneControl = true;
   const Font font(30);
@@ -39,7 +40,7 @@ void Main()
     meshGround.draw();
 
     //bone10.extraBoneMat *= Quaternion(10_deg, 0, 0, 1).toMatrix();
-    model.draw(vmd);
+    model.update().draw();
     auto mat = *model.bones()->calcBoneMatML(L"頭");
     camera.lookat = mat.transform(Vec3(0, 0, 0));
     camera.pos = mat.transform(Vec3(0, 0, -10));

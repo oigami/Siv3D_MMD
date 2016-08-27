@@ -97,23 +97,3 @@ VS_OUTPUT VS(VS_INPUT input)
   Out.tex = v.tex;
   return Out;
 }
-
-cbuffer pscbMesh0 : register(b0)
-{
-  float3 g_cameraPosition;
-  uint g_fogType;
-  float4 g_fogParam;
-  float4 g_fogColor;
-}
-
-SamplerState sampler0 : register(s0);
-Texture2D texture0 : register(t0);
-
-PS_OUTPUT PS(VS_OUTPUT input)
-{
-  PS_OUTPUT output;
-  output.color = input.color * texture0.Sample(sampler0, input.tex);
-  output.depth = distance(g_cameraPosition, input.worldPosition);
-  output.normal = float4(input.normal, 1);
-  return output;
-}

@@ -25,9 +25,9 @@ namespace s3d_mmd
     drawEdge(edgeSize);
   }
 
-  void MMD::drawEdge(double edgeSize) const
+  void MMD::drawEdge(double edgeSize, const Mat4x4& worldMat) const
   {
-    m_handle->drawEdge();
+    m_handle->drawEdge(worldMat);
   }
 
   void MMD::draw(const Mat4x4& worldMat) const
@@ -35,14 +35,19 @@ namespace s3d_mmd
     m_handle->draw(worldMat);
   }
 
-  void MMD::draw(const VMD &vmd, const Mat4x4& worldMat) const
-  {
-    DrawableVMD(*this, vmd).draw(worldMat);
-  }
-
   const Texture & MMD::vertexTexture() const
   {
     return m_handle->m_vertexTexture;
+  }
+
+  void MMD::attach(const VMD & vmd) const
+  {
+    m_handle->attach(vmd);
+  }
+
+  void MMD::dettach() const
+  {
+    m_handle->attach(VMD());
   }
 
   bool MMD::isOpen() const
@@ -70,19 +75,11 @@ namespace s3d_mmd
     return m_handle->m_comment;
   }
 
-  DrawableVMD::DrawableVMD(const MMD &mmd, const VMD &vmd) :m_mmd(mmd), m_vmd(vmd) {}
-
-  void DrawableVMD::draw(const Mat4x4& worldMat) const
+  const MMD& MMD::update() const
   {
-    auto bones = m_mmd.bones();
-    m_vmd.UpdateBone(*bones);
-    m_vmd.UpdateMorph(m_mmd.morphs());
-    {
-      m_mmd.draw(worldMat);
-    }
-    {
-      m_mmd.drawEdge(1.0);
-    }
+    m_handle->update();
+
+    return *this;
   }
 
 }

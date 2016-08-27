@@ -61,6 +61,11 @@ namespace s3d_mmd
     return m_handle->setPosFrame(frameNo);
   }
 
+  bool VMD::isEmpty() const
+  {
+    return m_handle->isEmpty();
+  }
+
   void VMD::play() const
   {
     m_handle->play();
