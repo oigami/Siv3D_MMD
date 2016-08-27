@@ -187,7 +187,6 @@
     <ClCompile Include="src\pmd_reader.cpp" />
     <ClCompile Include="src\VMD\vmd_controller.cpp" />
     <ClCompile Include="src\VMD\vmd_reader.cpp" />
-    <ClCompile Include="src\VMD\vmd_controller_pimpl.cpp" />
     <ClCompile Include="stdafx\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
