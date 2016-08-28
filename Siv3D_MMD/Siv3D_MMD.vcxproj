@@ -71,8 +71,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SIV3D_20160110)\Inc;$(ProjectDir)lib\bullet3-2.83.7\src;$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SIV3D_20160110)\Lib;$(ProjectDir)lib\bullet3-2.83.7\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SIV3D_20160811)\Inc;$(ProjectDir)lib\bullet3-2.83.7\src;$(ProjectDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SIV3D_20160811)\Lib;$(ProjectDir)lib\bullet3-2.83.7\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_lib|x64'">
     <LinkIncremental>true</LinkIncremental>
