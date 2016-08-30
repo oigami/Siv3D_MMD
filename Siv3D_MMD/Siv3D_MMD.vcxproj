@@ -76,19 +76,19 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_lib|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SIV3D_20160110)\Inc;$(ProjectDir)lib\bullet3-2.83.7\src;$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SIV3D_20160110)\Lib;$(ProjectDir)lib\bullet3-2.83.7\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SIV3D_20160811)\Inc;$(ProjectDir)lib\bullet3-2.83.7\src;$(ProjectDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SIV3D_20160811)\Lib;$(ProjectDir)lib\bullet3-2.83.7\lib;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_lib|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SIV3D_20160110)\Inc;$(ProjectDir)lib\bullet3-2.83.7\src;$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SIV3D_20160110)\Lib;$(ProjectDir)lib\bullet3-2.83.7\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SIV3D_20160811)\Inc;$(ProjectDir)lib\bullet3-2.83.7\src;$(ProjectDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SIV3D_20160811)\Lib;$(ProjectDir)lib\bullet3-2.83.7\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SIV3D_20160110)\Inc;$(ProjectDir)lib\bullet3-2.83.7\src;$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SIV3D_20160110)\Lib;$(ProjectDir)lib\bullet3-2.83.7\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SIV3D_20160811)\Inc;$(ProjectDir)lib\bullet3-2.83.7\src;$(ProjectDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SIV3D_20160811)\Lib;$(ProjectDir)lib\bullet3-2.83.7\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
