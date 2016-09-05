@@ -68,10 +68,10 @@ namespace s3d_mmd
 
       {
         // Ikフレームの書き込み
-        writer_.write<vmd_struct::ShowIkWithoutArray::CountType>(showIkFrame.size());
+        writer_.write(static_cast<vmd_struct::ShowIkWithoutArray::CountType>(showIkFrame.size()));
         for ( auto& i : showIkFrame )
         {
-          i.ik_count = i.ik.size();
+          i.ik_count = static_cast<uint32>(i.ik.size());
           writer_.write(static_cast<vmd_struct::ShowIkWithoutArray&>(i));
           writer_.write(i.ik.data(), sizeof(i.ik[0]) * i.ik_count);
         }

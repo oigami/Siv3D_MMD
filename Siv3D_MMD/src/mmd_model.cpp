@@ -78,7 +78,7 @@ namespace s3d_mmd
   {
     Array<mmd::MeshVertex> meshVertices;
     meshVertices.resize(Vertices.size());
-    for ( auto& i : step(Vertices.size()) )
+    for ( auto& i : step(static_cast<int>(Vertices.size())) )
     {
       meshVertices[i] = CreateVertex(Vertices[i]);
       meshVertices[i].vertexNum = i;

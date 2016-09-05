@@ -1,22 +1,19 @@
 #include <MMD/MMD.h>
 #include <MMD/mmd_model.h>
 #include "detail/mmd_pimpl.h"
-#ifdef USE_BULLET_PHYSICS
-#include "MMDPhysics.h"
-#endif // USE_BULLET_PHYSICS
 
 namespace s3d_mmd
 {
 
-  MMD::MMD(const MMDModel &model)
+  MMD::MMD(const MMDModel &model, const physics3d::Physics3DWorld& world)
   {
-    m_handle = std::make_shared<Pimpl>(model);
+    m_handle = std::make_shared<Pimpl>(model, world);
   }
 
   MMD::~MMD() {}
-  void MMD::PhysicsUpdate(Array<Mat4x4> &boneWorld) const
+  void MMD::PhysicsUpdate() const
   {
-    m_handle->PhysicsUpdate(boneWorld);
+    m_handle->physicsUpdate();
 
   }
   void MMD::draw(double edgeSize) const

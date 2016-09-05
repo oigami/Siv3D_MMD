@@ -1,10 +1,10 @@
 ﻿#ifndef MMDPHYSICS_H
 #define MMDPHYSICS_H
-#include"../include/BulletPhysics.h"
+#include <MMD/physics3d.h>
+#include <MMD/mmd_bone.h>
+#include <MMD/pmd_struct.h>
 #include<vector>
 #include<memory>
-#include "../include/PMDStruct.h"
-#include "../include/MMDBone.h"
 
 namespace s3d_mmd
 {
@@ -12,53 +12,46 @@ namespace s3d_mmd
   class MmdPhysics
   {
 
-    /// 全ボーン配列へのポインタをセット
-    /// @param bones 全ボーン配列へのポインタ
     void SetBones(std::shared_ptr<mmd::Bones> bones);
 
-    /// 剛体を作成
-    /// @param pmdRigidBodies Pmd剛体配列
-    /// @param pmdBones Pmdボーン配列
-    void CreateRigid(const std::vector<s3d_mmd::pmd::RigidBody> &pmdRigidBodies);
+    void CreateRigid(const std::vector<s3d_mmd::pmd_struct::RigidBody> &pmdRigidBodies);
 
-    /// ジョイントを作成
-    /// @param pmdBones Pmdジョイント配列
-    void CreateJoint(const std::vector<s3d_mmd::pmd::Joint> &pmdJoints);
+    void CreateJoint(const std::vector<s3d_mmd::pmd_struct::Joint> &pmdJoints);
 
   public:
 
-    MmdPhysics(s3d_bullet::BulletPhysics bulletPhysics);
+    MmdPhysics(physics3d::Physics3DWorld world = physics3d::Physics3DWorld());
     ~MmdPhysics();
 
     void Create(std::shared_ptr<mmd::Bones> bones,
-                const std::vector<pmd::RigidBody> &pmdRigidBodies,
-                const std::vector<pmd::Joint> &pmdJoints);
+                const std::vector<pmd_struct::RigidBody> &pmdRigidBodies,
+                const std::vector<pmd_struct::Joint> &pmdJoints);
 
     void Destroy();
 
-    /// ボーン行列を更新
-    /// @param 物理演算使用可能
     void BoneUpdate(const Mat4x4 &mat, Array<Mat4x4> &boneWorld);
 
-  private:
-
-    Mat4x4 CreateRigidMatrix(const float* pos, const float* rot, int i);
 
   private:
-    s3d_bullet::BulletPhysics m_bulletPhysics;
+
+    std::pair<Vector, Quaternion> CreateRigidMatrix(const s3d::Float3& pos, const s3d::Float3& rot, int i);
+
+  private:
+    physics3d::Physics3DWorld m_world;
     std::shared_ptr<mmd::Bones> m_bones;    // 全ボーン配列へのポインタ
-    Array<s3d_bullet::bullet::RigidBody> m_rigidBodies;         // 1メッシュに対する剛体配列
+    Array<physics3d::Physics3DBody> m_rigidBodies;         // 1メッシュに対する剛体配列
     Array<int> m_rigidbodyRelatedBoneIndex; // 各剛体に関連するボーンのインデックス
     Array<int> m_rigidbodyType;             // 各剛体のタイプ
     Array<Matrix> m_rigidbodyInit;          // 各剛体の初期姿勢行列
-    Array<Matrix> m_rigidbodyOffset;        // 各剛体のオフセット行列
+    Array<Matrix> m_rigidbodyInvInit;       // 各剛体のオフセット行列
 
     //vector<ID3DXMesh*> rigidbody_mesh;    // 各剛体のメッシュ
     //ID3DXMesh* joint_mesh;                // ジョイントのメッシュ
     Array<int> m_jointRelatedRigidIndex;    // 各ジョイントの関連剛体
     Array<Matrix> m_jointMatrix;            // 各ジョイントの姿勢行列(剛体Aローカル座標系)
-    Array<Matrix> m_rigidMat;               //rigidbody_init*bones.offsetMatML
-    Array<Matrix> m_initOffsetMat;          // bones.initMatML*rigidbody_offset
+    Array<Matrix> m_rigidMat;               // rigidbody_init * bones.offsetMatML
+    Array<Matrix> m_initOffsetMat;          // bones.initMatML * rigidbodyInvInit
+    Array<physics3d::Physics3D6DofSpringConstraint> m_6DofSpringConstraint;
 
   };;
 

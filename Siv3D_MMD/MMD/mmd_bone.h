@@ -21,18 +21,20 @@ namespace s3d_mmd
 
       Bone();
 
-      int id;                // ボーンID（通し番号）
-      int parent;            // 親ボーン
-      int firstChild;        // 子ボーン
-      int sibling;           // 兄弟ボーン
-      String name;           // ボーン名
-      unsigned char type;    // ボーンタイプ (MMDの場合 0:回転 1:回転と移動 2:IK 3:不明 4:IK影響下 5:回転影響下 6:IK接続先 7:非表示 8:捻り 9:回転運動 )
-      bool extraBoneControl; // 階層構造を使わず直接boneMatを操作
-      Mat4x4 boneMatML;   // 独自に動かす場合のボーン行列(extraBoneControlがtrueの時使用)
+
+      Mat4x4 boneMatML;      // 独自に動かす場合のボーン行列(extraBoneControlがtrueの時使用)
       Mat4x4 initMat;        // 初期姿勢行列(ボーンローカル座標系)
       Mat4x4 initMatML;      // 初期姿勢行列(モデルローカル座標系)
       Mat4x4 boneMat;        // 現在のボーン行列(ボーンローカル座標系)
       Mat4x4 offsetMat;      // ボーンオフセット行列(モデルローカル座標系)
+      String name;           // ボーン名
+      int id;                // ボーンID（通し番号）
+      int parent;            // 親ボーン
+      int firstChild;        // 子ボーン
+      int sibling;           // 兄弟ボーン
+      unsigned char type;    // ボーンタイプ (MMDの場合 0:回転 1:回転と移動 2:IK 3:不明 4:IK影響下 5:回転影響下 6:IK接続先 7:非表示 8:捻り 9:回転運動 )
+      bool extraBoneControl; // 階層構造を使わず直接boneMatを操作
+
 
     };
 

@@ -76,7 +76,7 @@ namespace s3d_mmd
             Println(L"error");
       }
 
-      Mat4x4 CreateRot() const
+      Mat4x4 CreateMatrix() const
       {
         Mat4x4 rot;
         using namespace DirectX;

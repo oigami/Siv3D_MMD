@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <MMD/MMD.h>
+#include <src/mmd_physics.h>
 #include "../../ShaderAttacher.h"
+#include <MMD/my_vector.h>
 namespace s3d_mmd
 {
   namespace mmd
@@ -179,13 +181,13 @@ namespace s3d_mmd
 
     Float2 WriteTextureVertex(ImageRGBA32F &vertexImage, const mmd::MeshVertex &v, int &vPos, Array<Float4> morph);
 
-    Pimpl(const MMDModel& model);
+    Pimpl(const MMDModel& model, const physics3d::Physics3DWorld& world);
 
     void draw(const Mat4x4& worldMat);
 
     void drawEdge(const Mat4x4& worldMat);
 
-    void PhysicsUpdate(Array<Mat4x4> &boneWorld);
+    void physicsUpdate();
 
     void update();
     void updateIK(const mmd::Ik &ikData);
@@ -195,9 +197,6 @@ namespace s3d_mmd
     const VMD& vmd() const;
 
 
-#ifdef USE_BULLET_PHYSICS
-    MmdPhysics m_mmdPhysics;
-#endif
 
     mmd::AllNode m_nodes;
     Array<mmd::Node> m_edges;
@@ -209,6 +208,9 @@ namespace s3d_mmd
     Array<Mat4x4> worlds;
 
     VMD m_vmd;
+
+    MmdPhysics m_mmdPhysics;
+    bool isPhysicsEnabled = true;
   };
 
   Float2 MMD::Pimpl::WriteTextureVertex(ImageRGBA32F & vertexImage, const mmd::MeshVertex & v, int & vPos, Array<Float4> morph)
@@ -217,9 +219,12 @@ namespace s3d_mmd
     int y = vPos / 1016;
     assert(y < 1016);
     int resize = morph.size() % 16;
+
+    // モーフの数を16個ずつ処理することで高速化する
     if ( resize != 0 )
       morph.resize(morph.size() + 16 - resize);
-    const int dataSize = (3 + morph.size() + 1);
+
+    const int dataSize = static_cast<int>(3 + morph.size() + 1);
     if ( 1024 < x + dataSize )
     {
       vPos += -x + vertexImage.width;
@@ -232,7 +237,7 @@ namespace s3d_mmd
     assert(v.boneNum[0] < 256 && v.boneNum[1] < 256);
     image[x] = RGBA32F(asFloat(v.boneNum[0]), asFloat(v.boneNum[1]), 0.0f, 0.0f);
     image[x + 1] = RGBA32F(v.boneWeight.x, v.boneWeight.y, v.boneWeight.z, v.boneWeight.w);
-    int f = morph.size();
+    int f = static_cast<int>(morph.size());
     image[x + 2] = RGBA32F(v.texcoord.x, v.texcoord.y, asFloat(f), 0.0f);
 
     int now = x + 2;
@@ -244,10 +249,8 @@ namespace s3d_mmd
     return{ asFloat(x), asFloat(y) };
   }
 
-  MMD::Pimpl::Pimpl(const MMDModel & model)
-#ifdef USE_BULLET_PHYSICS
-    : m_mmdPhysics(s3d_bullet::getBulletPhysics())
-#endif;
+  MMD::Pimpl::Pimpl(const MMDModel & model, const physics3d::Physics3DWorld& world)
+    : m_mmdPhysics(world)
   {
     m_bones = model.bones();
     if ( m_bones->size() >= 256 )
@@ -257,9 +260,10 @@ namespace s3d_mmd
     }
     m_name = model.name();
     m_comment = model.comment();
-#ifdef USE_BULLET_PHYSICS
+
+    // 物理演算データの生成
     m_mmdPhysics.Create(m_bones, model.rigidBodies(), model.joints());
-#endif
+
     ImageRGBA32F vertexImage(1024, 1024);
     struct FaceMorph
     {
@@ -374,6 +378,33 @@ namespace s3d_mmd
     Draw(nodes);
   }
 
+  template<class Getter, class Setter, Getter getter, Setter setter>class StateBinderClass
+  {
+  public:
+    template<class NowState>
+    constexpr StateBinderClass(NowState&& nowState)
+      :before(getter())
+    {
+      setter(std::forward<NowState>(nowState));
+    }
+
+    constexpr StateBinderClass() : before(getter()) {}
+
+    ~StateBinderClass()
+    {
+      setter(before);
+    }
+
+  private:
+    const decltype(getter()) before;
+  };
+
+  template<class Getter, class Setter>
+  constexpr auto StateBinder(Getter&& getter, Setter&& setter)
+  {
+    return StateBinderClass<Getter, Setter, getter, setter>();
+  }
+  using RasterizerStateBinder2D = StateBinderClass<decltype(Graphics3D::GetRasterizerState), decltype(Graphics3D::SetRasterizerState), Graphics3D::GetRasterizerState, Graphics3D::SetRasterizerState>;
   void MMD::Pimpl::draw(const Mat4x4 & worldMat)
   {
     mmd::MMDShader::init();
@@ -384,11 +415,12 @@ namespace s3d_mmd
 
     pushGPUData();
 
-    const auto rasterizerState = Graphics3D::GetRasterizerState();
+    const RasterizerStateBinder2D rasterizerState;
     const auto rasterizerStateForawrt = Graphics3D::GetRasterizerStateForward();
+
     Draw(m_nodes.nodeCullBack, RasterizerState::SolidCullBack);
     Draw(m_nodes.nodeCullNone, RasterizerState::SolidCullNone);
-    Graphics3D::SetRasterizerState(rasterizerState);
+
     Graphics3D::SetRasterizerStateForward(rasterizerStateForawrt);
 
   }
@@ -439,11 +471,10 @@ namespace s3d_mmd
     Graphics3D::SetTexture(ShaderStage::Vertex, 1, m_vertexTexture);
   }
 
-  void MMD::Pimpl::PhysicsUpdate(Array<Mat4x4>& boneWorld)
+  void MMD::Pimpl::physicsUpdate()
   {
-#ifdef USE_BULLET_PHYSICS
-    m_mmdPhysics.BoneUpdate(Mat4x4::Identity(), boneWorld);
-#endif
+    if ( isPhysicsEnabled )
+      m_mmdPhysics.BoneUpdate(Mat4x4::Identity(), worlds);
   }
 
   void MMD::Pimpl::update()
@@ -457,15 +488,14 @@ namespace s3d_mmd
     for ( auto& i : m_bones->ikData() )
       updateIK(i);
 
-    PhysicsUpdate(worlds);
     m_bones->calcWorld(Mat4x4::Identity(), worlds);
+
+    physicsUpdate();
   }
 
   void MMD::Pimpl::updateIK(const mmd::Ik &ikData)
   {
     auto& bones = *m_bones;
-    Vector localEffectorPos = DirectX::g_XMZero;
-    Vector localTargetPos = DirectX::g_XMZero;
     const Mat4x4& targetMat = bones.calcBoneMatML(ikData.ik_bone_index);
 
     for ( int i = ikData.iterations - 1; i >= 0; i-- )
@@ -473,29 +503,25 @@ namespace s3d_mmd
       for ( auto& attentionIdx : ikData.ik_child_bone_index )
       {
         auto& bone = bones[attentionIdx];
-        using namespace DirectX;
         const Mat4x4& effectorMat = bones.calcBoneMatML(ikData.ik_target_bone_index);
         const auto& invCoord = bones.calcBoneMatML(attentionIdx).inverse();
-        localEffectorPos = XMVector3TransformCoord(effectorMat.r[3], invCoord); // 注目ボーン基準に変換
-        localTargetPos = XMVector3TransformCoord(targetMat.r[3], invCoord);     // 注目ボーン基準に変換
 
-                                                                                // エフェクタのローカル方向（注目ボーン基準）
-        const Vector& localEffectorDir = XMVector3Normalize(localEffectorPos);
+
+        // エフェクタのローカル方向（注目ボーン基準）
+        const MyVector& localEffectorDir = MyVector::TransformCoord3(effectorMat.r[3], invCoord).normalize3();
         // ターゲットのローカル方向（注目ボーン基準）
-        const Vector& localTargetDir = XMVector3Normalize(localTargetPos);
+        const MyVector& localTargetDir = MyVector::TransformCoord3(targetMat.r[3], invCoord).normalize3();
 
-        const float& p = XMVectorGetX(XMVector3Dot(localEffectorDir, localTargetDir));
-        if ( p >= 1.0f ) continue;
-        const float& angle = std::min(std::acos(std::max(p, -1.0f)), ikData.control_weight);
+        const float angle = std::min(DirectX::XMVectorGetX(DirectX::XMVectorACos(DirectX::XMVectorClamp(localEffectorDir.dot3(localTargetDir), DirectX::g_XMNegativeOne, DirectX::g_XMOne))), ikData.control_weight);
 
-        Vector axis = XMVector3Cross(localEffectorDir, localTargetDir);
+        MyVector axis = localEffectorDir.cross3(localTargetDir);
         if ( bone.name == L"左足" || bone.name == L"右足" )
-          axis = XMVectorSetY(axis, 0.0f);
+          axis = axis * MyVector(1.0f, 0.0f, 1.0f, 0.0f);
 
-        if ( XMVector3Equal(axis, XMVectorZero()) ) continue;
+        if ( DirectX::XMVector3Equal(axis, DirectX::XMVectorZero()) ) continue;
 
         const Quaternion& rotation = DirectX::XMQuaternionRotationAxis(axis, angle);
-        const XMMATRIX& xmboneMatBL = bone.boneMat;
+        const Mat4x4& xmboneMatBL = bone.boneMat;
         if ( bone.name == L"左ひざ" || bone.name == L"右ひざ" )
         {
           const Quaternion& rv = (rotation * DirectX::XMQuaternionRotationMatrix(xmboneMatBL)).normalize();
@@ -503,7 +529,7 @@ namespace s3d_mmd
           eulerAngle.x = Clamp(eulerAngle.x, Radians(-180.f), Radians(-10.f));
           eulerAngle.y = 0;
           eulerAngle.z = 0;
-          bone.boneMat = DirectX::XMMatrixMultiply(eulerAngle.CreateRot(), DirectX::XMMatrixTranslationFromVector(xmboneMatBL.r[3]));
+          bone.boneMat = DirectX::XMMatrixMultiply(eulerAngle.CreateMatrix(), DirectX::XMMatrixTranslationFromVector(xmboneMatBL.r[3]));
         }
         else
         {

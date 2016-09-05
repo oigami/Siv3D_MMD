@@ -162,18 +162,11 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
+      <OptimizeReferences>false</OptimizeReferences>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BulletPhysics\BulletBox.cpp" />
-    <ClCompile Include="BulletPhysics\BulletCapsule.cpp" />
-    <ClCompile Include="BulletPhysics\BulletPhysics.cpp" />
-    <ClCompile Include="BulletPhysics\BulletPhysicsSinglton.cpp" />
-    <ClCompile Include="BulletPhysics\BulletRigidBody.cpp" />
-    <ClCompile Include="BulletPhysics\BulletSphere.cpp" />
-    <ClCompile Include="BulletPhysics\detail\BulletDebug.cpp" />
-    <ClCompile Include="BulletPhysics\detail\BulletPhysicsDetail.cpp" />
     <ClCompile Include="src\math_util.cpp" />
     <ClCompile Include="src\key_frame_data.cpp" />
     <ClCompile Include="src\VMD\vmd_writer.cpp" />
@@ -296,20 +289,15 @@
     <Font Include="Example\YomogiFont.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MMD\BulletBox.h" />
-    <ClInclude Include="MMD\BulletCapsule.h" />
-    <ClInclude Include="MMD\BulletRigidBody.h" />
-    <ClInclude Include="MMD\BulletSphere.h" />
-    <ClInclude Include="BulletPhysics\detail\BulletDebug.h" />
-    <ClInclude Include="BulletPhysics\detail\BulletPhysicsDetail.h" />
-    <ClInclude Include="BulletPhysics\detail\Siv3DBulletConverter.h" />
-    <ClInclude Include="MMD\BulletPhysics.h" />
     <ClInclude Include="MMD\key_frame_data.h" />
     <ClInclude Include="MMD\math_util.h" />
     <ClInclude Include="MMD\mmd.h" />
     <ClInclude Include="MMD\mmd_morph.h" />
     <ClInclude Include="MMD\mmd_model.h" />
     <ClInclude Include="MMD\mmd_bone.h" />
+    <ClInclude Include="MMD\mouse_camera3d.h" />
+    <ClInclude Include="MMD\my_vector.h" />
+    <ClInclude Include="MMD\physics3d.h" />
     <ClInclude Include="MMD\pmd_reader.h" />
     <ClInclude Include="MMD\pmd_struct.h" />
     <ClInclude Include="MMD\vmd_controller.h" />

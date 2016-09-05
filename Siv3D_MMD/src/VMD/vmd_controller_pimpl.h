@@ -212,15 +212,13 @@ namespace s3d_mmd
     using namespace DirectX;
     for ( auto &i : bones )
     {
-      i.boneMat = i.initMat;
       const auto it = m_keyFrameData.find(i.name);
       if ( it == m_keyFrameData.end() ) continue;
 
       const auto& frame = it->second.calcFrame();
 
       // 親ボーン座標系のボーン行列を求める
-      i.boneMat = DirectX::XMMatrixAffineTransformation(DirectX::g_XMOne, DirectX::g_XMZero,
-                                                        frame.rotation.component, frame.position) * i.initMat;
+      i.boneMat = frame.rotation.toMatrix() * DirectX::XMMatrixTranslationFromVector(frame.position) * i.initMat;
 
     }
   }

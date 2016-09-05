@@ -104,8 +104,8 @@ namespace s3d_mmd
       float shape_w;                          // 幅/2(又は半径)
       float shape_h;                          // 高さ/2(カプセルの場合は球中心間の距離)
       float shape_d;                          // 奥行/2
-      float pos_pos[3];                       // 位置 (x, y, z)  : 関連ボーンがある場合は、剛体タイプによらず関連ボーン位置からの相対位置(PMDエディタではモデルのローカル座標系であり、値が違うので注意！)
-      float pos_rot[3];                       // 回転 : 回転行列は MATRIXRotationYawPitchRoll(&rotation, pos_rot[1], pos_rot[0], pos_rot[2])
+      Float3 pos_pos;                         // 位置 (x, y, z)  : 関連ボーンがある場合は、剛体タイプによらず関連ボーン位置からの相対位置(PMDエディタではモデルのローカル座標系であり、値が違うので注意！)
+      Float3 pos_rot;                         // 回転 : 回転行列は MATRIXRotationYawPitchRoll(&rotation, pos_rot.y, pos_rot.x, pos_rot.z)
       float rigidbody_weight;                 // 質量
       float rigidbody_pos_dim;                // 移動減衰
       float rigidbody_rot_dim;                // 回転減衰
@@ -119,14 +119,14 @@ namespace s3d_mmd
       char joint_name[20];             // 名称
       std::uint32_t joint_rigidbody_a; // 剛体A
       std::uint32_t joint_rigidbody_b; // 剛体B
-      float joint_pos[3];              // 位置 (x, y, z) : モデルローカル座標系
-      float joint_rot[3];              // 回転 (rad(x), rad(y), rad(z))
-      float constrain_pos_1[3];        // 移動制限下限 (x, y, z)
-      float constrain_pos_2[3];        // 移動制限上限 (x, y, z)
-      float constrain_rot_1[3];        // 回転制限下限 (rad(x), rad(y), rad(z))
-      float constrain_rot_2[3];        // 回転制限上限 (rad(x), rad(y), rad(z))
-      float spring_pos[3];             // 移動ばね (x, y, z)
-      float spring_rot[3];             // 回転ばね (rad(x), rad(y), rad(z))
+      Float3 joint_pos;                // 位置 (x, y, z) : モデルローカル座標系
+      Float3 joint_rot;                // 回転 (rad(x), rad(y), rad(z))
+      Float3 constrain_lower_pos;      // 移動制限下限 (x, y, z)
+      Float3 constrain_upper_pos;      // 移動制限上限 (x, y, z)
+      Float3 constrain_lower_rot;      // 回転制限下限 (rad(x), rad(y), rad(z))
+      Float3 constrain_upper_rot;      // 回転制限上限 (rad(x), rad(y), rad(z))
+      Float3 spring_pos;               // 移動ばね (x, y, z)
+      Float3 spring_rot;               // 回転ばね (rad(x), rad(y), rad(z))
     };
 
     struct BoneEnglishName
