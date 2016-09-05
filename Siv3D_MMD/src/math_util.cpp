@@ -49,24 +49,39 @@ namespace s3d_mmd
       return s * (t * (s * p1.y + t * p2.y)) + t * t * t;
     }
 
-    float Bezie::newton(float t, float x) const
+    DirectX::XMVECTOR Bezie::newton(float _x,
+                                    const Bezie& x,
+                                    const Bezie& y,
+                                    const Bezie& z,
+                                    const Bezie& r
+    )
     {
-      auto  f = [&](float t, float x)
-      {
-        return 3 * (1 - t) * (1 - t) * t * p1.x + 3 * (1 - t) * t * t * p2.x + t * t * t - x;
-      };
-      auto fd = [&](float t)
-      {
-        return 3 * t * t * (3 * (p1.x - p2.x) + 1) + 6 * t * (p2.x - 2 * p1.x) + 3 * p1.x;
-      };
+      using namespace DirectX;
+      const DirectX::XMVECTOR p1_3x = { x.p1.x, y.p1.x, z.p1.x, r.p1.x };
+      const DirectX::XMVECTOR p2_3x = { x.p2.x, y.p2.x, z.p2.x, r.p2.x };
+      constexpr DirectX::XMVECTOR twoNegative{ -2, -2, -2, -2 };
+      const DirectX::XMVECTOR b = DirectX::XMVectorMultiplyAdd(p1_3x, twoNegative, p2_3x);
+      const DirectX::XMVECTOR c = p1_3x - p2_3x + DirectX::g_XMOne;
+      const DirectX::XMVECTOR d = c * 3;
+      const DirectX::XMVECTOR e = p2_3x * DirectX::g_XMTwo - p1_3x * DirectX::g_XMFour;
+      const DirectX::XMVECTOR xx{ _x, _x, _x, _x };
+      DirectX::XMVECTOR t1{ 0.5f, 0.5f, 0.5f, 0.5f };
+      DirectX::XMVECTOR t2 = t1 * t1;
+
       constexpr int N = 16;
+
       for ( int i = N - 1; i >= 0; --i )
       {
-        float t1 = t - f(t, x) / fd(t);
-        if ( fabs(t1 - t) < 1e-6 ) break;
-        t = t1;
+        using DirectX::XMVectorMultiplyAdd;
+        t1 = t1
+          - (t1 * XMVectorMultiplyAdd(t1, b, XMVectorMultiplyAdd(t2, c, p1_3x)) - xx)
+          / XMVectorMultiplyAdd(t2, d, XMVectorMultiplyAdd(t1, e, p1_3x));
+        t2 = t1 * t1;
       }
-      return t;
+
+      const DirectX::XMVECTOR p1_3y{ x.p1.y, y.p1.y, z.p1.y, r.p1.y };
+      const DirectX::XMVECTOR p2_3y{ x.p2.y, y.p2.y, z.p2.y, r.p2.y };
+      return t1 * DirectX::XMVectorMultiplyAdd(t1, p2_3y + twoNegative * p1_3y, DirectX::XMVectorMultiplyAdd(t2, p1_3y - p2_3y + DirectX::g_XMOne, p1_3y));
     }
   }
 

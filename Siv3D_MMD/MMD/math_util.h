@@ -109,7 +109,12 @@ namespace s3d_mmd
       Bezie(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2);
       float GetY(float x) const;	/// xにおけるyを取得
 
-      float newton(float t, float x) const;
+      static DirectX::XMVECTOR newton(float _x,
+                                      const Bezie& x,
+                                      const Bezie& y,
+                                      const Bezie& z,
+                                      const Bezie& r
+      );
 
       const Float2& getP1()const { return p1; }
       const Float2& getP2()const { return p2; }

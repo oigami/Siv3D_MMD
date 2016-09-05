@@ -15,8 +15,8 @@
 #include <MMD/mmd_bone.h>
 #include <MMD/mmd_morph.h>
 #include <MMD/vmd_controller.h>
-#include "BulletPhysics.h"
 #include <MMD/mmd_motion.h>
+#include <MMD/physics3d.h>
 namespace s3d_mmd
 {
 
@@ -28,20 +28,25 @@ namespace s3d_mmd
   public:
 
     MMD() = default;
-    MMD(const MMDModel &model);
-    MMD(const FilePath &filename) :MMD(MMDModel(filename)) {}
+    MMD(const MMDModel &model, const physics3d::Physics3DWorld& world = physics3d::Physics3DWorld());
+    MMD(const FilePath &filename, const physics3d::Physics3DWorld& world = physics3d::Physics3DWorld()) :MMD(MMDModel(filename), world) {}
     ~MMD();
 
-
-    void draw(const Mat4x4& worldMat = Mat4x4::Identity()) const;
 
     /// <summary>
     /// ボーンを更新する
     /// <para> 1フレームに一回呼び出す </para>
     /// </summary>
-    /// <param name="m_vmd"></param>
+    /// <returns></returns>
     const MMD& update() const;
 
+    /// <summary>
+    /// モデルを描画する
+    /// </summary>
+    /// <param name="worldMat">
+    /// 表示するときの座標を指定する。
+    /// </param>
+    void draw(const Mat4x4& worldMat = Mat4x4::Identity()) const;
     void draw(double edgeSize) const;
     void drawEdge(double edgeSize, const Mat4x4& worldmat = Mat4x4::Identity()) const;
 
@@ -67,7 +72,7 @@ namespace s3d_mmd
     bool isOpen() const;
   private:
 
-    void PhysicsUpdate(Array<Mat4x4> &boneWorld) const;
+    void PhysicsUpdate() const;
 
   };
 

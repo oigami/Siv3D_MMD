@@ -135,11 +135,14 @@ namespace s3d_mmd
         const int& t0 = frameNo;
         const int& t1 = next.frameNo;
         const float& s = (float) (nowFrameNo - t0) / float(t1 - t0);
-        const auto rot = Math::Slerp(rotation, next.rotation, next.bezie_r.GetY(s));
+        auto bezie = math::Bezie::newton(s, next.bezie_x,
+                                         next.bezie_y,
+                                         next.bezie_z,
+                                         next.bezie_r);
+        const auto rot = Math::Slerp(rotation, next.rotation, DirectX::XMVectorGetW(bezie));
+
         auto bonePos = DirectX::XMVectorMultiplyAdd(DirectX::XMVectorSubtract(p1, p0),
-                                                    DirectX::XMVectorSet(next.bezie_x.GetY(s),
-                                                                         next.bezie_y.GetY(s),
-                                                                         next.bezie_z.GetY(s), 0), p0);
+                                                    bezie, p0);
         return{ bonePos, rot };
       }
 
