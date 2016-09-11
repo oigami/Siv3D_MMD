@@ -119,7 +119,7 @@ namespace s3d_mmd
 
 
     /// <summary> キーフレームの名前とデータ </summary>
-    std::unordered_map<String, vmd::detail::KeyFrameData<mmd::BoneFrame>> m_keyFrameData;
+    std::unordered_map<String, vmd::detail::KeyFrameData<mmd::BoneKeyFrame>> m_keyFrameData;
 
     std::unordered_map<String, vmd::detail::MorphData> m_morphData;
 
@@ -191,13 +191,13 @@ namespace s3d_mmd
     m_isLoop = false;
     m_isFrameEnd = true;
 
-    for ( auto& i : data.getBoneFrames() )
+    for ( auto& i : data.bones() )
     {
       m_keyFrameData[i.first].m_keyFrames = i.second.createFrames();
       m_isEmpty = false;
     }
 
-    for ( auto& i : data.getMorphFrames() )
+    for ( auto& i : data.morph() )
     {
       m_morphData[i.first].m_keyFrames = i.second;
       sort(m_morphData[i.first].m_keyFrames.begin(), m_morphData[i.first].m_keyFrames.end());

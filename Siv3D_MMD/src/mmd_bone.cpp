@@ -66,10 +66,10 @@ namespace s3d_mmd
         ret = XMMatrixMultiply(ret, m_bones[parent].boneMat);
       }
       return ret;
-      /*auto &bone = m_bones[index];
-      if (bone.parent != -1) {
-        return XMMatrixMultiply(bone.boneMat, calcBoneMatML(bone.parent));
-      } else return bone.boneMat;*/
+      /*auto &bones = m_bones[index];
+      if (bones.parent != -1) {
+        return XMMatrixMultiply(bones.boneMat, calcBoneMatML(bones.parent));
+      } else return bones.boneMat;*/
     }
 
     Optional<Mat4x4> Bones::calcBoneMatML(const String & boneName) const

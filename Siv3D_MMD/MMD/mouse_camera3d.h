@@ -10,122 +10,104 @@ namespace s3d_mmd
     void setCamera() const;
 
     s3d::Camera camera;
+
   private:
     void updateREvent();
     void updateLEvent();
-    void endEvent();
-
     enum class NowState
     {
-      LEvent,
-      REvent,
-      None,
+      LEvent, REvent, None,
     };
-
-    s3d::Vec2 pressedPos;
     NowState nowState = NowState::None;
-
-    s3d::Mat4x4 cameraMatrix;
   };
 
   inline void MouseCamera3D::update()
   {
     switch ( nowState )
     {
-    case s3d_mmd::MouseCamera3D::NowState::LEvent:
+    case MouseCamera3D::NowState::LEvent:
       updateLEvent(); break;
 
-    case s3d_mmd::MouseCamera3D::NowState::REvent:
+    case MouseCamera3D::NowState::REvent:
       updateREvent(); break;
 
-    case s3d_mmd::MouseCamera3D::NowState::None:
+    case MouseCamera3D::NowState::None:
 
       if ( s3d::Input::MouseL.pressed )
-      {
-        pressedPos = Mouse::PosF();
-        cameraMatrix = camera.calcInvViewMatrix();
         nowState = NowState::LEvent;
-      }
       else if ( s3d::Input::MouseR.pressed )
-      {
-        pressedPos = Mouse::PosF();
-        cameraMatrix = camera.calcInvViewMatrix();
         nowState = NowState::REvent;
-      }
-      else if ( Mouse::Wheel() != 0 )
-      {
-        camera.pos += (camera.pos - camera.lookat).normalize() * Mouse::Wheel();
-      }
+      else if ( s3d::Mouse::Wheel() != 0 )
+        camera.pos += (camera.pos - camera.lookat).normalize() * s3d::Mouse::Wheel();
       break;
-
     }
-
   }
 
   inline void MouseCamera3D::setCamera() const
   {
-    Graphics3D::SetCamera(camera);
+    s3d::Graphics3D::SetCamera(camera);
   }
 
   inline void MouseCamera3D::updateREvent()
   {
     if ( s3d::Input::MouseR.released )
     {
-      endEvent();
+      nowState = NowState::None;
       return;
     }
-    // 現在との差分を取る
-#if 0 // カメラ自体を回転させる
-    Float3 diff(Mouse::PosF() - *pressedPos, 0.0f);
-    diff.y *= -1;
-    const auto rot = s3d::Quaternion::RollPitchYaw(s3d::Math::Radians(0),
-                                                   s3d::Math::Radians(diff.y),
-                                                   s3d::Math::Radians(diff.x)).toMatrix();
-    const auto newPos = DirectX::XMMatrixTranslationFromVector(cameraMatrix.r[3]) * rot;
-    camera.pos = s3d::ToVec3(newPos.r[3]);
-#else // 視点を回転させる
 
-    Float3 diff(Mouse::PosF() - pressedPos, 0.0f);
-    diff /= 5;
-    const auto rot = s3d::Quaternion::RollPitchYaw(s3d::Math::Radians(0),
-                                                   s3d::Math::Radians(diff.y) + s3d::Math::TwoPiF,
-                                                   s3d::Math::Radians(diff.x)).toMatrix();
+#if 1
 
+    // カメラ自体を回転させる
+    auto& target = camera.pos;
+    const auto center = camera.lookat;
 
-    // カメラを軸にして回転させる
-    const auto newPos = Mat4x4::Translate(cameraMatrix.inverse().transform(camera.lookat)) * rot;
-
-    // ワールド座標系に戻す
-    camera.lookat = cameraMatrix.transform(ToVec3(newPos.r[3]));
-
-    pressedPos = Mouse::PosF();
+#else
+    // 視点を回転させる
+    auto& target = camera.lookat;
+    const auto center = camera.pos;
 #endif
+
+    const DirectX::XMVECTOR targetVec = ToVector(target, 0.0f);
+    const DirectX::XMVECTOR centerVec = ToVector(center, 0.0f);
+
+    s3d::Float2 delta(s3d::Mouse::DeltaF());
+    delta.y *= -1;
+    delta = s3d::Math::Radians(delta);
+
+    // 回転は基準点で行うのでターゲットのベクトルから基準点を引いて基準点が原点になるようにする
+    const auto localTarget = DirectX::XMVectorSubtract(targetVec, centerVec);
+
+    // ターゲットベクトルと上方向ベクトルの外積を取り上下方向の回転軸を計算する
+    const DirectX::XMVECTOR axis = DirectX::XMVector3Cross(localTarget, ToVector(camera.up, 0.0f));
+
+    // 上で計算した軸と回転量でクォータニオンを作り、残りの左右方向のクォータニオンをかける（左右方向の回転軸はy軸固定）
+    const s3d::Quaternion qt = s3d::Quaternion(axis, delta.y) * s3d::Quaternion(DirectX::g_XMIdentityR1, delta.x);
+
+    // ローカルで回転させて、原点をワールド座標に戻すために基準点を足す
+    target = s3d::ToVec3(DirectX::XMVectorAdd(DirectX::XMVector3Rotate(localTarget, qt.component), centerVec));
+
+    camera.up = s3d::ToVec3(DirectX::XMVector3Rotate(ToVector(camera.up, 0.0f), qt.component));
   }
 
   inline void MouseCamera3D::updateLEvent()
   {
     if ( s3d::Input::MouseL.released )
     {
-      endEvent();
+      nowState = NowState::None;
       return;
     }
-    // 現在との差分を取る
-    Float3 diff(Mouse::PosF() - pressedPos, 0.0f);
-    diff.x *= -1;
+
+    s3d::Float3 delta(s3d::Mouse::DeltaF(), 0.0f);
+    delta.x *= -1;
+
     // カメラ行列と差のベクトルと掛けて新しい座標を求める
-    const auto newPos = cameraMatrix.transform(diff / 10);
+    const auto newPos = camera.calcInvViewMatrix().transform(delta / 10);
 
     // 視点を同じ量だけ移動させる
     camera.lookat += newPos - camera.pos;
 
     camera.pos = newPos;
   }
-
-  inline void MouseCamera3D::endEvent()
-  {
-    nowState = NowState::None;
-  }
-
-
 
 }

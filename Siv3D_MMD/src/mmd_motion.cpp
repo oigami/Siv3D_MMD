@@ -33,14 +33,6 @@ namespace s3d_mmd
 
     }
 
-    const BoneFrames& MMDMotion::getBoneFrames(const String & bone_name) const
-    {
-      static const Array<BoneFrame> notFindBone;
-      auto it = m_keyFrames.find(bone_name);
-      if ( it == m_keyFrames.end() )return notFindBone;
-      return it->second;
-    }
-
     void MMDMotion::sort()
     {
       for ( auto& i : m_morphs )
@@ -72,7 +64,7 @@ namespace s3d_mmd
     {
       VMDWriter writer(filename);
       if ( !writer.isOpened() ) return false;
-      for ( auto& i : getBoneFrames() )
+      for ( auto& i : bones() )
       {
         for ( auto& j : i.second.createFrames() )
         {
@@ -103,7 +95,8 @@ namespace s3d_mmd
     /// <param name="frameNo"></param>
     /// <returns></returns>
 
-    void BoneFrames::sort()
+    template<class FrameData>
+    void Frames<FrameData>::sort()
     {
       if ( isSorted ) return;
 
@@ -111,13 +104,15 @@ namespace s3d_mmd
       isSorted = true;
     }
 
-    void BoneFrames::push(const FrameData & data)
+    template<class FrameData>
+    void Frames<FrameData>::push(const FrameData & data)
     {
       m_frames.push_back(data);
       isSorted = false;
     }
 
-    std::pair<Array<BoneFrames::FrameData>::iterator, bool> BoneFrames::getFrameImpl(int frameNo)
+    template<class FrameData>
+    std::pair<typename Frames<FrameData>::iterator, bool> Frames<FrameData>::getFrameImpl(int frameNo)
     {
       FrameData val;
       val.frameNo = frameNo;
@@ -128,11 +123,14 @@ namespace s3d_mmd
       return{ first, false };
     }
 
-    BoneFrames::BoneFrames() :isSorted(true) {}
+    template<class FrameData>
+    Frames<FrameData>::Frames() : isSorted(true) {}
 
-    BoneFrames::BoneFrames(Array<FrameData> data) : m_frames(std::move(data)) {}
+    template<class FrameData>
+    Frames<FrameData>::Frames(Array<FrameData> data) : m_frames(std::move(data)) {}
 
-    int BoneFrames::lastFrameNo()const
+    template<class FrameData>
+    int Frames<FrameData>::lastFrameNo()const
     {
       int lastFrame = 0;
       for ( auto& i : m_frames )
@@ -141,7 +139,8 @@ namespace s3d_mmd
       return lastFrame;
     }
 
-    Optional<BoneFrames::FrameData> BoneFrames::add(const FrameData & data)
+    template<class FrameData>
+    Optional<FrameData> Frames<FrameData>::add(const FrameData & data)
     {
       auto preFrame = getFrameImpl(data.frameNo);
       if ( preFrame.second )
@@ -154,7 +153,8 @@ namespace s3d_mmd
       return none;
     }
 
-    bool BoneFrames::remove(int frameNo)
+    template<class FrameData>
+    bool Frames<FrameData>::remove(int frameNo)
     {
       auto p = getFrameImpl(frameNo);
       if ( p.second )
@@ -163,7 +163,9 @@ namespace s3d_mmd
       return p.second;
     }
 
-    std::pair<Optional<const BoneFrames::FrameData&>, Optional<const BoneFrames::FrameData&>> BoneFrames::getSection(int frameNo)
+    template<class FrameData>
+    std::pair<Optional<const FrameData&>, Optional<const FrameData&>>
+      Frames<FrameData>::getSection(int frameNo)
     {
       if ( size() == 0 ) return{ none, none };
       sort();
@@ -189,7 +191,8 @@ namespace s3d_mmd
       }
     }
 
-    Optional<const BoneFrame&> BoneFrames::getFrame(int frameNo)
+    template<class FrameData>
+    Optional<const FrameData&> Frames<FrameData>::getFrame(int frameNo)
     {
       auto p = getFrameImpl(frameNo);
       if ( p.second )
@@ -197,13 +200,15 @@ namespace s3d_mmd
       return none;
     }
 
-    Array<BoneFrames::FrameData>& BoneFrames::frames()
+    template<class FrameData>
+    Array<FrameData>& Frames<FrameData>::frames()
     {
       sort();
       return m_frames;
     }
 
-    Array<BoneFrames::FrameData> BoneFrames::createFrames() const
+    template<class FrameData>
+    Array<FrameData> Frames<FrameData>::createFrames() const
     {
       Array<FrameData> res = m_frames;
       std::sort(res.begin(), res.end());

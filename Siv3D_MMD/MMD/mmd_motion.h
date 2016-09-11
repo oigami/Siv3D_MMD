@@ -6,11 +6,10 @@ namespace s3d_mmd
   namespace mmd
   {
 
-    using BoneFrame = key_frame::BoneFrame;
-    class BoneFrames
+    template<class FrameData>
+    class Frames
     {
-      using FrameData = BoneFrame;
-      using iterator = Array<FrameData>::iterator;
+      using iterator = typename Array<FrameData>::iterator;
       Array<FrameData> m_frames;
 
       bool isSorted;
@@ -21,9 +20,9 @@ namespace s3d_mmd
 
     public:
 
-      BoneFrames();
+      Frames();
 
-      BoneFrames(Array<FrameData> data);
+      Frames(Array<FrameData> data);
 
 
       int size() const { return static_cast<int>(m_frames.size()); }
@@ -52,9 +51,9 @@ namespace s3d_mmd
       /// </summary>
       /// <param name="frameNo"></param>
       /// <returns></returns>
-      std::pair<Optional<const BoneFrame&>, Optional<const BoneFrame&>> getSection(int frameNo);
+      std::pair<Optional<const FrameData&>, Optional<const FrameData&>> getSection(int frameNo);
 
-      Optional<const BoneFrame&> getFrame(int frameNo);
+      Optional<const FrameData&> getFrame(int frameNo);
 
       Array<FrameData>& frames();
 
@@ -63,10 +62,22 @@ namespace s3d_mmd
 
 
     using MorphKeyFrame = key_frame::MorphFrame;
+    using MorphFrames = Frames<MorphKeyFrame>;
+
     using CameraKeyFrame = vmd_struct::Camera;
+    using CameraFrames = Frames<CameraKeyFrame>;
+
     using LightKeyFrame = vmd_struct::Light;
+    using LightFrames = Frames<LightKeyFrame>;
+
     using SelfShadowKeyFrame = vmd_struct::SelfShadow;
+    using SelfShadowFrames = Frames<SelfShadowKeyFrame>;
+
     using ShowIkKeyFrame = vmd_struct::ShowIk;
+    using ShowIkFrames = Frames<ShowIkKeyFrame>;
+
+    using BoneKeyFrame = key_frame::BoneFrame;
+    using BoneFrames = Frames<BoneKeyFrame>;
 
     class MMDMotion
     {
@@ -74,12 +85,9 @@ namespace s3d_mmd
       MMDMotion() = default;
       MMDMotion(const VMDReader& reader);
 
-      const BoneFrames& getBoneFrames(const String& bone_name) const;
-      BoneFrames& getBoneFrames(const String& bone_name) { return m_keyFrames[bone_name]; }
+      std::unordered_map<String, BoneFrames>& bones() { return m_keyFrames; }
 
-      std::unordered_map<String, BoneFrames>& getBoneFrames() { return m_keyFrames; }
-
-      std::unordered_map<String, Array<MorphKeyFrame>>& getMorphFrames() { return m_morphs; }
+      std::unordered_map<String, Array<MorphKeyFrame>>& morph() { return m_morphs; }
 
       void sort();
 
