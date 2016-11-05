@@ -82,7 +82,7 @@ namespace s3d_mmd
     const DirectX::XMVECTOR axis = DirectX::XMVector3Cross(localTarget, ToVector(camera.up, 0.0f));
 
     // 上で計算した軸と回転量でクォータニオンを作り、残りの左右方向のクォータニオンをかける（左右方向の回転軸はy軸固定）
-    const s3d::Quaternion qt = s3d::Quaternion(axis, delta.y) * s3d::Quaternion(DirectX::g_XMIdentityR1, delta.x);
+    const s3d::Quaternion qt = s3d::Quaternion(s3d::ToVec3(axis).normalize(), delta.y) * s3d::Quaternion(s3d::ToVec3(DirectX::g_XMIdentityR1).normalize(), delta.x);
 
     // ローカルで回転させて、原点をワールド座標に戻すために基準点を足す
     target = s3d::ToVec3(DirectX::XMVectorAdd(DirectX::XMVector3Rotate(localTarget, qt.component), centerVec));
