@@ -2,6 +2,7 @@
 #include <Siv3D.hpp>
 #include <MMD/pmd_struct.h>
 #include <MMD/mmd_bone.h>
+
 namespace s3d_mmd
 {
   namespace mmd
@@ -14,7 +15,6 @@ namespace s3d_mmd
 
     struct Material
     {
-
       ColorF ambient;
       ColorF diffuse;
       ColorF specular;
@@ -24,6 +24,8 @@ namespace s3d_mmd
 
       //TODO: スフィア
       String SphereTextureName;
+
+      Texture texture;
 
       //TODO: Toon
       int toonTextureIndex;
@@ -55,12 +57,39 @@ namespace s3d_mmd
       mmd::Material material;
     };
   }
+
+  struct ITextureLoader
+  {
+  public:
+    virtual ~ITextureLoader() = default;
+
+    virtual Texture getTexture(FilePath baseDir, FilePath filename) = 0;
+    virtual void removeTexture(FilePath baseDir, FilePath filename) = 0;
+  };
+
+  struct TextureAssetTextureLoader : ITextureLoader
+  {
+    Texture getTexture(FilePath baseDir, FilePath filename) override
+    {
+      const auto& path = baseDir + filename;
+      if ( !TextureAsset::IsRegistered(path) )
+      {
+        TextureAsset::Register(path, path);
+      }
+      return static_cast<Texture>(TextureAsset(path));
+    }
+
+    void removeTexture(FilePath baseDir, FilePath filename) override
+    {
+      TextureAsset::Unregister(baseDir + filename);
+    }
+  };
+
   class MMDModel
   {
-
     class Pimpl;
     std::shared_ptr<Pimpl> m_handle;
-
+    static const std::shared_ptr<ITextureLoader> defaultLoader;
   public:
 
     MMDModel();
@@ -74,7 +103,7 @@ namespace s3d_mmd
     /// <remarks>
     /// MikuMikuDance pmd_struct形式のみサポートしています。
     /// </remarks>
-    MMDModel(const FilePath& path);
+    MMDModel(const FilePath& path, std::shared_ptr<ITextureLoader> textureLoader = defaultLoader);
 
     /// <summary>
     /// デストラクタ
@@ -95,9 +124,9 @@ namespace s3d_mmd
 
     bool isEmpty() const;
 
-    bool operator == (const MMDModel& model) const;
+    bool operator ==(const MMDModel& model) const;
 
-    bool operator != (const MMDModel& model) const;
+    bool operator !=(const MMDModel& model) const;
 
     /// <summary>
     /// モデルノードの一覧を取得します。
@@ -117,10 +146,7 @@ namespace s3d_mmd
 
     const mmd::SkinData skinData() const;
 
-    const String& name()const;
-    const String& comment()const;
-
+    const String& name() const;
+    const String& comment() const;
   };
-
-
 }

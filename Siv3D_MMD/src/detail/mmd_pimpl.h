@@ -19,16 +19,6 @@ namespace s3d_mmd
         mmd::Material material;
       };
 
-      struct AllNode
-      {
-        Array<mmd::Node> nodes;
-
-        void push(mmd::Node node)
-        {
-          nodes.push_back(std::move(node));
-        }
-      };
-
       class EdgeShader
       {
         constexpr static auto edgePath = L"Data/Shaders/MMD3DEdge.hlsl";
@@ -162,7 +152,7 @@ namespace s3d_mmd
     const VMD& vmd() const;
 
 
-    mmd::AllNode m_nodes;
+    Array<mmd::Node> m_nodes;
     Array<mmd::Node> m_edges;
     String m_name;
     String m_comment;
@@ -281,12 +271,11 @@ namespace s3d_mmd
         Float2 pos = WriteTextureVertex(vertexImage, v, vPos, it != faceMorphVertex.end() ? it->second.vertex : Array<Float4>{});
         meshData.vertices.push_back({ v.position , v.normal, pos });
       }
-      mmd::AllNode nodes;
+      m_nodes.reserve(model.nodes().size());
       for ( auto& i : model.nodes() )
       {
-        nodes.push(mmd::Node{ i.indexStart, i.indexCount, i.material });
+        m_nodes.push_back(mmd::Node{ i.indexStart, i.indexCount, i.material });
       }
-      m_nodes = std::move(nodes);
       m_mesh = Mesh(meshData);
     }
 
@@ -361,7 +350,7 @@ namespace s3d_mmd
 
     const RasterizerStateForwardBinder2D rasterizerStateForward;
 
-    for ( auto& i : m_nodes.nodes )
+    for ( auto& i : m_nodes )
     {
       if ( i.material.isCullNone )
       {
@@ -377,7 +366,7 @@ namespace s3d_mmd
         m_mesh.drawSubsetForward(i.indexStart, i.indexCount, i.material.diffuse);
       }else
       {
-        m_mesh.drawSubsetForward(i.indexStart, i.indexCount, TextureAsset(i.material.diffuseTextureName), i.material.diffuse);
+        m_mesh.drawSubsetForward(i.indexStart, i.indexCount, i.material.texture, i.material.diffuse);
       }
     }
   }

@@ -36,33 +36,7 @@ namespace s3d_mmd
       }
     };
   }
-
-  mmd::Material CreateMaterial(const pmd_struct::Material& pmdMaterial, const FilePath& m_filepath)
-  {
-    mmd::Material material;
-
-    auto ToColorF = [](const float (&f)[3], float alpha) { return ColorF(f[0], f[1], f[2], alpha); };
-
-    material.ambient = ToColorF(pmdMaterial.mirror_color, 1.0f);
-    material.diffuse = ToColorF(pmdMaterial.diffuse_color, pmdMaterial.alpha);
-    material.specular = ToColorF(pmdMaterial.specular_color, pmdMaterial.specularity);
-
-    material.isEdge = pmdMaterial.edge_flag != 0;
-    const float alpha = pmdMaterial.alpha;
-    material.isCullNone = alpha + alphaEps < 1.0;
-    if ( pmdMaterial.texture_file_name[0] != '\0' )
-    {
-      //TODO: スフィアに未対応
-      String filename = Widen({ pmdMaterial.texture_file_name,sizeof(pmdMaterial.texture_file_name) });
-      const size_t pos = filename.lastIndexOf(L'*');
-      if ( pos != String::npos )
-      {
-        filename = filename.substr(0, pos);
-      }
-      material.diffuseTextureName = FileSystem::ParentPath(m_filepath) + filename;
-    }
-    return material;
-  }
+  const std::shared_ptr<ITextureLoader> MMDModel::defaultLoader = std::make_shared<TextureAssetTextureLoader>();
 
   mmd::MeshVertex CreateVertex(const pmd_struct::Vertex& vertex)
   {
@@ -153,8 +127,11 @@ namespace s3d_mmd
   class MMDModel::Pimpl
   {
   public:
-    Pimpl(const FilePath& path)
+    std::shared_ptr<ITextureLoader> m_textureLoader;
+
+    Pimpl(const FilePath& path, const std::shared_ptr<ITextureLoader> textureLoader)
     {
+      m_textureLoader = textureLoader;
       PMDReader loader(path);
       createNode(loader, path);
       m_bones = std::make_shared<mmd::Bones>();
@@ -188,17 +165,17 @@ namespace s3d_mmd
     String m_modelName;
     String m_comment;
     HandleIDType m_handle;
-    Texture vertexTexture;
     std::vector<mmd::MeshVertex> m_vertecies;
     std::vector<uint16> m_indices;
+    mmd::Material createMaterial(const pmd_struct::Material& pmdMaterial, const FilePath& m_filepath) const;
     void createNode(const PMDReader& loader, const FilePath& m_filepath);
   };
 
   MMDModel::MMDModel() {}
 
-  MMDModel::MMDModel(const FilePath& path)
+  MMDModel::MMDModel(const FilePath& path, std::shared_ptr<ITextureLoader> textureLoader)
   {
-    m_handle = std::make_shared<Pimpl>(path);
+    m_handle = std::make_shared<Pimpl>(path, textureLoader);
   }
 
   MMDModel::~MMDModel()
@@ -282,6 +259,39 @@ namespace s3d_mmd
     return m_handle->m_comment;
   }
 
+
+  mmd::Material MMDModel::Pimpl::createMaterial(const pmd_struct::Material& pmdMaterial, const FilePath& m_filepath)const
+  {
+    mmd::Material material;
+
+    auto ToColorF = [](const float(&f)[3], float alpha) { return ColorF(f[0], f[1], f[2], alpha); };
+
+    material.ambient = ToColorF(pmdMaterial.mirror_color, 1.0f);
+    material.diffuse = ToColorF(pmdMaterial.diffuse_color, pmdMaterial.alpha);
+    material.specular = ToColorF(pmdMaterial.specular_color, pmdMaterial.specularity);
+
+    material.isEdge = pmdMaterial.edge_flag != 0;
+    const float alpha = pmdMaterial.alpha;
+    material.isCullNone = alpha + alphaEps < 1.0;
+    if (pmdMaterial.texture_file_name[0] != '\0')
+    {
+      //TODO: スフィアに未対応
+      String filename = Widen({ pmdMaterial.texture_file_name,sizeof(pmdMaterial.texture_file_name) });
+      const size_t pos = filename.lastIndexOf(L'*');
+      if (pos != String::npos)
+      {
+        filename = filename.substr(0, pos);
+      }
+      material.diffuseTextureName = FileSystem::ParentPath(m_filepath) + filename;
+
+      material.texture = m_textureLoader->getTexture(FileSystem::ParentPath(m_filepath), filename);
+    }
+
+
+    return material;
+  }
+
+
   void MMDModel::Pimpl::createNode(const PMDReader& loader, const FilePath& m_filepath)
   {
     const auto& pmdMaterials = loader.getMaterials();
@@ -294,7 +304,8 @@ namespace s3d_mmd
     for ( auto& item : pmdMaterials )
     {
       const int face_vertex_len = item.face_vert_count;
-      const mmd::Material material = CreateMaterial(item, m_filepath);
+      const mmd::Material material = createMaterial(item, m_filepath);
+
       // 材質とインデックスデータを追加
       m_nodes.push_back({ preVertexLen, face_vertex_len, material });
       preVertexLen += face_vertex_len;
