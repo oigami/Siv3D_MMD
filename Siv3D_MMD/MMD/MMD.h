@@ -46,8 +46,8 @@ namespace s3d_mmd
     /// <param name="worldMat">
     /// 表示するときの座標を指定する。
     /// </param>
-    void draw(const Mat4x4& worldMat = Mat4x4::Identity()) const;
-    void draw(double edgeSize) const;
+    void drawForward(const Mat4x4& worldMat = Mat4x4::Identity()) const;
+    void drawForward(double edgeSize) const;
     void drawEdge(double edgeSize, const Mat4x4& worldmat = Mat4x4::Identity()) const;
 
     std::shared_ptr<mmd::Bones> bones() const;

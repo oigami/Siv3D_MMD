@@ -14,11 +14,11 @@ namespace s3d_mmd
   void MMD::PhysicsUpdate() const
   {
     m_handle->physicsUpdate();
-
   }
-  void MMD::draw(double edgeSize) const
+
+  void MMD::drawForward(double edgeSize) const
   {
-    draw();
+    drawForward();
     drawEdge(edgeSize);
   }
 
@@ -27,9 +27,9 @@ namespace s3d_mmd
     m_handle->drawEdge(worldMat);
   }
 
-  void MMD::draw(const Mat4x4& worldMat) const
+  void MMD::drawForward(const Mat4x4& worldMat) const
   {
-    m_handle->draw(worldMat);
+    m_handle->drawForward(worldMat);
   }
 
   const Texture & MMD::vertexTexture() const

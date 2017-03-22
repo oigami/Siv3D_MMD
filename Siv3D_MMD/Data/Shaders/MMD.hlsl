@@ -61,12 +61,10 @@ TexVertex GetVertex(float2 pos, float4 vertexPos)
 struct VS_OUTPUT
 {
   float4 pos : SV_POSITION;
-  float3 normal : TEXCOORD0;
-  float3 worldPosition : TEXCOORD1;
-  float4 color : TEXCOORD2;
-  float2 tex : TEXCOORD3;
+  float3 worldPosition : TEXCOORD0;
+  float4 color : TEXCOORD1;
+  float2 tex : TEXCOORD2;
 };
-
 struct PS_OUTPUT
 {
   float4 color : SV_Target0;
@@ -85,13 +83,10 @@ VS_OUTPUT VS(VS_INPUT input)
   float4x3 comb = (float4x3)BoneMatrix[v.idx.x] * v.w.x;
   comb += (float4x3)BoneMatrix[v.idx.y] * v.w.y;
 
-  //comb += BoneMatrix[v.idx[3]] * (1.0f - w[0] - w[1] - w[2]);
-  const float3 normal_head = mul(float4(v.pos.xyz + input.normal, v.pos.w), comb);
   const float4 pos = float4(mul(v.pos, comb), v.pos.w);
 
   VS_OUTPUT Out;
   Out.pos = mul(pos, g_viewProjectionMatrix);
-  Out.normal = normalize(normal_head.xyz - pos.xyz);
   Out.color = input.diffuseColor;
   Out.worldPosition = pos.xyz;
   Out.tex = v.tex;

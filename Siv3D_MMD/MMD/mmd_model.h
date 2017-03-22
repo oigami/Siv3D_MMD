@@ -50,7 +50,8 @@ namespace s3d_mmd
 
     struct ModelNode
     {
-      mmd::MeshData mesh;
+      int indexStart;
+      int indexCount;
       mmd::Material material;
     };
   }
@@ -105,7 +106,8 @@ namespace s3d_mmd
     /// モデルノードの一覧
     /// </returns>
     Array<mmd::ModelNode>& nodes() const;
-    Array<mmd::ModelNode>& edgeNodes() const;
+    Array<mmd::MeshVertex>& vertices() const;
+    Array<uint16>& indices() const;
 
     std::shared_ptr<mmd::Bones> bones() const;
 

@@ -41,7 +41,8 @@ void Main()
     meshGround.draw();
 
     //bone10.extraBoneMat *= Quaternion(10_deg, 0, 0, 1).toMatrix();
-    model.update().draw();
+    model.update().drawForward();
+    model.drawEdge(1);
     auto mat = *model.bones()->calcBoneMatML(L"頭");
     //camera.lookat = mat.transform(Vec3(0, 0, 0));
     //camera.pos = mat.transform(Vec3(0, 0, -10));

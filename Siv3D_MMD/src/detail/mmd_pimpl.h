@@ -3,6 +3,7 @@
 #include <src/mmd_physics.h>
 #include "../../ShaderAttacher.h"
 #include <MMD/my_vector.h>
+
 namespace s3d_mmd
 {
   namespace mmd
@@ -10,61 +11,33 @@ namespace s3d_mmd
     namespace
     {
       constexpr double alphaEps = 1e-9;
+
       struct Node
       {
-        Mesh mesh;
+        int indexStart;
+        int indexCount;
         mmd::Material material;
-      };
-
-      struct ModelNodeTex
-      {
-        Array<mmd::Node> nodeNotTex;
-        Array<mmd::Node> nodeWithTex;
-        void set(const mmd::Node &node)
-        {
-          if ( node.material.diffuseTextureName.isEmpty ) nodeNotTex.push_back(node);
-          else
-          {
-            nodeWithTex.push_back(node);
-            TextureAsset::Register(node.material.diffuseTextureName, node.material.diffuseTextureName);
-          }
-        }
-      };
-
-      struct ModelNodeAlpha
-      {
-        ModelNodeTex nodeNotAlpha;
-        ModelNodeTex nodeWithAlpha;
-
-        void set(const mmd::Node &node)
-        {
-          if ( node.material.diffuse.a + alphaEps < 1.0 ) nodeWithAlpha.set(node);
-          else nodeNotAlpha.set(node);
-        }
-
       };
 
       struct AllNode
       {
-        ModelNodeAlpha nodeCullBack;
-        ModelNodeAlpha nodeCullNone;
+        Array<mmd::Node> nodes;
 
-        void set(const mmd::Node &node)
+        void push(mmd::Node node)
         {
-          if ( node.material.isCullNone ) nodeCullNone.set(node);
-          else nodeCullBack.set(node);
+          nodes.push_back(std::move(node));
         }
-
       };
 
       class EdgeShader
       {
         constexpr static auto edgePath = L"Data/Shaders/MMD3DEdge.hlsl";
-        static void Compile(const wchar *outPath, ShaderType type)
+
+        static void Compile(const wchar* outPath, ShaderType type)
         {
-          if ( !FileSystem::Exists(outPath) )
-            Shader::Compile(edgePath, outPath, type);
+          if ( !FileSystem::Exists(outPath) ) Shader::Compile(edgePath, outPath, type);
         }
+
       public:
 
         static void init()
@@ -75,16 +48,14 @@ namespace s3d_mmd
             constexpr auto edgeVSCompiledPath = L"Data/Shaders/MMD3DEdge.vs";
             Compile(edgeVSCompiledPath, ShaderType::VS_4_0);
             m_vsEdge = VertexShader{ edgeVSCompiledPath };
-            if ( m_vsEdge.isEmpty() )
-              Println(L"MMD vertex shader compile error");
+            if ( m_vsEdge.isEmpty() ) Println(L"MMD vertex shader compile error");
           }
 
           {
             constexpr auto edgePSCompiledPath = L"Data/Shaders/MMD3DEdge.ps";
             Compile(edgePSCompiledPath, ShaderType::PS_4_0);
             m_psEdge = PixelShader{ edgePSCompiledPath };
-            if ( m_psEdge.isEmpty() )
-              Println(L"MMD pixel shader compile error");
+            if ( m_psEdge.isEmpty() ) Println(L"MMD pixel shader compile error");
           }
           m_isInit = true;
         }
@@ -97,6 +68,7 @@ namespace s3d_mmd
         }
 
         static const VertexShader& vs() { return m_vsEdge; }
+
         static const PixelShader& ps() { return m_psEdge; }
 
       private:
@@ -113,13 +85,15 @@ namespace s3d_mmd
       class MMDShader
       {
         constexpr static auto mmdShaderPath = L"Data/Shaders/MMD.hlsl";
-        static void Compile(const wchar *outPath, ShaderType type)
+
+        static void Compile(const wchar* outPath, ShaderType type)
         {
           if ( !FileSystem::Exists(outPath) )
           {
             Shader::Compile(mmdShaderPath, outPath, type);
           }
         }
+
       public:
 
         static void init()
@@ -130,8 +104,7 @@ namespace s3d_mmd
             constexpr auto vsPath = L"Data/Shaders/MMD.vs";
             Compile(vsPath, ShaderType::VS_4_0);
             m_vs = VertexShader{ vsPath };
-            if ( m_vs.isEmpty() )
-              Println(L"MMD VMD vertex shader compile error");
+            if ( m_vs.isEmpty() ) Println(L"MMD VMD vertex shader compile error");
           }
 
           m_isInit = true;
@@ -168,34 +141,25 @@ namespace s3d_mmd
 
   class MMD::Pimpl
   {
-    static void Draw(const mmd::ModelNodeTex &nodes);
-
-    static void DrawForward(const mmd::ModelNodeTex &nodes);
-
-    static void Draw(const mmd::ModelNodeAlpha &nodes);
-
-    static void Draw(const mmd::ModelNodeAlpha &nodes, const RasterizerState& state);
-
     void pushGPUData();
   public:
 
-    Float2 WriteTextureVertex(ImageRGBA32F &vertexImage, const mmd::MeshVertex &v, int &vPos, Array<Float4> morph);
+    Float2 WriteTextureVertex(ImageRGBA32F& vertexImage, const mmd::MeshVertex& v, int& vPos, Array<Float4> morph);
 
     Pimpl(const MMDModel& model, const physics3d::Physics3DWorld& world);
 
-    void draw(const Mat4x4& worldMat);
+    void drawForward(const Mat4x4& worldMat);
 
     void drawEdge(const Mat4x4& worldMat);
 
     void physicsUpdate();
 
     void update();
-    void updateIK(const mmd::Ik &ikData);
+    void updateIK(const mmd::Ik& ikData);
 
     void attach(const VMD& vmd);
 
     const VMD& vmd() const;
-
 
 
     mmd::AllNode m_nodes;
@@ -211,19 +175,18 @@ namespace s3d_mmd
 
     MmdPhysics m_mmdPhysics;
     bool isPhysicsEnabled = true;
+    Mesh m_mesh;
+    Mesh m_edgeMesh;
   };
 
-  Float2 MMD::Pimpl::WriteTextureVertex(ImageRGBA32F & vertexImage, const mmd::MeshVertex & v, int & vPos, Array<Float4> morph)
+  Float2 MMD::Pimpl::WriteTextureVertex(ImageRGBA32F& vertexImage, const mmd::MeshVertex& v, int& vPos, Array<Float4> morph)
   {
     int x = vPos % 1016;
     int y = vPos / 1016;
     assert(y < 1016);
-    int resize = morph.size() % 16;
 
     // モーフの数を16個ずつ処理することで高速化する
-    if ( resize != 0 )
-      morph.resize(morph.size() + 16 - resize);
-
+    morph.resize((morph.size() + 15) / 16 * 16);
     const int dataSize = static_cast<int>(3 + morph.size() + 1);
     if ( 1024 < x + dataSize )
     {
@@ -246,10 +209,10 @@ namespace s3d_mmd
       image[++now] = RGBA32F(i.x, i.y, i.z, asFloat(static_cast<int>(i.w)));
     }
     vPos += dataSize;
-    return{ asFloat(x), asFloat(y) };
+    return { asFloat(x), asFloat(y) };
   }
 
-  MMD::Pimpl::Pimpl(const MMDModel & model, const physics3d::Physics3DWorld& world)
+  MMD::Pimpl::Pimpl(const MMDModel& model, const physics3d::Physics3DWorld& world)
     : m_mmdPhysics(world)
   {
     m_bones = model.bones();
@@ -291,7 +254,7 @@ namespace s3d_mmd
         for ( auto& j : i.skin_vert_data )
         {
           faceMorphVertex[baseMorph[j.skin_vert_index]].vertex.push_back({ j.skin_vert_pos,
-                                                                         static_cast<float>(index) });
+            static_cast<float>(index) });
         }
         faceIndex.insert({ Widen(i.skin_name), index });
         index++;
@@ -300,90 +263,66 @@ namespace s3d_mmd
     }
 
 
-    // メッシュの生成
-    int vPos = 0;
-    mmd::AllNode nodes;
-    for ( auto& node : model.nodes() )
+    Array<uint32> indices(model.indices().size());
+    for ( auto& i : step(indices.size()) )
     {
-      const int size = static_cast<int>(node.mesh.vertices.size());
-      Array<MeshVertex> vertex(size);
-      for ( auto &i : step(size) )
-      {
-        const mmd::MeshVertex &v = node.mesh.vertices[i];
-        auto it = faceMorphVertex.find(v.vertexNum);
-        Float2 pos = WriteTextureVertex(vertexImage, v, vPos, it != faceMorphVertex.end() ? it->second.vertex : Array<Float4>{});
-        vertex[i] = { v.position , v.normal, pos };
-      }
-      nodes.set(mmd::Node{ Mesh({ vertex, node.mesh.indices }), node.material });
+      indices[i] = model.indices()[i];
     }
-    m_nodes = std::move(nodes);
 
+    int vPos = 0;
+    { // メッシュの生成
+      MeshData meshData;
+      meshData.indices = indices;
 
-    // エッジの生成
-    m_edges.reserve(model.edgeNodes().size());
-    for ( auto& node : model.edgeNodes() )
-    {
-      const int size = static_cast<int>(node.mesh.vertices.size());
-      Array<MeshVertex> vertex(size);
-      for ( auto& i : step(size) )
+      meshData.vertices.reserve(model.vertices().size());
+      for ( auto& v : model.vertices() )
       {
-        mmd::MeshVertex &v = node.mesh.vertices[i];
         auto it = faceMorphVertex.find(v.vertexNum);
         Float2 pos = WriteTextureVertex(vertexImage, v, vPos, it != faceMorphVertex.end() ? it->second.vertex : Array<Float4>{});
-        vertex[i] = { v.position, v.normal, pos };
+        meshData.vertices.push_back({ v.position , v.normal, pos });
       }
-      m_edges.push_back(mmd::Node{ Mesh({ vertex, node.mesh.indices }), node.material });
+      mmd::AllNode nodes;
+      for ( auto& i : model.nodes() )
+      {
+        nodes.push(mmd::Node{ i.indexStart, i.indexCount, i.material });
+      }
+      m_nodes = std::move(nodes);
+      m_mesh = Mesh(meshData);
+    }
+
+    { // エッジの生成
+      MeshData meshData;
+      meshData.indices = indices;
+      meshData.vertices.resize(model.vertices().size());
+      m_edges.reserve(model.nodes().size());
+      for ( auto& i : step(model.vertices().size()) )
+      {
+        const auto& v = model.vertices()[i];
+        auto it = faceMorphVertex.find(v.vertexNum);
+        Float2 pos = WriteTextureVertex(vertexImage, v, vPos, it != faceMorphVertex.end() ? it->second.vertex : Array<Float4>{});
+        meshData.vertices[i] = { v.position, v.normal, pos };
+      }
+      for ( auto& node : model.nodes() )
+      {
+        if ( node.material.isEdge )
+        {
+          m_edges.push_back({ node.indexStart,node.indexCount,node.material });
+        }
+      }
+
+      m_edges.shrink_to_fit();
+      m_edgeMesh = Mesh(meshData);
     }
     m_vertexTexture = Texture(vertexImage);
   }
 
-  void MMD::Pimpl::Draw(const mmd::ModelNodeTex & nodes)
-  {
-    for ( auto& node : nodes.nodeNotTex )
-    {
-      Graphics3D::SetAmbientLight(node.material.ambient);
-      node.mesh.draw(node.material.diffuse).drawShadow();
-    }
-    for ( auto& node : nodes.nodeWithTex )
-    {
-      Graphics3D::SetAmbientLight(node.material.ambient);
-      node.mesh.draw(TextureAsset(node.material.diffuseTextureName), node.material.diffuse).drawShadow();
-    }
-  }
-
-  void MMD::Pimpl::DrawForward(const mmd::ModelNodeTex & nodes)
-  {
-    for ( auto& node : nodes.nodeNotTex )
-    {
-      Graphics3D::SetAmbientLightForward(node.material.ambient);
-      node.mesh.drawForward(node.material.diffuse);
-    }
-    for ( auto& node : nodes.nodeWithTex )
-    {
-      Graphics3D::SetAmbientLightForward(node.material.ambient);
-      node.mesh.drawForward(TextureAsset(node.material.diffuseTextureName), node.material.diffuse);
-    }
-  }
-
-  void MMD::Pimpl::Draw(const mmd::ModelNodeAlpha & nodes)
-  {
-    Draw(nodes.nodeNotAlpha);
-    DrawForward(nodes.nodeWithAlpha);
-  }
-
-  void MMD::Pimpl::Draw(const mmd::ModelNodeAlpha & nodes, const RasterizerState & state)
-  {
-    Graphics3D::SetRasterizerState(state);
-    Graphics3D::SetRasterizerStateForward(state);
-    Draw(nodes);
-  }
-
-  template<class Getter, class Setter, Getter getter, Setter setter>class StateBinderClass
+  template<class Getter, class Setter, Getter getter, Setter setter>
+  class StateBinderClass
   {
   public:
     template<class NowState>
     constexpr StateBinderClass(NowState&& nowState)
-      :before(getter())
+      : before(getter())
     {
       setter(std::forward<NowState>(nowState));
     }
@@ -399,30 +338,48 @@ namespace s3d_mmd
     const decltype(getter()) before;
   };
 
-  template<class Getter, class Setter>
-  constexpr auto StateBinder(Getter&& getter, Setter&& setter)
+  template<class Type, Type(*getter)(), void(*setter)(const Type&)>
+  struct StateBinderClassHelper
   {
-    return StateBinderClass<Getter, Setter, getter, setter>();
-  }
-  using RasterizerStateBinder2D = StateBinderClass<decltype(Graphics3D::GetRasterizerState), decltype(Graphics3D::SetRasterizerState), Graphics3D::GetRasterizerState, Graphics3D::SetRasterizerState>;
-  void MMD::Pimpl::draw(const Mat4x4 & worldMat)
+    using type = StateBinderClass<decltype(*getter), decltype(*setter), getter, setter>;
+  };
+
+  using RasterizerStateBinder2D = StateBinderClassHelper<RasterizerState,
+                                                         Graphics3D::GetRasterizerState,
+                                                         Graphics3D::SetRasterizerState>::type;
+  using RasterizerStateForwardBinder2D = StateBinderClassHelper<RasterizerState,
+                                                                Graphics3D::GetRasterizerStateForward,
+                                                                Graphics3D::SetRasterizerStateForward>::type;
+
+  void MMD::Pimpl::drawForward(const Mat4x4& worldMat)
   {
     mmd::MMDShader::init();
-    auto vsAttach = ShaderAttach(mmd::MMDShader::vs());
-    if ( !vsAttach ) return;
     auto vsForwardAttach = ShaderForwardAttach(mmd::MMDShader::vs());
     if ( !vsForwardAttach ) return;
 
     pushGPUData();
 
-    const RasterizerStateBinder2D rasterizerState;
-    const auto rasterizerStateForawrt = Graphics3D::GetRasterizerStateForward();
+    const RasterizerStateForwardBinder2D rasterizerStateForward;
 
-    Draw(m_nodes.nodeCullBack, RasterizerState::SolidCullBack);
-    Draw(m_nodes.nodeCullNone, RasterizerState::SolidCullNone);
-
-    Graphics3D::SetRasterizerStateForward(rasterizerStateForawrt);
-
+    for ( auto& i : m_nodes.nodes )
+    {
+      if ( i.material.isCullNone )
+      {
+        Graphics3D::SetRasterizerStateForward(RasterizerState::SolidCullNone);
+      }
+      else
+      {
+        Graphics3D::SetRasterizerStateForward(RasterizerState::SolidCullBack);
+      }
+      Graphics3D::SetAmbientLightForward(i.material.ambient);
+      if(i.material.diffuseTextureName.isEmpty)
+      {
+        m_mesh.drawSubsetForward(i.indexStart, i.indexCount, i.material.diffuse);
+      }else
+      {
+        m_mesh.drawSubsetForward(i.indexStart, i.indexCount, TextureAsset(i.material.diffuseTextureName), i.material.diffuse);
+      }
+    }
   }
 
   void MMD::Pimpl::drawEdge(const Mat4x4& worldMat)
@@ -436,7 +393,7 @@ namespace s3d_mmd
       Graphics3D::SetRasterizerState(RasterizerState::SolidCullFront);
       for ( const auto& node : m_edges )
       {
-        node.mesh.draw(worldMat);
+        m_edgeMesh.drawSubset(node.indexStart, node.indexCount, node.material.diffuse);
       }
       Graphics3D::SetRasterizerState(rasterizerState);
     }
@@ -461,20 +418,19 @@ namespace s3d_mmd
       ConstantBuffer<std::array<Float4, 1024>> morphData;
       const auto& weights = m_faceMorph.weights();
 
-      for ( auto& i : step(static_cast<int>(weights.size())) )
-        morphData.get()[i].x = weights[i];
+      for ( auto& i : step(static_cast<int>(weights.size())) ) morphData.get()[i].x = weights[i];
 
       Graphics3D::SetConstant(ShaderStage::Vertex, 2, morphData);
       Graphics3D::SetConstantForward(ShaderStage::Vertex, 2, morphData);
     }
 
     Graphics3D::SetTexture(ShaderStage::Vertex, 1, m_vertexTexture);
+    Graphics3D::SetTextureForward(ShaderStage::Vertex, 1, m_vertexTexture);
   }
 
   void MMD::Pimpl::physicsUpdate()
   {
-    if ( isPhysicsEnabled )
-      m_mmdPhysics.BoneUpdate(Mat4x4::Identity(), worlds);
+    if ( isPhysicsEnabled ) m_mmdPhysics.BoneUpdate(Mat4x4::Identity(), worlds);
   }
 
   void MMD::Pimpl::update()
@@ -485,15 +441,14 @@ namespace s3d_mmd
       m_vmd.UpdateMorph(m_faceMorph);
     }
 
-    for ( auto& i : m_bones->ikData() )
-      updateIK(i);
+    for ( auto& i : m_bones->ikData() ) updateIK(i);
 
     m_bones->calcWorld(Mat4x4::Identity(), worlds);
 
     physicsUpdate();
   }
 
-  void MMD::Pimpl::updateIK(const mmd::Ik &ikData)
+  void MMD::Pimpl::updateIK(const mmd::Ik& ikData)
   {
     auto& bones = *m_bones;
     const Mat4x4& targetMat = bones.calcBoneMatML(ikData.ik_bone_index);
@@ -516,7 +471,9 @@ namespace s3d_mmd
 
         MyVector axis = localEffectorDir.cross3(localTargetDir);
         if ( bone.name == L"左足" || bone.name == L"右足" )
+        {
           axis = axis * MyVector(1.0f, 0.0f, 1.0f, 0.0f);
+        }
 
         if ( DirectX::XMVector3Equal(axis, DirectX::XMVectorZero()) ) continue;
 
@@ -538,11 +495,13 @@ namespace s3d_mmd
       }
     }
   }
-  void MMD::Pimpl::attach(const VMD & vmd)
+
+  void MMD::Pimpl::attach(const VMD& vmd)
   {
     m_vmd = vmd;
   }
-  const VMD & MMD::Pimpl::vmd() const
+
+  const VMD& MMD::Pimpl::vmd() const
   {
     return m_vmd;
   }

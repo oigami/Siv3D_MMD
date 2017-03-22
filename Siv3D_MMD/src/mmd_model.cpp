@@ -1,11 +1,13 @@
 ﻿#include <MMD/mmd_model.h>
 #include <MMD/pmd_reader.h>
+
 namespace s3d_mmd
 {
   namespace
   {
     constexpr double alphaEps = 1e-9;
     uint32 handleCounter = 0;
+
     uint32 createHandle() { return ++handleCounter; }
 
     class IndexMap
@@ -14,6 +16,7 @@ namespace s3d_mmd
       int m_nowIndex;
     public:
       IndexMap() { reset(); }
+
       void reset()
       {
         m_map.clear();
@@ -28,18 +31,17 @@ namespace s3d_mmd
       std::pair<int, bool> insert(int index)
       {
         auto iter = m_map.insert({ index , m_nowIndex });
-        if ( iter.second )
-          m_nowIndex++;
-        return{ iter.first->second, iter.second };
+        if ( iter.second ) m_nowIndex++;
+        return { iter.first->second, iter.second };
       }
     };
-
   }
-  mmd::Material CreateMaterial(const pmd_struct::Material &pmdMaterial, const FilePath &m_filepath)
+
+  mmd::Material CreateMaterial(const pmd_struct::Material& pmdMaterial, const FilePath& m_filepath)
   {
     mmd::Material material;
 
-    auto ToColorF = [](const float(&f)[3], float alpha) { return ColorF(f[0], f[1], f[2], alpha); };
+    auto ToColorF = [](const float (&f)[3], float alpha) { return ColorF(f[0], f[1], f[2], alpha); };
 
     material.ambient = ToColorF(pmdMaterial.mirror_color, 1.0f);
     material.diffuse = ToColorF(pmdMaterial.diffuse_color, pmdMaterial.alpha);
@@ -61,7 +63,8 @@ namespace s3d_mmd
     }
     return material;
   }
-  mmd::MeshVertex CreateVertex(const pmd_struct::Vertex &vertex)
+
+  mmd::MeshVertex CreateVertex(const pmd_struct::Vertex& vertex)
   {
     mmd::MeshVertex v;
     v.position = vertex.pos;
@@ -74,7 +77,8 @@ namespace s3d_mmd
     v.normal.normalize();
     return v;
   }
-  Array<mmd::MeshVertex> CreateVertices(const pmd_struct::Vertices &Vertices)
+
+  Array<mmd::MeshVertex> CreateVertices(const pmd_struct::Vertices& Vertices)
   {
     Array<mmd::MeshVertex> meshVertices;
     meshVertices.resize(Vertices.size());
@@ -86,65 +90,8 @@ namespace s3d_mmd
     return meshVertices;
   }
 
-  std::pair<Array<mmd::ModelNode>, Array<mmd::ModelNode>> CreateNode(const PMDReader &loader, const FilePath &m_filepath)
-  {
-    const auto &pmdFaces = loader.getFaces();
-    const auto &pmdMaterials = loader.getMaterials();
-    const auto &pmdVertices = loader.getVertices();
-    auto meshVertices = CreateVertices(pmdVertices);
-    auto pmdFacesIter = pmdFaces.begin();
-    Array<mmd::ModelNode> nodes, edgeNodes;
-    nodes.reserve(pmdMaterials.size());
-    IndexMap indexMap, edgeIndex;
-    for ( auto& item : pmdMaterials )
-    {
-      const int face_vertex_len = item.face_vert_count;
-      const mmd::Material material = CreateMaterial(item, m_filepath);
-      indexMap.reset();
-      edgeIndex.reset();
-      MeshData mesh, edgeMesh;
-      Array<uint32_t> indices(face_vertex_len), edgeIndices;
-      Array<mmd::MeshVertex> vertices, edgeVertices;
-      vertices.reserve(face_vertex_len);
-      const bool isEdge = material.isEdge;
-      if ( isEdge ) edgeIndices.resize(face_vertex_len);
-      for ( auto& i : step(face_vertex_len) )
-      {
-        const int faceIndex = *pmdFacesIter;
-        ++pmdFacesIter;
-        const auto iter = indexMap.insert(faceIndex);
-        const mmd::MeshVertex &meshVertex = meshVertices[faceIndex];
-        if ( iter.second ) //新規に挿入した時のみ頂点を追加
-          vertices.push_back(meshVertex);
-        indices[i] = iter.first;
 
-        if ( !isEdge ) continue;
-        const auto edgeIter = edgeIndex.insert(faceIndex);
-        if ( edgeIter.second )
-        {
-          if ( meshVertices[faceIndex].isEdge )
-          {
-            edgeVertices.push_back(meshVertex);
-          }
-          else
-          {
-            edgeVertices.push_back({ meshVertex.position,
-                                   Float3(0.0f, 0.0f, 0.0f), meshVertex.texcoord,
-                                   meshVertex.boneNum, meshVertex.boneWeight,
-                                   meshVertex.isEdge, meshVertex.vertexNum
-            });
-          }
-        }
-        edgeIndices[i] = edgeIter.first;
-      }
-      vertices.shrink_to_fit();
-      nodes.push_back({ { vertices, indices }, material });
-      if ( isEdge )
-        edgeNodes.push_back({ {edgeVertices, edgeIndices},material });
-    }
-    return{ std::move(nodes), std::move(edgeNodes) };
-  }
-  Array<mmd::Ik> CreateIkData(const pmd_struct::IkData & ikData)
+  Array<mmd::Ik> CreateIkData(const pmd_struct::IkData& ikData)
   {
     Array<mmd::Ik> newIkData(ikData.size());
     for ( auto& i : step(static_cast<int>(ikData.size())) )
@@ -161,44 +108,46 @@ namespace s3d_mmd
     }
     return newIkData;
   }
-  mmd::Bones CreateBones(const Array<pmd_struct::Bone> &pmdBones, const pmd_struct::IkData &ikData)
+
+  mmd::Bones CreateBones(const Array<pmd_struct::Bone>& pmdBones, const pmd_struct::IkData& ikData)
   {
     Array<mmd::Bone> bones;
     const int size = static_cast<int>(pmdBones.size());
     bones.resize(size);
     for ( int i : step(size) )
     {
-      const auto &item = pmdBones[i];
-      mmd::Bone &bone = bones[i];
+      const auto& item = pmdBones[i];
+      mmd::Bone& bone = bones[i];
       const uint16 parentBoneIndex = item.parent_bone_index;
 
       //自分と同じ親で自分よりあとのボーンが兄弟になる
-      for ( int j = i + 1; j < size; ++j ) if ( parentBoneIndex == pmdBones[j].parent_bone_index )
-      {
-        bone.sibling = j;
-        break;
-      }
+      for ( int j = i + 1; j < size; ++j )
+        if ( parentBoneIndex == pmdBones[j].parent_bone_index )
+        {
+          bone.sibling = j;
+          break;
+        }
 
       //自分が親担っていて一番早く現れるボーンが子になる
-      for ( int j : step(size) ) if ( i == pmdBones[j].parent_bone_index )
-      {
-        bone.firstChild = j;
-        break;
-      }
+      for ( int j : step(size) )
+        if ( i == pmdBones[j].parent_bone_index )
+        {
+          bone.firstChild = j;
+          break;
+        }
 
-      if ( parentBoneIndex != 0xFFFF )
-        bone.parent = parentBoneIndex;
+      if ( parentBoneIndex != 0xFFFF ) bone.parent = parentBoneIndex;
 
-      char boneName[21] = { 0 };	// ボーン名が20byteのときのために最後に0を追加
+      char boneName[21] = { 0 }; // ボーン名が20byteのときのために最後に0を追加
       memcpy(boneName, item.bone_name, 20);
       bone.name = Widen(boneName);
       bone.id = i;
       bone.type = item.bone_type;
       const Mat4x4 modelLocalInitMat = Mat4x4::Translate(item.bone_head_pos[0], item.bone_head_pos[1], item.bone_head_pos[2]);
-      bone.initMatML = bone.boneMatML = bone.initMat = modelLocalInitMat;	// モデルローカル座標系
+      bone.initMatML = bone.boneMatML = bone.initMat = modelLocalInitMat; // モデルローカル座標系
       bone.offsetMat = XMMatrixInverse(0, modelLocalInitMat);
     }
-    return{ std::move(bones), CreateIkData(ikData) };
+    return { std::move(bones), CreateIkData(ikData) };
   }
 
   class MMDModel::Pimpl
@@ -207,7 +156,7 @@ namespace s3d_mmd
     Pimpl(const FilePath& path)
     {
       PMDReader loader(path);
-      std::tie(m_nodes, m_edges) = CreateNode(loader, path);
+      createNode(loader, path);
       m_bones = std::make_shared<mmd::Bones>();
       *m_bones = CreateBones(loader.getBones(), loader.getIkData());
       m_modelName = loader.getModelName();
@@ -217,18 +166,20 @@ namespace s3d_mmd
       m_skinData = loader.getSkinData();
       m_handle = createHandle();
     }
-    Pimpl() :m_handle(NullHandleID) {}
+
+    Pimpl() : m_handle(NullHandleID) {}
 
     void release()
     {
       m_handle = NullHandleID;
-      m_edges = m_nodes = Array<mmd::ModelNode>();
+      m_nodes.clear();
+      m_nodes.shrink_to_fit();
       m_bones = std::make_shared<mmd::Bones>();
       m_modelName.clear();
       m_comment.clear();
     }
+
     Array<mmd::ModelNode> m_nodes;
-    Array<mmd::ModelNode> m_edges;
     std::shared_ptr<mmd::Bones> m_bones;
 
     pmd_struct::RigidBodies m_rigidBodies;
@@ -238,11 +189,14 @@ namespace s3d_mmd
     String m_comment;
     HandleIDType m_handle;
     Texture vertexTexture;
+    std::vector<mmd::MeshVertex> m_vertecies;
+    std::vector<uint16> m_indices;
+    void createNode(const PMDReader& loader, const FilePath& m_filepath);
   };
 
   MMDModel::MMDModel() {}
 
-  MMDModel::MMDModel(const FilePath & path)
+  MMDModel::MMDModel(const FilePath& path)
   {
     m_handle = std::make_shared<Pimpl>(path);
   }
@@ -267,12 +221,12 @@ namespace s3d_mmd
     return !m_handle;
   }
 
-  bool MMDModel::operator==(const MMDModel & model) const
+  bool MMDModel::operator==(const MMDModel& model) const
   {
     return m_handle == model.m_handle;
   }
 
-  bool MMDModel::operator!=(const MMDModel & model) const
+  bool MMDModel::operator!=(const MMDModel& model) const
   {
     return !(*this == model);
   }
@@ -288,23 +242,29 @@ namespace s3d_mmd
     return m_handle->m_nodes;
   }
 
-  Array<mmd::ModelNode>& MMDModel::edgeNodes() const
+  Array<mmd::MeshVertex>& MMDModel::vertices() const
   {
-    return m_handle->m_edges;
+    return m_handle->m_vertecies;
   }
+
+  Array<uint16>& MMDModel::indices() const
+  {
+    return m_handle->m_indices;
+  }
+
   std::shared_ptr<mmd::Bones> MMDModel::bones() const
   {
     return m_handle->m_bones;
   }
 
-  const pmd_struct::RigidBodies & MMDModel::rigidBodies() const
+  const pmd_struct::RigidBodies& MMDModel::rigidBodies() const
   {
     return m_handle->m_rigidBodies;
   }
 
-  const pmd_struct::Joints & MMDModel::joints() const
+  const pmd_struct::Joints& MMDModel::joints() const
   {
-    return  m_handle->m_joints;
+    return m_handle->m_joints;
   }
 
   const pmd_struct::SkinData MMDModel::skinData() const
@@ -316,8 +276,28 @@ namespace s3d_mmd
   {
     return m_handle->m_modelName;
   }
+
   const String& MMDModel::comment() const
   {
     return m_handle->m_comment;
+  }
+
+  void MMDModel::Pimpl::createNode(const PMDReader& loader, const FilePath& m_filepath)
+  {
+    const auto& pmdMaterials = loader.getMaterials();
+    const auto& pmdVertices = loader.getVertices();
+    m_indices = loader.getFaces();
+    m_vertecies = CreateVertices(pmdVertices);
+    m_nodes.reserve(pmdMaterials.size());
+
+    int preVertexLen = 0;
+    for ( auto& item : pmdMaterials )
+    {
+      const int face_vertex_len = item.face_vert_count;
+      const mmd::Material material = CreateMaterial(item, m_filepath);
+      // 材質とインデックスデータを追加
+      m_nodes.push_back({ preVertexLen, face_vertex_len, material });
+      preVertexLen += face_vertex_len;
+    }
   }
 }
