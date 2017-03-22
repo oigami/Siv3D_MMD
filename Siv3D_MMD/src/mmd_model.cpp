@@ -36,6 +36,7 @@ namespace s3d_mmd
       }
     };
   }
+
   const std::shared_ptr<ITextureLoader> MMDModel::defaultLoader = std::make_shared<TextureAssetTextureLoader>();
 
   mmd::MeshVertex CreateVertex(const pmd_struct::Vertex& vertex)
@@ -133,6 +134,22 @@ namespace s3d_mmd
     {
       m_textureLoader = textureLoader;
       PMDReader loader(path);
+      load(loader, path);
+    }
+
+    Pimpl(PMDReader& loader, const std::shared_ptr<ITextureLoader> textureLoader)
+    {
+      m_textureLoader = textureLoader;
+      load(loader, L"");
+    }
+
+    void load(const PMDReader& loader, const String& path)
+    {
+      if ( loader.isLoaded() == false )
+      {
+        return;
+      }
+      m_baseDir = path;
       createNode(loader, path);
       m_bones = std::make_shared<mmd::Bones>();
       *m_bones = CreateBones(loader.getBones(), loader.getIkData());
@@ -148,6 +165,11 @@ namespace s3d_mmd
 
     void release()
     {
+      for ( auto& i : m_nodes )
+      {
+        m_textureLoader->removeTexture(m_baseDir, FileSystem::FileName(i.material.diffuseTextureName));
+      }
+      m_textureLoader.reset();
       m_handle = NullHandleID;
       m_nodes.clear();
       m_nodes.shrink_to_fit();
@@ -167,6 +189,8 @@ namespace s3d_mmd
     HandleIDType m_handle;
     std::vector<mmd::MeshVertex> m_vertecies;
     std::vector<uint16> m_indices;
+    String m_baseDir;
+
     mmd::Material createMaterial(const pmd_struct::Material& pmdMaterial, const FilePath& m_filepath) const;
     void createNode(const PMDReader& loader, const FilePath& m_filepath);
   };
@@ -260,11 +284,11 @@ namespace s3d_mmd
   }
 
 
-  mmd::Material MMDModel::Pimpl::createMaterial(const pmd_struct::Material& pmdMaterial, const FilePath& m_filepath)const
+  mmd::Material MMDModel::Pimpl::createMaterial(const pmd_struct::Material& pmdMaterial, const FilePath& m_filepath) const
   {
     mmd::Material material;
 
-    auto ToColorF = [](const float(&f)[3], float alpha) { return ColorF(f[0], f[1], f[2], alpha); };
+    auto ToColorF = [](const float (&f)[3], float alpha) { return ColorF(f[0], f[1], f[2], alpha); };
 
     material.ambient = ToColorF(pmdMaterial.mirror_color, 1.0f);
     material.diffuse = ToColorF(pmdMaterial.diffuse_color, pmdMaterial.alpha);
@@ -273,12 +297,12 @@ namespace s3d_mmd
     material.isEdge = pmdMaterial.edge_flag != 0;
     const float alpha = pmdMaterial.alpha;
     material.isCullNone = alpha + alphaEps < 1.0;
-    if (pmdMaterial.texture_file_name[0] != '\0')
+    if ( pmdMaterial.texture_file_name[0] != '\0' )
     {
       //TODO: スフィアに未対応
       String filename = Widen({ pmdMaterial.texture_file_name,sizeof(pmdMaterial.texture_file_name) });
       const size_t pos = filename.lastIndexOf(L'*');
-      if (pos != String::npos)
+      if ( pos != String::npos )
       {
         filename = filename.substr(0, pos);
       }

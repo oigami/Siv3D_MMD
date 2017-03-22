@@ -1,19 +1,31 @@
 ﻿#include <MMD/pmd_reader.h>
 #include<src/reader_helper.h>
+
 namespace s3d_mmd
 {
   PMDReader::PMDReader(const FilePath& path)
-  { // ヘッダ
+  {
     BinaryReader reader(path);
+    load(reader);
+  }
+
+  PMDReader::PMDReader(IReader& reader)
+  {
+    load(reader);
+  }
+
+  void PMDReader::load(IReader& reader)
+  {
+    
     if ( !reader.isOpened() ) return;
     pmd_struct::Header pmdHeader;
     reader.read(pmdHeader);
     m_modelName = Widen(pmdHeader.model_name);
     m_comment = Widen(pmdHeader.comment);
-    ReadSizeAndArray<std::uint32_t>(reader, m_vertices);  // 頂点データ
-    ReadSizeAndArray<std::uint32_t>(reader, m_faces);     // ポリゴンデータ
+    ReadSizeAndArray<std::uint32_t>(reader, m_vertices); // 頂点データ
+    ReadSizeAndArray<std::uint32_t>(reader, m_faces); // ポリゴンデータ
     ReadSizeAndArray<std::uint32_t>(reader, m_materials); // 材料データ
-    ReadSizeAndArray<std::uint16_t>(reader, m_bones);     // ボーンデータ
+    ReadSizeAndArray<std::uint16_t>(reader, m_bones); // ボーンデータ
     const size_t numPmdBone = m_bones.size();
 
     // IKデータ
@@ -22,7 +34,7 @@ namespace s3d_mmd
     m_ikData.resize(numPmdIkData);
     for ( auto& pmdIkData : m_ikData )
     {
-      pmd_struct::IkDataWithoutArray *pmdIkDataWithoutArray = &pmdIkData;
+      pmd_struct::IkDataWithoutArray* pmdIkDataWithoutArray = &pmdIkData;
       reader.read(*pmdIkDataWithoutArray);
       ReadArray(reader, pmdIkData.ik_child_bone_length, pmdIkData.ik_child_bone_index);
     }
@@ -33,7 +45,7 @@ namespace s3d_mmd
     m_skinData.resize(numPmdSkin);
     for ( auto& skinData : m_skinData )
     {
-      pmd_struct::SkinDataWithoutArray *pmdSkinDataWithoutArray = &skinData;
+      pmd_struct::SkinDataWithoutArray* pmdSkinDataWithoutArray = &skinData;
       reader.read(*pmdSkinDataWithoutArray);
       ReadArray(reader, skinData.skin_vert_count, skinData.skin_vert_data);
     }
@@ -57,10 +69,9 @@ namespace s3d_mmd
     {
       pmd_struct::EnglishName tmp;
       reader.read(tmp.modelName); // モデル名
-      reader.read(tmp.comment);   // コメント
+      reader.read(tmp.comment); // コメント
       ReadArray(reader, numPmdBone, tmp.boneName); // ボーンリスト
-      if ( numPmdSkin )
-        ReadArray(reader, numPmdSkin - 1, tmp.skinName); // 表情リスト
+      if ( numPmdSkin ) ReadArray(reader, numPmdSkin - 1, tmp.skinName); // 表情リスト
       ReadArray(reader, numBoneDispName, tmp.boneDispName); // ボーン枠用枠名リスト
       m_englishName = tmp;
     }
@@ -75,9 +86,9 @@ namespace s3d_mmd
 
     // ジョイントデータ
     ReadSizeAndArray<std::uint32_t>(reader, m_joints);
+
+    m_isLoaded = true;
   }
 
-  PMDReader::~PMDReader()
-  {
-  }
+  PMDReader::~PMDReader() { }
 }

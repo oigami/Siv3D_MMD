@@ -24,6 +24,8 @@ namespace s3d_mmd
     String m_modelName;
     String m_comment;
 
+    bool m_isLoaded = false;
+
   public:
 
     const pmd_struct::Vertices& getVertices() const { return m_vertices; }
@@ -39,7 +41,13 @@ namespace s3d_mmd
     const FilePath& getFilePath()const { return m_filepath; }
     const String& getModelName()const { return m_modelName; }
     const String& getComment()const { return m_comment; }
-    PMDReader(const FilePath& path);
+
+    bool isLoaded() const { return m_isLoaded; }
+
+    void load(IReader& reader);
+
+    explicit PMDReader(IReader& reader);
+    explicit PMDReader(const FilePath& path);
     ~PMDReader();
 
   };
