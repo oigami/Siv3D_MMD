@@ -1,5 +1,6 @@
 ﻿#include <Siv3D.hpp>
 #include <MMD/mmd_bone.h>
+
 namespace s3d_mmd
 {
   namespace mmd
@@ -15,17 +16,17 @@ namespace s3d_mmd
     void Bones::initMatCalc()
     {
       initMatCalc(m_bones.data(), Mat4x4::Identity());
-      for ( auto &i : m_bones ) i.boneMat = i.initMat;
+      for ( auto& i : m_bones ) i.boneMat = i.initMat;
     }
 
-    void Bones::initMatCalc(Bone * me, const Matrix & parentoffsetMat)
+    void Bones::initMatCalc(Bone* me, const Matrix& parentoffsetMat)
     {
       if ( me->firstChild != -1 ) initMatCalc(&m_bones[me->firstChild], me->offsetMat);
       if ( me->sibling != -1 ) initMatCalc(&m_bones[me->sibling], parentoffsetMat);
       me->initMat = me->initMatML * parentoffsetMat;
     }
 
-    void Bones::calcWorld(const Bone &me, const Mat4x4 & parentWorldMat, Array<Mat4x4>& worlds) const
+    void Bones::calcWorld(const Bone& me, const Mat4x4& parentWorldMat, Array<Mat4x4>& worlds) const
     {
       const Mat4x4 m = me.boneMat * parentWorldMat;
       worlds[me.id] = me.offsetMat * m;
@@ -33,7 +34,7 @@ namespace s3d_mmd
       if ( me.sibling != -1 ) calcWorld(m_bones[me.sibling], parentWorldMat, worlds);
     }
 
-    Bones::Bones(Array<Bone> bones, Array<mmd::Ik> ikData) :m_bones(std::move(bones)), m_ikData(std::move(ikData))
+    Bones::Bones(Array<Bone> bones, Array<mmd::Ik> ikData) : m_bones(std::move(bones)), m_ikData(std::move(ikData))
     {
       for ( auto& i : step(static_cast<int>(m_bones.size())) )
       {
@@ -42,7 +43,7 @@ namespace s3d_mmd
       initMatCalc();
     }
 
-    void Bones::calcWorld(const Mat4x4 &world, Array<Mat4x4> &worlds) const
+    void Bones::calcWorld(const Mat4x4& world, Array<Mat4x4>& worlds) const
     {
       const std::uint_fast32_t bonsSize = static_cast<std::uint_fast32_t>(m_bones.size());
       worlds.resize(bonsSize);
@@ -61,7 +62,7 @@ namespace s3d_mmd
     {
       Mat4x4 ret = m_bones[index].boneMat;
 
-      for ( int parent = index; parent = m_bones[parent].parent, parent != -1;)
+      for ( int parent = index; parent = m_bones[parent].parent , parent != -1; )
       {
         ret = XMMatrixMultiply(ret, m_bones[parent].boneMat);
       }
@@ -72,7 +73,7 @@ namespace s3d_mmd
       } else return bones.boneMat;*/
     }
 
-    Optional<Mat4x4> Bones::calcBoneMatML(const String & boneName) const
+    Optional<Mat4x4> Bones::calcBoneMatML(const String& boneName) const
     {
       if ( auto index = getBoneIndex(boneName) )
       {
@@ -87,7 +88,7 @@ namespace s3d_mmd
       return calcBoneMatML(m_bones[index].parent);
     }
 
-    Optional<Mat4x4> Bones::calcParentBoneMat(const String & boneName) const
+    Optional<Mat4x4> Bones::calcParentBoneMat(const String& boneName) const
     {
       if ( auto index = getBoneIndex(boneName) )
       {
@@ -96,7 +97,7 @@ namespace s3d_mmd
       return none;
     }
 
-    Optional<int> Bones::getBoneIndex(const String & boneName) const
+    Optional<int> Bones::getBoneIndex(const String& boneName) const
     {
       auto it = m_boneNameIndex.find(boneName);
       if ( it != m_boneNameIndex.end() )
@@ -105,7 +106,5 @@ namespace s3d_mmd
       }
       return none;
     }
-
   }
-
 }

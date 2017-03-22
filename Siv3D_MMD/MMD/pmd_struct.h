@@ -1,11 +1,11 @@
 ﻿#pragma once
 #include <cstdint>
 #include <vector>
+
 namespace s3d_mmd
 {
   namespace pmd_struct
   {
-
 #pragma pack(push, 1)
 
     static_assert(std::is_pod<Float3>::value, "");
@@ -49,38 +49,37 @@ namespace s3d_mmd
     struct Bone
     {
       char bone_name[20];
-      std::uint16_t parent_bone_index;    // ない場合は0xFFFF
-      std::uint16_t tail_pos_bone_index;  // ない場合は0xFFFF
-      std::uint8_t bone_type;             // 0:回転 1:回転と移動 2:IK 3:不明 4:IK影響下 5:回転影響下 6:IK接続先 7:非表示 8:捻り 9:回転運動 (8, 9はMMD4.0以降)
+      std::uint16_t parent_bone_index; // ない場合は0xFFFF
+      std::uint16_t tail_pos_bone_index; // ない場合は0xFFFF
+      std::uint8_t bone_type; // 0:回転 1:回転と移動 2:IK 3:不明 4:IK影響下 5:回転影響下 6:IK接続先 7:非表示 8:捻り 9:回転運動 (8, 9はMMD4.0以降)
       std::uint16_t ik_parent_bone_index; // ない場合は0
       float bone_head_pos[3];
     };
 
     struct IkDataWithoutArray
     {
-      std::uint16_t ik_bone_index;        // IKボーン番号
+      std::uint16_t ik_bone_index; // IKボーン番号
       std::uint16_t ik_target_bone_index; // IKボーンの位置にこのボーンを一致させるようにIK処理が行われる
-      std::uint8_t ik_child_bone_length;  // IKチェーンの長さ
-      std::uint16_t iterations;           // 再帰演算回数
-      float control_weight;               // ボーンの単位制限角 1.0 → 3.14(pi)[rad]。また「ひざ」を含むボーン名をもつボーンはX軸方向にしか動かない制限がある。
+      std::uint8_t ik_child_bone_length; // IKチェーンの長さ
+      std::uint16_t iterations; // 再帰演算回数
+      float control_weight; // ボーンの単位制限角 1.0 → 3.14(pi)[rad]。また「ひざ」を含むボーン名をもつボーンはX軸方向にしか動かない制限がある。
 
-                                          // unsigned short ik_child_bone_index[ik_chain_length]; // IK影響下のボーン番号 (配列の大きさが変化)
+      // unsigned short ik_child_bone_index[ik_chain_length]; // IK影響下のボーン番号 (配列の大きさが変化)
     };
 
     struct SkinDataWithoutArray
     {
-      char skin_name[20];            // 表情名
+      char skin_name[20]; // 表情名
       std::uint32_t skin_vert_count; // 表情用の頂点数
-      std::uint8_t skin_type;        // 表情の種類 → 0:base、1:まゆ、2:目、3:リップ、4:その他
+      std::uint8_t skin_type; // 表情の種類 → 0:base、1:まゆ、2:目、3:リップ、4:その他
 
-                                     // PmdSkinVertexData skin_vert_data[skin_vert_count];	// (配列の大きさが変化)
+      // PmdSkinVertexData skin_vert_data[skin_vert_count];	// (配列の大きさが変化)
     };
 
     struct SkinVertexData
     {
       std::uint32_t skin_vert_index; // 表情用の頂点の番号(頂点リストにある番号)
       Float3 skin_vert_pos;
-
     };
 
     struct BoneDispName
@@ -90,43 +89,43 @@ namespace s3d_mmd
 
     struct BoneDisp
     {
-      std::uint16_t bone_index;           // 枠用ボーン番号
+      std::uint16_t bone_index; // 枠用ボーン番号
       std::uint8_t bone_disp_frame_index; // 表示枠番号
     };
 
     struct RigidBody
     {
-      char rigidbody_name[20];                // 名称
+      char rigidbody_name[20]; // 名称
       std::uint16_t rigidbody_rel_bone_index; // 関連ボーン番号 （なし→0xFFFF）
-      std::uint8_t rigidbody_group_index;     // グループ(1～16)
-      std::uint16_t rigidbody_group_target;   // 非衝突グループ(ビット単位)
-      std::uint8_t shape_type;                // 形状タイプ 0:球 1:箱 2:カプセル
-      float shape_w;                          // 幅/2(又は半径)
-      float shape_h;                          // 高さ/2(カプセルの場合は球中心間の距離)
-      float shape_d;                          // 奥行/2
-      Float3 pos_pos;                         // 位置 (x, y, z)  : 関連ボーンがある場合は、剛体タイプによらず関連ボーン位置からの相対位置(PMDエディタではモデルのローカル座標系であり、値が違うので注意！)
-      Float3 pos_rot;                         // 回転 : 回転行列は MATRIXRotationYawPitchRoll(&rotation, pos_rot.y, pos_rot.x, pos_rot.z)
-      float rigidbody_weight;                 // 質量
-      float rigidbody_pos_dim;                // 移動減衰
-      float rigidbody_rot_dim;                // 回転減衰
-      float rigidbody_recoil;                 // 反発力
-      float rigidbody_friction;               // 摩擦力
-      std::uint8_t rigidbody_type;            // 剛体タイプ 0:Bone追従 1:物理演算 2:物理演算(Bone位置あわせ)
+      std::uint8_t rigidbody_group_index; // グループ(1～16)
+      std::uint16_t rigidbody_group_target; // 非衝突グループ(ビット単位)
+      std::uint8_t shape_type; // 形状タイプ 0:球 1:箱 2:カプセル
+      float shape_w; // 幅/2(又は半径)
+      float shape_h; // 高さ/2(カプセルの場合は球中心間の距離)
+      float shape_d; // 奥行/2
+      Float3 pos_pos; // 位置 (x, y, z)  : 関連ボーンがある場合は、剛体タイプによらず関連ボーン位置からの相対位置(PMDエディタではモデルのローカル座標系であり、値が違うので注意！)
+      Float3 pos_rot; // 回転 : 回転行列は MATRIXRotationYawPitchRoll(&rotation, pos_rot.y, pos_rot.x, pos_rot.z)
+      float rigidbody_weight; // 質量
+      float rigidbody_pos_dim; // 移動減衰
+      float rigidbody_rot_dim; // 回転減衰
+      float rigidbody_recoil; // 反発力
+      float rigidbody_friction; // 摩擦力
+      std::uint8_t rigidbody_type; // 剛体タイプ 0:Bone追従 1:物理演算 2:物理演算(Bone位置あわせ)
     };
 
     struct Joint
     {
-      char joint_name[20];             // 名称
+      char joint_name[20]; // 名称
       std::uint32_t joint_rigidbody_a; // 剛体A
       std::uint32_t joint_rigidbody_b; // 剛体B
-      Float3 joint_pos;                // 位置 (x, y, z) : モデルローカル座標系
-      Float3 joint_rot;                // 回転 (rad(x), rad(y), rad(z))
-      Float3 constrain_lower_pos;      // 移動制限下限 (x, y, z)
-      Float3 constrain_upper_pos;      // 移動制限上限 (x, y, z)
-      Float3 constrain_lower_rot;      // 回転制限下限 (rad(x), rad(y), rad(z))
-      Float3 constrain_upper_rot;      // 回転制限上限 (rad(x), rad(y), rad(z))
-      Float3 spring_pos;               // 移動ばね (x, y, z)
-      Float3 spring_rot;               // 回転ばね (rad(x), rad(y), rad(z))
+      Float3 joint_pos; // 位置 (x, y, z) : モデルローカル座標系
+      Float3 joint_rot; // 回転 (rad(x), rad(y), rad(z))
+      Float3 constrain_lower_pos; // 移動制限下限 (x, y, z)
+      Float3 constrain_upper_pos; // 移動制限上限 (x, y, z)
+      Float3 constrain_lower_rot; // 回転制限下限 (rad(x), rad(y), rad(z))
+      Float3 constrain_upper_rot; // 回転制限上限 (rad(x), rad(y), rad(z))
+      Float3 spring_pos; // 移動ばね (x, y, z)
+      Float3 spring_rot; // 回転ばね (rad(x), rad(y), rad(z))
     };
 
     struct BoneEnglishName
@@ -181,8 +180,5 @@ namespace s3d_mmd
     using SkinIndices = Array<std::uint16_t>;
     using BoneDispNames = Array<BoneDispName>;
     using BoneDisps = Array<BoneDisp>;
-
   }
-
-
 }

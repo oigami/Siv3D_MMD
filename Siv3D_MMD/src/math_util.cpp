@@ -1,4 +1,5 @@
 ﻿#include <MMD/math_util.h>
+
 namespace s3d_mmd
 {
   namespace math
@@ -39,10 +40,8 @@ namespace s3d_mmd
         // s * s * t * 3 * p1.x + s * t * t * 3 * p2.x + t * t * t
         float ft = t * (s * (s * p1.x + t * p2.x) + t * t);
         //if ( fabs(ft) < 1e-6 ) break; // 誤差が定数以内なら終了
-        if ( ft > x )
-          r = t;
-        else
-          l = t;
+        if ( ft > x ) r = t;
+        else l = t;
       }
       pre_x = x;
       pre_out = l;
@@ -84,5 +83,4 @@ namespace s3d_mmd
       return t1 * DirectX::XMVectorMultiplyAdd(t1, p2_3y + twoNegative * p1_3y, DirectX::XMVectorMultiplyAdd(t2, p1_3y - p2_3y + DirectX::g_XMOne, p1_3y));
     }
   }
-
 }

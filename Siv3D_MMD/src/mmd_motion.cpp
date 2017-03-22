@@ -5,9 +5,8 @@ namespace s3d_mmd
 {
   namespace mmd
   {
-    MMDMotion::MMDMotion(const VMDReader & reader)
+    MMDMotion::MMDMotion(const VMDReader& reader)
     {
-
       for ( const auto& bone : reader.getBoneFrames() )
       {
         key_frame::BoneFrame keyFrame;
@@ -30,7 +29,6 @@ namespace s3d_mmd
       m_selfShadows = reader.getSelfShadowFrames();
 
       m_showIks = reader.getShowIk();
-
     }
 
     void MMDMotion::sort()
@@ -60,7 +58,7 @@ namespace s3d_mmd
       return lastFrame;
     }
 
-    bool MMDMotion::saveVMD(const FilePath & filename)
+    bool MMDMotion::saveVMD(const FilePath& filename)
     {
       VMDWriter writer(filename);
       if ( !writer.isOpened() ) return false;
@@ -75,9 +73,7 @@ namespace s3d_mmd
       writer.modelName = m_modelName;
       for ( auto& i : m_morphs )
       {
-        for ( auto& j : i.second )
-          writer.morphFrame.push_back(j.convert(i.first));
-
+        for ( auto& j : i.second ) writer.morphFrame.push_back(j.convert(i.first));
       }
       writer.cameraFrame = m_cameras;
       writer.lightFrame = m_lights;
@@ -105,7 +101,7 @@ namespace s3d_mmd
     }
 
     template<class FrameData>
-    void Frames<FrameData>::push(const FrameData & data)
+    void Frames<FrameData>::push(const FrameData& data)
     {
       m_frames.push_back(data);
       isSorted = false;
@@ -117,10 +113,9 @@ namespace s3d_mmd
       FrameData val;
       val.frameNo = frameNo;
       auto first = std::lower_bound(m_frames.begin(), m_frames.end(), val);
-      if ( first != m_frames.end() && first->frameNo == frameNo )
-        return{ first,true };
+      if ( first != m_frames.end() && first->frameNo == frameNo ) return { first,true };
 
-      return{ first, false };
+      return { first, false };
     }
 
     template<class FrameData>
@@ -130,17 +125,16 @@ namespace s3d_mmd
     Frames<FrameData>::Frames(Array<FrameData> data) : m_frames(std::move(data)) {}
 
     template<class FrameData>
-    int Frames<FrameData>::lastFrameNo()const
+    int Frames<FrameData>::lastFrameNo() const
     {
       int lastFrame = 0;
-      for ( auto& i : m_frames )
-        lastFrame = std::max(lastFrame, i.frameNo);
+      for ( auto& i : m_frames ) lastFrame = std::max(lastFrame, i.frameNo);
 
       return lastFrame;
     }
 
     template<class FrameData>
-    Optional<FrameData> Frames<FrameData>::add(const FrameData & data)
+    Optional<FrameData> Frames<FrameData>::add(const FrameData& data)
     {
       auto preFrame = getFrameImpl(data.frameNo);
       if ( preFrame.second )
@@ -157,17 +151,15 @@ namespace s3d_mmd
     bool Frames<FrameData>::remove(int frameNo)
     {
       auto p = getFrameImpl(frameNo);
-      if ( p.second )
-        m_frames.erase(p.first);
+      if ( p.second ) m_frames.erase(p.first);
 
       return p.second;
     }
 
     template<class FrameData>
-    std::pair<Optional<const FrameData&>, Optional<const FrameData&>>
-      Frames<FrameData>::getSection(int frameNo)
+    std::pair<Optional<const FrameData&>, Optional<const FrameData&>> Frames<FrameData>::getSection(int frameNo)
     {
-      if ( size() == 0 ) return{ none, none };
+      if ( size() == 0 ) return { none, none };
       sort();
 
       // frameNoより後のデータを探索
@@ -175,19 +167,17 @@ namespace s3d_mmd
       val.frameNo = frameNo;
       auto it = std::upper_bound(m_frames.begin(), m_frames.end(), val);
 
-      if ( it == m_frames.end() )
-        return{ *--it, none };
+      if ( it == m_frames.end() ) return { *--it, none };
 
       // 一つ前に戻れるかチェック
       if ( it != m_frames.begin() )
       {
         auto second = it;
-        return{ *--it, *second };    // もしフレームの後のデータがある場合
-
+        return { *--it, *second }; // もしフレームの後のデータがある場合
       }
       else
       {
-        return{ none, *it };
+        return { none, *it };
       }
     }
 
@@ -195,8 +185,7 @@ namespace s3d_mmd
     Optional<const FrameData&> Frames<FrameData>::getFrame(int frameNo)
     {
       auto p = getFrameImpl(frameNo);
-      if ( p.second )
-        return *p.first;
+      if ( p.second ) return *p.first;
       return none;
     }
 
@@ -214,6 +203,5 @@ namespace s3d_mmd
       std::sort(res.begin(), res.end());
       return std::move(res);
     }
-
   }
 }

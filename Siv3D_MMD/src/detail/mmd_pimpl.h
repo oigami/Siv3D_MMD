@@ -361,10 +361,11 @@ namespace s3d_mmd
         Graphics3D::SetRasterizerStateForward(RasterizerState::SolidCullBack);
       }
       Graphics3D::SetAmbientLightForward(i.material.ambient);
-      if(i.material.diffuseTextureName.isEmpty)
+      if ( i.material.diffuseTextureName.isEmpty )
       {
         m_mesh.drawSubsetForward(i.indexStart, i.indexCount, i.material.diffuse);
-      }else
+      }
+      else
       {
         m_mesh.drawSubsetForward(i.indexStart, i.indexCount, i.material.texture, i.material.diffuse);
       }

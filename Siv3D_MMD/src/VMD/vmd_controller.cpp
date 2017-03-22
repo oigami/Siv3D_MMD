@@ -5,33 +5,33 @@
 #include <src/reader_helper.h>
 #include <src/VMD/vmd_controller_pimpl.h>
 #include <MMD/mmd_motion.h>
+
 namespace s3d_mmd
 {
-
   VMD::VMD()
   {
     m_handle = std::make_shared<Pimpl>();
   }
 
-  VMD::VMD(const FilePath & filename)
+  VMD::VMD(const FilePath& filename)
   {
     mmd::MMDMotion motion(filename);
     m_handle = std::make_shared<Pimpl>(motion);
   }
 
-  VMD::VMD(mmd::MMDMotion & motion)
+  VMD::VMD(mmd::MMDMotion& motion)
   {
     m_handle = std::make_shared<Pimpl>(motion);
   }
 
   VMD::~VMD() {}
 
-  void VMD::UpdateBone(mmd::Bones &bones) const
+  void VMD::UpdateBone(mmd::Bones& bones) const
   {
     m_handle->UpdateBone(bones);
   }
 
-  void VMD::UpdateMorph(mmd::FaceMorph & m_morph) const
+  void VMD::UpdateMorph(mmd::FaceMorph& m_morph) const
   {
     m_handle->UpdateMorph(m_morph);
   }
@@ -46,12 +46,12 @@ namespace s3d_mmd
     return m_handle->setLoop(loop);
   }
 
-  void VMD::setLoopBySec(bool loop, const SecondsF & loopBegin, const SecondsF & loopEnd) const
+  void VMD::setLoopBySec(bool loop, const SecondsF& loopBegin, const SecondsF& loopEnd) const
   {
     return m_handle->setLoopBySec(loop, loopBegin, loopEnd);
   }
 
-  void VMD::setPosSec(const SecondsF & pos) const
+  void VMD::setPosSec(const SecondsF& pos) const
   {
     return m_handle->setPosSec(pos);
   }
@@ -90,6 +90,4 @@ namespace s3d_mmd
   {
     return m_handle->isPaused();
   }
-
-
 }

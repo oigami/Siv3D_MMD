@@ -1,12 +1,12 @@
 #pragma once
 #include <Siv3D.hpp>
+
 namespace s3d_mmd
 {
   namespace mmd
   {
     struct FaceMorph
     {
-
     public:
 
       FaceMorph() = default;
@@ -19,7 +19,7 @@ namespace s3d_mmd
 
       bool setWeight(const String& faceName, float weight);
 
-      const Array<float>& weights()const;
+      const Array<float>& weights() const;
 
       const std::unordered_map<String, int> faceNameIndex() const;
 
@@ -28,7 +28,6 @@ namespace s3d_mmd
       std::unordered_map<String, int> m_faceNum;
 
       Array<float> m_weight;
-
     };
   }
 }

@@ -7,8 +7,11 @@ namespace s3d_mmd
     {
       enum class Type
       {
-        XYZ, YZX, ZXY
+        XYZ,
+        YZX,
+        ZXY
       };
+
       static bool IsGimballock(float val)
       {
         constexpr float eps = 1.0e-4f;
@@ -18,7 +21,8 @@ namespace s3d_mmd
         }
         return false;
       }
-      bool CreateXYZ(const Mat4x4 &rot)
+
+      bool CreateXYZ(const Mat4x4& rot)
       {
         using namespace DirectX;
         const float tmp = XMVectorGetZ(rot.r[0]);
@@ -29,7 +33,8 @@ namespace s3d_mmd
         type = Type::XYZ;
         return true;
       }
-      bool CreateYZX(const Mat4x4 &rot)
+
+      bool CreateYZX(const Mat4x4& rot)
       {
         using namespace DirectX;
         const float tmp = XMVectorGetX(rot.r[1]);
@@ -40,7 +45,8 @@ namespace s3d_mmd
         type = Type::YZX;
         return true;
       }
-      bool CreateZXY(const Mat4x4 &rot)
+
+      bool CreateZXY(const Mat4x4& rot)
       {
         using namespace DirectX;
         const float tmp = XMVectorGetY(rot.r[2]);
@@ -51,28 +57,32 @@ namespace s3d_mmd
         type = Type::ZXY;
         return true;
       }
+
       Mat4x4 CreateX() const
       {
         return DirectX::XMMatrixRotationX(x);
       }
+
       Mat4x4 CreateY() const
       {
         return DirectX::XMMatrixRotationY(y);
       }
+
       Mat4x4 CreateZ() const
       {
         return DirectX::XMMatrixRotationZ(z);
       }
+
       Type type;
     public:
       float x, y, z;
 
 
-      EulerAngles(const Mat4x4 &rot)
+      EulerAngles(const Mat4x4& rot)
       {
         if ( !CreateXYZ(rot) )
           if ( !CreateYZX(rot) )
-            //if ( !CreateZXY(rot) ) // x が90度以内に制限されると膝が上がらなくなってしまう
+          //if ( !CreateZXY(rot) ) // x が90度以内に制限されると膝が上がらなくなってしまう
             Println(L"error");
       }
 
@@ -92,13 +102,11 @@ namespace s3d_mmd
         assert(0);
         return Mat4x4::Identity();
       }
-
     };
 
     /// /// 0～1に規格化されたベジェ曲線
     class Bezie
     {
-
       Float2 p1, p2; /// 制御点
 
       mutable float pre_x;
@@ -107,7 +115,7 @@ namespace s3d_mmd
 
       Bezie() = default;
       Bezie(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2);
-      float GetY(float x) const;	/// xにおけるyを取得
+      float GetY(float x) const; /// xにおけるyを取得
 
       static DirectX::XMVECTOR newton(float _x,
                                       const Bezie& x,
@@ -116,9 +124,9 @@ namespace s3d_mmd
                                       const Bezie& r
       );
 
-      const Float2& getP1()const { return p1; }
-      const Float2& getP2()const { return p2; }
-    };
+      const Float2& getP1() const { return p1; }
 
+      const Float2& getP2() const { return p2; }
+    };
   }
 }

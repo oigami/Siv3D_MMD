@@ -1,11 +1,11 @@
 ﻿#pragma once
 #include <MMD/vmd_reader.h>
 #include <MMD/key_frame_data.h>
+
 namespace s3d_mmd
 {
   namespace mmd
   {
-
     template<class FrameData>
     class Frames
     {
@@ -119,7 +119,6 @@ namespace s3d_mmd
       Array<SelfShadowKeyFrame> m_selfShadows;
 
       Array<ShowIkKeyFrame> m_showIks;
-
     };
   }
 }

@@ -14,10 +14,14 @@ namespace s3d_mmd
   private:
     void updateREvent();
     void updateLEvent();
+
     enum class NowState
     {
-      LEvent, REvent, None,
+      LEvent,
+      REvent,
+      None,
     };
+
     NowState nowState = NowState::None;
   };
 
@@ -26,19 +30,18 @@ namespace s3d_mmd
     switch ( nowState )
     {
     case MouseCamera3D::NowState::LEvent:
-      updateLEvent(); break;
+      updateLEvent();
+      break;
 
     case MouseCamera3D::NowState::REvent:
-      updateREvent(); break;
+      updateREvent();
+      break;
 
     case MouseCamera3D::NowState::None:
 
-      if ( s3d::Input::MouseL.pressed )
-        nowState = NowState::LEvent;
-      else if ( s3d::Input::MouseR.pressed )
-        nowState = NowState::REvent;
-      else if ( s3d::Mouse::Wheel() != 0 )
-        camera.pos += (camera.pos - camera.lookat).normalize() * s3d::Mouse::Wheel();
+      if ( s3d::Input::MouseL.pressed ) nowState = NowState::LEvent;
+      else if ( s3d::Input::MouseR.pressed ) nowState = NowState::REvent;
+      else if ( s3d::Mouse::Wheel() != 0 ) camera.pos += (camera.pos - camera.lookat).normalize() * s3d::Mouse::Wheel();
       break;
     }
   }
@@ -109,5 +112,4 @@ namespace s3d_mmd
 
     camera.pos = newPos;
   }
-
 }

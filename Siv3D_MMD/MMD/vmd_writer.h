@@ -1,5 +1,6 @@
 #pragma once
 #include <MMD/vmd_struct.h>
+
 namespace s3d_mmd
 {
   namespace mmd

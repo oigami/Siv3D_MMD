@@ -16,7 +16,6 @@ namespace s3d_mmd
 
   void PMDReader::load(IReader& reader)
   {
-    
     if ( !reader.isOpened() ) return;
     pmd_struct::Header pmdHeader;
     reader.read(pmdHeader);

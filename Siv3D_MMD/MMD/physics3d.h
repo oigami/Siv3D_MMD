@@ -66,13 +66,12 @@
 #include <BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h>
 #include <BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
 #include <BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h>
+
 namespace physics3d
 {
-
-
   class DebugDraw : public btIDebugDraw
   {
-    int  m_debugMode;
+    int m_debugMode;
 
   public:
 
@@ -166,7 +165,6 @@ namespace physics3d
     /// </summary>
     /// <returns> デバッグモード </returns>
     virtual int getDebugMode() const;
-
   };
 
   class Physics3DBody;
@@ -183,7 +181,6 @@ namespace physics3d
     Box,
     Sphere,
     Capsule,
-
   };
 
   class Physics3D6DofSpringConstraint;
@@ -207,22 +204,19 @@ namespace physics3d
 
     constexpr Physics3DMaterial(double _mass = 1.0, double _restitution = 0.1, double _friction = 0.2, double _linearDamping = 0.2, double _angularDamping = 0.2)
       : mass(_mass)
-      , restitution(_restitution)
-      , friction(_friction)
-      , linearDamping(_linearDamping)
-      , angularDamping(_angularDamping)
-    {
-    }
+        , restitution(_restitution)
+        , friction(_friction)
+        , linearDamping(_linearDamping)
+        , angularDamping(_angularDamping) { }
   };
 
   struct Physics3DFilter
   {
     s3d::uint16 group;
     s3d::uint16 mask;
+
     Physics3DFilter(s3d::uint16 _group = 0b0000'0000'0000'0001, s3d::uint16 _mask = 0b1111'1111'1111'1111)
-      :group(_group), mask(_mask)
-    {
-    }
+      : group(_group), mask(_mask) { }
   };
 
   class Physics3DWorld
@@ -299,7 +293,7 @@ namespace physics3d
 
     Physics3DBody();
 
-    Physics3DBody(const Physics3DWorld& world, const s3d::Vec3& center = s3d::Vec3(0, 0, 0), const Physics3DMaterial& material = Physics3DMaterial(), const Physics3DFilter&filter = Physics3DFilter(), PhysicsBodyType bodyType = PhysicsBodyType::Dynamic);
+    Physics3DBody(const Physics3DWorld& world, const s3d::Vec3& center = s3d::Vec3(0, 0, 0), const Physics3DMaterial& material = Physics3DMaterial(), const Physics3DFilter& filter = Physics3DFilter(), PhysicsBodyType bodyType = PhysicsBodyType::Dynamic);
 
     bool initialized() const;
 
@@ -395,7 +389,7 @@ namespace physics3d
 
     const Physics3DShape& shape(size_t index) const;
 
-    template <class PShape, std::enable_if_t<std::is_base_of<PhysicsShape, PShape>::value>* = nullptr>
+    template<class PShape, std::enable_if_t<std::is_base_of<PhysicsShape, PShape>::value>* = nullptr>
     std::shared_ptr<PShape> shapeAs(const size_t index) const;
 
     size_t num_shapes() const;
@@ -414,7 +408,7 @@ namespace physics3d
 
   public:
 
-    CPhysics3DBody(const Physics3DWorld& world, const s3d::Vec3& center, const Physics3DMaterial& material, const Physics3DFilter&filter, Physics3DBodyType bodyType);
+    CPhysics3DBody(const Physics3DWorld& world, const s3d::Vec3& center, const Physics3DMaterial& material, const Physics3DFilter& filter, Physics3DBodyType bodyType);
 
     ~CPhysics3DBody();
 
@@ -467,7 +461,6 @@ namespace physics3d
     void setFilter(const Physics3DFilter& filter);
     Physics3DFilter getFilter() const;
     */
-
   };
 
   struct Physics3D6DofSpringConstraintState
@@ -499,7 +492,6 @@ namespace physics3d
     Physics3D6DofSpringConstraint();
 
     Physics3D6DofSpringConstraint(const Physics3DWorld& world, const Physics3DBody& bodyA, const Physics3DBody& bodyB, const Physics3D6DofSpringConstraintState& state);
-
   };
 
   class Physics3D6DofSpringConstraint::CPhysics3D6DofSpringConstraint
@@ -513,9 +505,6 @@ namespace physics3d
     CPhysics3D6DofSpringConstraint(const Physics3DWorld& world, const Physics3DBody& bodyA, const Physics3DBody& bodyB, const Physics3D6DofSpringConstraintState& state);
 
     ~CPhysics3D6DofSpringConstraint();
-
-
-
   };
 
 
@@ -559,7 +548,7 @@ namespace physics3d
     /// <returns></returns>
     inline btVector3 XM_CALLCONV toBTVec3(FVec3 vec)
     {
-      return{ static_cast<btScalar>(vec.x), static_cast<btScalar>(vec.y), static_cast<btScalar>(-vec.z) };
+      return { static_cast<btScalar>(vec.x), static_cast<btScalar>(vec.y), static_cast<btScalar>(-vec.z) };
     }
 
     /// <summary>
@@ -570,7 +559,7 @@ namespace physics3d
     /// <returns></returns>
     inline s3d::Vec3 toVec3(const btVector3& vec)
     {
-      return{ vec.x(), vec.y(), -vec.z() };
+      return { vec.x(), vec.y(), -vec.z() };
     }
 
     inline s3d::Vector toVector(const btVector3& vec)
@@ -587,7 +576,7 @@ namespace physics3d
     /// <returns></returns>
     inline btVector3 XM_CALLCONV toBTScalar3(FVec3 scalar3)
     {
-      return{ static_cast<btScalar>(scalar3.x), static_cast<btScalar>(scalar3.y), static_cast<btScalar>(scalar3.z) };
+      return { static_cast<btScalar>(scalar3.x), static_cast<btScalar>(scalar3.y), static_cast<btScalar>(scalar3.z) };
     }
 
     /// <summary>
@@ -598,10 +587,10 @@ namespace physics3d
     /// <returns></returns>
     inline s3d::Vec3 toScalar3(const btVector3& scalar3)
     {
-      return{ scalar3.x(), scalar3.y(), scalar3.z() };
+      return { scalar3.x(), scalar3.y(), scalar3.z() };
     }
 
-    inline btTransform XM_CALLCONV toBTMatrix(DirectX::FXMMATRIX  m)
+    inline btTransform XM_CALLCONV toBTMatrix(DirectX::FXMMATRIX m)
     {
       btTransform ret;
 
@@ -626,7 +615,7 @@ namespace physics3d
       return ret;
     }
 
-    inline s3d::Mat4x4 toMatrix(const btTransform &t)
+    inline s3d::Mat4x4 toMatrix(const btTransform& t)
     {
       s3d::Mat4x4 ret;
       const btMatrix3x3 basis = t.getBasis();
@@ -655,13 +644,12 @@ namespace physics3d
 #endif // BT_USE_SSE_IN_API
 
 
-
       return ret;
     }
 
     inline s3d::ColorF toColor(const btVector3& btColor)
     {
-      return  s3d::ColorF(btColor.x(), btColor.y(), btColor.z());
+      return s3d::ColorF(btColor.x(), btColor.y(), btColor.z());
     }
   }
 
@@ -692,7 +680,7 @@ namespace physics3d
     s3d::Box getBox() const
     {
       const s3d::Vec3 size = detail::toScalar3(m_shape.getHalfExtentsWithoutMargin() * 2);
-      return{ getPos(), size, getRot() };
+      return { getPos(), size, getRot() };
     }
   };
 
@@ -703,7 +691,7 @@ namespace physics3d
   public:
 
     BTCapsule(btRigidBody* body, btCompoundShape* compound, const s3d::Cylinder& capsule)
-      :m_shape(static_cast<btScalar>(capsule.r), static_cast<btScalar>(capsule.h)), Physics3DShape(body, capsule.center, capsule.rotation)
+      : m_shape(static_cast<btScalar>(capsule.r), static_cast<btScalar>(capsule.h)), Physics3DShape(body, capsule.center, capsule.rotation)
     {
       compound->addChildShape(m_fixture.trans, &m_shape);
       body->setCollisionShape(compound);
@@ -726,7 +714,6 @@ namespace physics3d
       auto pos = getPos();
       return s3d::Cylinder(pos.x, pos.y, pos.z, m_shape.getRadius(), m_shape.getHalfHeight() * 2, getRot());
     }
-
   };
 
 
@@ -737,7 +724,7 @@ namespace physics3d
   public:
 
     BTSphere(btRigidBody* body, btCompoundShape* compound, const s3d::Sphere& sphere)
-      :m_shape(static_cast<btScalar>(sphere.r)), Physics3DShape(body, sphere.center, sphere.rotation)
+      : m_shape(static_cast<btScalar>(sphere.r)), Physics3DShape(body, sphere.center, sphere.rotation)
     {
       compound->addChildShape(m_fixture.trans, &m_shape);
       body->setCollisionShape(compound);
@@ -757,7 +744,7 @@ namespace physics3d
     s3d::Sphere getSphere() const
     {
       const float r = m_shape.getRadius();
-      return{ getPos(), r, getRot() };
+      return { getPos(), r, getRot() };
     }
   };
 
@@ -768,10 +755,7 @@ namespace physics3d
   //
 
   inline Physics3DWorld::Physics3DWorld(const s3d::Vec3& gravity)
-    :pImpl(std::make_shared<CPhysics3DWorld>(gravity))
-  {
-
-  }
+    : pImpl(std::make_shared<CPhysics3DWorld>(gravity)) { }
 
   inline std::weak_ptr<btDiscreteDynamicsWorld> Physics3DWorld::getWorldPtr() const
   {
@@ -807,33 +791,33 @@ namespace physics3d
     };
   }
 
-  inline Physics3DBody Physics3DWorld::createEmpty(const s3d::Vec3 & center, const Physics3DMaterial & material, const Physics3DFilter & filter, PhysicsBodyType bodyType) const
+  inline Physics3DBody Physics3DWorld::createEmpty(const s3d::Vec3& center, const Physics3DMaterial& material, const Physics3DFilter& filter, PhysicsBodyType bodyType) const
   {
     return Physics3DBody(*this, center, material, filter, bodyType);
   }
 
-  inline Physics3DBody Physics3DWorld::createBox(const s3d::Vec3 & center, const s3d::Box& box, const Physics3DMaterial & material, const Physics3DFilter & filter, PhysicsBodyType bodyType) const
+  inline Physics3DBody Physics3DWorld::createBox(const s3d::Vec3& center, const s3d::Box& box, const Physics3DMaterial& material, const Physics3DFilter& filter, PhysicsBodyType bodyType) const
   {
     Physics3DBody body(*this, center, material, filter, bodyType);
     body.addBox(box);
     return body;
   }
 
-  inline Physics3DBody Physics3DWorld::createCapsule(const s3d::Vec3 & center, const s3d::Cylinder & capsule, const Physics3DMaterial & material, const Physics3DFilter & filter, PhysicsBodyType bodyType) const
+  inline Physics3DBody Physics3DWorld::createCapsule(const s3d::Vec3& center, const s3d::Cylinder& capsule, const Physics3DMaterial& material, const Physics3DFilter& filter, PhysicsBodyType bodyType) const
   {
     Physics3DBody body(*this, center, material, filter, bodyType);
     body.addCapsule(capsule);
     return body;
   }
 
-  inline Physics3DBody Physics3DWorld::createSphere(const s3d::Vec3 & center, const s3d::Sphere & sphere, const Physics3DMaterial & material, const Physics3DFilter & filter, PhysicsBodyType bodyType) const
+  inline Physics3DBody Physics3DWorld::createSphere(const s3d::Vec3& center, const s3d::Sphere& sphere, const Physics3DMaterial& material, const Physics3DFilter& filter, PhysicsBodyType bodyType) const
   {
     Physics3DBody body(*this, center, material, filter, bodyType);
     body.addSphere(sphere);
     return body;
   }
 
-  inline Physics3D6DofSpringConstraint Physics3DWorld::create6DofSpringConstraint(const Physics3DBody & bodyA, const Physics3DBody & bodyB, const Physics3D6DofSpringConstraintState & state)
+  inline Physics3D6DofSpringConstraint Physics3DWorld::create6DofSpringConstraint(const Physics3DBody& bodyA, const Physics3DBody& bodyB, const Physics3D6DofSpringConstraintState& state)
   {
     return Physics3D6DofSpringConstraint(*this, bodyA, bodyB, state);
   }
@@ -846,12 +830,12 @@ namespace physics3d
 
   inline Physics3DWorld::CPhysics3DWorld::CPhysics3DWorld(const s3d::Vec3& gravity)
     : m_collisionConfiguration(new btDefaultCollisionConfiguration()),
-    m_dispatcher(new btCollisionDispatcher(m_collisionConfiguration.get())),
-    m_overlappingPairCache(new btDbvtBroadphase()),
-    m_solver(new btSequentialImpulseConstraintSolver()),
-    m_world(new btDiscreteDynamicsWorld(m_dispatcher.get(), m_overlappingPairCache.get(),
-                                        m_solver.get(), m_collisionConfiguration.get())),
-    m_debugDraw(new DebugDraw())
+      m_dispatcher(new btCollisionDispatcher(m_collisionConfiguration.get())),
+      m_overlappingPairCache(new btDbvtBroadphase()),
+      m_solver(new btSequentialImpulseConstraintSolver()),
+      m_world(new btDiscreteDynamicsWorld(m_dispatcher.get(), m_overlappingPairCache.get(),
+                                          m_solver.get(), m_collisionConfiguration.get())),
+      m_debugDraw(new DebugDraw())
   {
     m_world->setGravity(detail::toBTVec3(gravity));
     m_world->setDebugDrawer(m_debugDraw.get());
@@ -869,18 +853,15 @@ namespace physics3d
 
   inline Physics3DBody::Physics3DBody() {}
 
-  inline Physics3DBody::Physics3DBody(const Physics3DWorld & world, const s3d::Vec3 & center, const Physics3DMaterial& material, const Physics3DFilter&filter, PhysicsBodyType bodyType)
-    :pImpl(std::make_shared<CPhysics3DBody>(world, center, material, filter, bodyType))
-  {
-
-  }
+  inline Physics3DBody::Physics3DBody(const Physics3DWorld& world, const s3d::Vec3& center, const Physics3DMaterial& material, const Physics3DFilter& filter, PhysicsBodyType bodyType)
+    : pImpl(std::make_shared<CPhysics3DBody>(world, center, material, filter, bodyType)) { }
 
   inline bool Physics3DBody::initialized() const
   {
     return !!pImpl;
   }
 
-  inline Physics3DBody & Physics3DBody::addBox(const s3d::Box& box)
+  inline Physics3DBody& Physics3DBody::addBox(const s3d::Box& box)
   {
     if ( !pImpl )
     {
@@ -892,7 +873,7 @@ namespace physics3d
     return *this;
   }
 
-  inline Physics3DBody & Physics3DBody::addCapsule(const s3d::Cylinder & capsule)
+  inline Physics3DBody& Physics3DBody::addCapsule(const s3d::Cylinder& capsule)
   {
     if ( !pImpl )
     {
@@ -904,7 +885,7 @@ namespace physics3d
     return *this;
   }
 
-  inline Physics3DBody & Physics3DBody::addSphere(const s3d::Sphere & sphere)
+  inline Physics3DBody& Physics3DBody::addSphere(const s3d::Sphere& sphere)
   {
     if ( !pImpl )
     {
@@ -931,7 +912,6 @@ namespace physics3d
     {
       pImpl->getBody()->setSleepingThresholds(0.0f, 0.0f);
     }
-
   }
 
   inline bool Physics3DBody::isSleepingAllowed() const
@@ -977,7 +957,7 @@ namespace physics3d
     setPos({ x,y,z });
   }
 
-  inline void Physics3DBody::setPos(const s3d::Vec3 & pos)
+  inline void Physics3DBody::setPos(const s3d::Vec3& pos)
   {
     if ( !pImpl )
     {
@@ -994,12 +974,12 @@ namespace physics3d
     moveBy({ x,y,z, });
   }
 
-  inline void Physics3DBody::moveBy(const s3d::Vec3 & v)
+  inline void Physics3DBody::moveBy(const s3d::Vec3& v)
   {
     setPos(getPos() + v);
   }
 
-  inline void Physics3DBody::setAngle(const s3d::Quaternion & angle)
+  inline void Physics3DBody::setAngle(const s3d::Quaternion& angle)
   {
     if ( !pImpl )
     {
@@ -1011,17 +991,17 @@ namespace physics3d
     body->setWorldTransform(btTransform(detail::toBTRot(angle), body->getWorldTransform().getOrigin()));
   }
 
-  inline void Physics3DBody::rotateBy(const s3d::Quaternion & angle)
+  inline void Physics3DBody::rotateBy(const s3d::Quaternion& angle)
   {
     setAngle(getAngle() * angle);
   }
 
-  inline void Physics3DBody::setTransform(double x, double y, double z, const s3d::Quaternion & angle)
+  inline void Physics3DBody::setTransform(double x, double y, double z, const s3d::Quaternion& angle)
   {
     setTransform({ x,y,z }, angle);
   }
 
-  inline void Physics3DBody::setTransform(const s3d::Vec3 & pos, const s3d::Quaternion & angle)
+  inline void Physics3DBody::setTransform(const s3d::Vec3& pos, const s3d::Quaternion& angle)
   {
     if ( !pImpl )
     {
@@ -1031,7 +1011,7 @@ namespace physics3d
     pImpl->getBody()->setWorldTransform(btTransform(detail::toBTRot(angle), detail::toBTVec3(pos)));
   }
 
-  inline void Physics3DBody::setTransform(const Mat4x4 & transform)
+  inline void Physics3DBody::setTransform(const Mat4x4& transform)
   {
     if ( !pImpl )
     {
@@ -1041,9 +1021,8 @@ namespace physics3d
     pImpl->getBody()->getMotionState()->setWorldTransform(detail::toBTMatrix(transform));
   }
 
-  inline void Physics3DBody::applyForce(const s3d::Vec3 & force)
+  inline void Physics3DBody::applyForce(const s3d::Vec3& force)
   {
-
     if ( !pImpl )
     {
       return;
@@ -1053,7 +1032,7 @@ namespace physics3d
     pImpl->getBody()->applyCentralForce(detail::toBTVec3(force));
   }
 
-  inline void Physics3DBody::applyForce(const s3d::Vec3 & force, const s3d::Vec3 & offset)
+  inline void Physics3DBody::applyForce(const s3d::Vec3& force, const s3d::Vec3& offset)
   {
     if ( !pImpl )
     {
@@ -1064,17 +1043,17 @@ namespace physics3d
     pImpl->getBody()->applyForce(detail::toBTVec3(force), detail::toBTVec3(offset));
   }
 
-  inline void Physics3DBody::applyForceAt(const s3d::Vec3 & force, const s3d::Vec3 & pos)
+  inline void Physics3DBody::applyForceAt(const s3d::Vec3& force, const s3d::Vec3& pos)
   {
     applyForce(force, pos - getPos());
   }
 
-  inline void Physics3DBody::applyLinearImpulse(const s3d::Vec3 & force)
+  inline void Physics3DBody::applyLinearImpulse(const s3d::Vec3& force)
   {
     applyLinearImpulse(force, s3d::Vec3::Zero);
   }
 
-  inline void Physics3DBody::applyLinearImpulse(const s3d::Vec3 & force, const s3d::Vec3 & offset)
+  inline void Physics3DBody::applyLinearImpulse(const s3d::Vec3& force, const s3d::Vec3& offset)
   {
     if ( !pImpl )
     {
@@ -1084,12 +1063,12 @@ namespace physics3d
     pImpl->getBody()->applyImpulse(detail::toBTVec3(force), detail::toBTVec3(offset));
   }
 
-  inline void Physics3DBody::applyLinearImpulseAt(const s3d::Vec3 & force, const s3d::Vec3 & pos)
+  inline void Physics3DBody::applyLinearImpulseAt(const s3d::Vec3& force, const s3d::Vec3& pos)
   {
     applyLinearImpulse(force, pos - getPos());
   }
 
-  inline void Physics3DBody::applyTorque(const s3d::Vec3 & torque)
+  inline void Physics3DBody::applyTorque(const s3d::Vec3& torque)
   {
     if ( !pImpl )
     {
@@ -1099,7 +1078,7 @@ namespace physics3d
     pImpl->getBody()->applyTorque(detail::toBTVec3(torque));
   }
 
-  inline void Physics3DBody::applyAngularImpulse(const s3d::Vec3 & torque)
+  inline void Physics3DBody::applyAngularImpulse(const s3d::Vec3& torque)
   {
     if ( !pImpl )
     {
@@ -1141,7 +1120,7 @@ namespace physics3d
     return detail::toMatrix(transform);
   }
 
-  inline void Physics3DBody::setVelocity(const s3d::Vec3 & v)
+  inline void Physics3DBody::setVelocity(const s3d::Vec3& v)
   {
     if ( !pImpl )
     {
@@ -1161,7 +1140,7 @@ namespace physics3d
     return detail::toVec3(pImpl->getBody()->getLinearVelocity());
   }
 
-  inline void Physics3DBody::setAngularVelocity(const s3d::Vec3 & omega)
+  inline void Physics3DBody::setAngularVelocity(const s3d::Vec3& omega)
   {
     if ( !pImpl )
     {
@@ -1208,7 +1187,6 @@ namespace physics3d
     }
 
     pImpl->getBody()->setDamping(static_cast<btScalar>(getDamping()), static_cast<btScalar>(damping));
-
   }
 
   inline double Physics3DBody::getAngularDamping() const
@@ -1230,8 +1208,7 @@ namespace physics3d
 
     auto res = pImpl->getBody()->getInvMass();
 
-    if ( res == 0.0 )
-      return res;
+    if ( res == 0.0 ) return res;
 
     return 1 / res;
   }
@@ -1248,7 +1225,6 @@ namespace physics3d
 
   inline void Physics3DBody::setBodyType(Physics3DBodyType bodyType)
   {
-
     if ( !pImpl )
     {
       return;
@@ -1299,7 +1275,7 @@ namespace physics3d
     return Physics3DBodyType::Dynamic;
   }
 
-  inline void Physics3DBody::draw(const s3d::Color & color) const
+  inline void Physics3DBody::draw(const s3d::Color& color) const
   {
     if ( !pImpl )
     {
@@ -1312,7 +1288,7 @@ namespace physics3d
     }
   }
 
-  inline Physics3DShape & Physics3DBody::shape(size_t index)
+  inline Physics3DShape& Physics3DBody::shape(size_t index)
   {
     if ( !pImpl )
     {
@@ -1322,7 +1298,7 @@ namespace physics3d
     return *pImpl->getShapes()[index];
   }
 
-  inline const Physics3DShape & Physics3DBody::shape(size_t index) const
+  inline const Physics3DShape& Physics3DBody::shape(size_t index) const
   {
     if ( !pImpl )
     {
@@ -1358,7 +1334,7 @@ namespace physics3d
   //  CPhysicsBody
   //
 
-  inline Physics3DBody::CPhysics3DBody::CPhysics3DBody(const Physics3DWorld& world, const s3d::Vec3& center, const Physics3DMaterial& material, const Physics3DFilter&filter, Physics3DBodyType bodyType)
+  inline Physics3DBody::CPhysics3DBody::CPhysics3DBody(const Physics3DWorld& world, const s3d::Vec3& center, const Physics3DMaterial& material, const Physics3DFilter& filter, Physics3DBodyType bodyType)
   {
     m_world = world.getWorldPtr();
     m_compoundShape.reset(new btCompoundShape());
@@ -1409,17 +1385,17 @@ namespace physics3d
     m_shapes.push_back(std::make_shared<BTBox>(m_body.get(), m_compoundShape.get(), box));
   }
 
-  inline void Physics3DBody::CPhysics3DBody::addCapsule(const s3d::Cylinder & capsule)
+  inline void Physics3DBody::CPhysics3DBody::addCapsule(const s3d::Cylinder& capsule)
   {
     m_shapes.push_back(std::make_shared<BTCapsule>(m_body.get(), m_compoundShape.get(), capsule));
   }
 
-  inline void Physics3DBody::CPhysics3DBody::addSphere(const s3d::Sphere & sphere)
+  inline void Physics3DBody::CPhysics3DBody::addSphere(const s3d::Sphere& sphere)
   {
     m_shapes.push_back(std::make_shared<BTSphere>(m_body.get(), m_compoundShape.get(), sphere));
   }
 
-  inline btRigidBody * Physics3DBody::CPhysics3DBody::getBody()
+  inline btRigidBody* Physics3DBody::CPhysics3DBody::getBody()
   {
     return m_body.get();
   }
@@ -1455,7 +1431,7 @@ namespace physics3d
     return detail::toRot(transform.getRotation() * m_fixture.trans.getRotation());
   }
 
-  inline Physics3DShape::Physics3DShape(btRigidBody * _body, const s3d::Vec3 & center, const s3d::Quaternion & rot)
+  inline Physics3DShape::Physics3DShape(btRigidBody* _body, const s3d::Vec3& center, const s3d::Quaternion& rot)
   {
     m_fixture.body = _body;
     m_fixture.trans.setOrigin(detail::toBTVec3(center));
@@ -1467,15 +1443,10 @@ namespace physics3d
   //	Physics3D6DofSpringConstraint
   //
 
-  inline Physics3D6DofSpringConstraint::Physics3D6DofSpringConstraint()
-  {
+  inline Physics3D6DofSpringConstraint::Physics3D6DofSpringConstraint() { }
 
-  }
-
-  inline Physics3D6DofSpringConstraint::Physics3D6DofSpringConstraint(const Physics3DWorld & world, const Physics3DBody & bodyA, const Physics3DBody & bodyB, const Physics3D6DofSpringConstraintState & state)
-    :pImpl(std::make_shared<CPhysics3D6DofSpringConstraint>(world, bodyA, bodyB, state))
-  {
-  }
+  inline Physics3D6DofSpringConstraint::Physics3D6DofSpringConstraint(const Physics3DWorld& world, const Physics3DBody& bodyA, const Physics3DBody& bodyB, const Physics3D6DofSpringConstraintState& state)
+    : pImpl(std::make_shared<CPhysics3D6DofSpringConstraint>(world, bodyA, bodyB, state)) { }
 
   inline Physics3D6DofSpringConstraint::CPhysics3D6DofSpringConstraint::CPhysics3D6DofSpringConstraint(const Physics3DWorld& world, const Physics3DBody& bodyA, const Physics3DBody& bodyB, const Physics3D6DofSpringConstraintState& state)
   {
@@ -1493,13 +1464,13 @@ namespace physics3d
     m_joint->setAngularUpperLimit(detail::toBTScalar3(state.angularUpperLimit));
 
     auto set = [&](double val, int i)
-    {
-      if ( val != 0.0f )
       {
-        m_joint->enableSpring(i, true);
-        m_joint->setStiffness(i, static_cast<btScalar>(val));
-      }
-    };
+        if ( val != 0.0f )
+        {
+          m_joint->enableSpring(i, true);
+          m_joint->setStiffness(i, static_cast<btScalar>(val));
+        }
+      };
     set(state.stiffnessPos.x, 0);
     set(state.stiffnessPos.y, 1);
     set(state.stiffnessPos.z, 2);
@@ -1513,13 +1484,16 @@ namespace physics3d
   {
     // bodyA も bodyB も生きている時だけここで消す
     // それ以外は bodyA か bodyB が消えるタイミングでCPhysics3DBodyが消す
-    if ( auto a = m_bodyA.lock() ) if ( auto b = m_bodyB.lock() ) if ( auto world = m_world.lock() )
-    {
-      world->removeConstraint(m_joint.get());
-    }
+    if ( auto a = m_bodyA.lock() )
+      if ( auto b = m_bodyB.lock() )
+        if ( auto world = m_world.lock() )
+        {
+          world->removeConstraint(m_joint.get());
+        }
   }
 
-  template<class F>inline void SetRasterizerState(s3d::RasterizerState state, F f)
+  template<class F>
+  inline void SetRasterizerState(s3d::RasterizerState state, F f)
   {
     const s3d::RasterizerState rasterizerState = s3d::Graphics3D::GetRasterizerState();
     s3d::Graphics3D::SetRasterizerState(state);
@@ -1528,9 +1502,7 @@ namespace physics3d
   }
 
   inline DebugDraw::DebugDraw()
-    : m_debugMode(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawConstraints)
-  {
-  }
+    : m_debugMode(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_DrawConstraints) { }
 
   inline void DebugDraw::drawLine(const btVector3& from, const btVector3& to, const btVector3& btColor)
   {
@@ -1540,23 +1512,23 @@ namespace physics3d
     s3d::Line3D(vec1, vec2).drawForward(color);
   }
 
-  inline void DebugDraw::drawSphere(btScalar radius, const btTransform &transform, const btVector3 & color)
+  inline void DebugDraw::drawSphere(btScalar radius, const btTransform& transform, const btVector3& color)
   {
     const s3d::Vec3 pos = detail::toVec3(transform.getOrigin());
     SetRasterizerState(s3d::RasterizerState::WireframeCullBack, [&]()
-    {
-      s3d::Sphere(pos, radius).draw(detail::toColor(color));
-    });
+                       {
+                         s3d::Sphere(pos, radius).draw(detail::toColor(color));
+                       });
   }
 
-  inline void DebugDraw::drawBox(const btVector3 & bbMin, const btVector3 & bbMax, const btVector3 & color)
+  inline void DebugDraw::drawBox(const btVector3& bbMin, const btVector3& bbMax, const btVector3& color)
   {
     const s3d::Vec3 from = detail::toVec3(bbMin);
     const s3d::Vec3 to = detail::toVec3(bbMax);
     SetRasterizerState(s3d::RasterizerState::WireframeCullBack, [&]()
-    {
-      s3d::Box(from, to).draw(detail::toColor(color));
-    });
+                       {
+                         s3d::Box(from, to).draw(detail::toColor(color));
+                       });
   }
 
   //void DebugDraw::drawBox(const btVector3 & bbMin, const btVector3 & bbMax, const btTransform& trans, const btVector3 & color) {
@@ -1573,21 +1545,20 @@ namespace physics3d
     const s3d::Vec3 vec = detail::toVec3(transform.getOrigin());
     const s3d::Quaternion rot = detail::toRot(transform.getRotation() * static_cast<btScalar>(upAxis));
     SetRasterizerState(s3d::RasterizerState::WireframeCullBack, [&]()
-    {
-      //TODO: Capsuleがない
-      s3d::Cylinder(vec, radius, halfHeight * 2, rot).draw(detail::toColor(color));
-    });
+                       {
+                         //TODO: Capsuleがない
+                         s3d::Cylinder(vec, radius, halfHeight * 2, rot).draw(detail::toColor(color));
+                       });
   }
 
-  inline void DebugDraw::drawCylinder(btScalar radius, btScalar halfHeight, int upAxis, const btTransform & transform, const btVector3 & color)
+  inline void DebugDraw::drawCylinder(btScalar radius, btScalar halfHeight, int upAxis, const btTransform& transform, const btVector3& color)
   {
-
     const s3d::Vec3 vec = detail::toVec3(transform.getOrigin());
     const s3d::Quaternion rot = detail::toRot(transform.getRotation() * static_cast<btScalar>(upAxis));
     SetRasterizerState(s3d::RasterizerState::WireframeCullBack, [&]()
-    {
-      s3d::Cylinder(vec, radius, halfHeight * 2, rot).draw(detail::toColor(color));
-    });
+                       {
+                         s3d::Cylinder(vec, radius, halfHeight * 2, rot).draw(detail::toColor(color));
+                       });
   }
 
   inline void DebugDraw::drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int, const btVector3& color)

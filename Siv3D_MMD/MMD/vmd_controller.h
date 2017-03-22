@@ -3,9 +3,9 @@
 #include <MMD/mmd_bone.h>
 #include <MMD/mmd_morph.h>
 #include <MMD/mmd_motion.h>
+
 namespace s3d_mmd
 {
-
   class VMD
   {
     class Pimpl;
@@ -13,13 +13,13 @@ namespace s3d_mmd
 
   public:
 
-    VMD(const FilePath &filename);
+    VMD(const FilePath& filename);
     VMD(mmd::MMDMotion& motion);
     VMD();
     ~VMD();
 
-    void UpdateBone(mmd::Bones &bones) const;
-    void UpdateMorph(mmd::FaceMorph& m_morph)const;
+    void UpdateBone(mmd::Bones& bones) const;
+    void UpdateMorph(mmd::FaceMorph& m_morph) const;
 
     void play() const;
 

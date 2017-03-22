@@ -4,13 +4,13 @@
 
 namespace s3d_mmd
 {
-
-  MMD::MMD(const MMDModel &model, const physics3d::Physics3DWorld& world)
+  MMD::MMD(const MMDModel& model, const physics3d::Physics3DWorld& world)
   {
     m_handle = std::make_shared<Pimpl>(model, world);
   }
 
   MMD::~MMD() {}
+
   void MMD::PhysicsUpdate() const
   {
     m_handle->physicsUpdate();
@@ -32,12 +32,12 @@ namespace s3d_mmd
     m_handle->drawForward(worldMat);
   }
 
-  const Texture & MMD::vertexTexture() const
+  const Texture& MMD::vertexTexture() const
   {
     return m_handle->m_vertexTexture;
   }
 
-  void MMD::attach(const VMD & vmd) const
+  void MMD::attach(const VMD& vmd) const
   {
     m_handle->attach(vmd);
   }
@@ -57,17 +57,17 @@ namespace s3d_mmd
     return m_handle->m_bones;
   }
 
-  mmd::FaceMorph & MMD::morphs() const
+  mmd::FaceMorph& MMD::morphs() const
   {
     return m_handle->m_faceMorph;
   }
 
-  const String & MMD::name() const
+  const String& MMD::name() const
   {
     return m_handle->m_name;
   }
 
-  const String & MMD::comment() const
+  const String& MMD::comment() const
   {
     return m_handle->m_comment;
   }
@@ -78,5 +78,4 @@ namespace s3d_mmd
 
     return *this;
   }
-
 }

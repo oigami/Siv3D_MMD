@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
+
 namespace s3d_mmd
 {
   struct alignas(16) MyVector;
@@ -19,7 +20,6 @@ namespace s3d_mmd
 
   struct alignas(16) MyVector
   {
-
     DirectX::XMVECTOR component;
 
     constexpr XM_CALLCONV operator DirectX::XMVECTOR() const
@@ -27,7 +27,7 @@ namespace s3d_mmd
       return component;
     }
 
-    XM_CALLCONV operator DirectX::XMVECTOR& ()
+    XM_CALLCONV operator DirectX::XMVECTOR&()
     {
       return component;
     }
@@ -36,29 +36,19 @@ namespace s3d_mmd
     MyVector() {}
 
     constexpr MyVector(const MyVector& v)
-      : component(v.component)
-    {
-    }
+      : component(v.component) { }
 
     constexpr MyVector(DirectX::FXMVECTOR v)
-      : component(v)
-    {
-    }
+      : component(v) { }
 
     constexpr MyVector(float x, float y, float z, float w = 0.0f)
-      : component({ x, y, z, w })
-    {
-    }
+      : component({ x, y, z, w }) { }
 
     constexpr MyVector(detail::FVec4 v)
-      : component(s3d::ToVector(v))
-    {
-    }
+      : component(s3d::ToVector(v)) { }
 
     constexpr MyVector(detail::FVec3 v, double w)
-      : component(s3d::ToVector(v, w))
-    {
-    }
+      : component(s3d::ToVector(v, w)) { }
 
     //-----------------------------------------------
     //
@@ -78,7 +68,7 @@ namespace s3d_mmd
 
     constexpr static MyVector XM_CALLCONV Zero()
     {
-      return{ 0.0f, 0.0f, 0.0f, 0.0f };
+      return { 0.0f, 0.0f, 0.0f, 0.0f };
     }
 
 
@@ -172,6 +162,5 @@ namespace s3d_mmd
     float XM_CALLCONV getZ() const { return DirectX::XMVectorGetZ(component); }
 
     float XM_CALLCONV getW() const { return DirectX::XMVectorGetW(component); }
-
   };
 }

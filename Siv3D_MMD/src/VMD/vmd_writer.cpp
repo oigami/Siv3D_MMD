@@ -1,5 +1,6 @@
 ﻿#include <MMD/vmd_writer.h>
 #include <src/reader_helper.h>
+
 namespace s3d_mmd
 {
   namespace mmd
@@ -13,7 +14,7 @@ namespace s3d_mmd
       }
     }
 
-    VMDWriter::VMDWriter(const FilePath & outFileName)
+    VMDWriter::VMDWriter(const FilePath& outFileName)
     {
       writer_.open(outFileName);
     }

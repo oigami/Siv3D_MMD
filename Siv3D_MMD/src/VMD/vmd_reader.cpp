@@ -1,5 +1,6 @@
 ﻿#include <MMD/vmd_reader.h>
 #include <src/reader_helper.h>
+
 namespace s3d_mmd
 {
   namespace
@@ -10,19 +11,20 @@ namespace s3d_mmd
       return s3d_mmd::ReadSizeAndArray<typename Type::CountType>(reader, arr);
     }
   }
+
   bool VMDReader::reload()
   {
-    if ( !path_.isEmpty )
-      return open(path_);
+    if ( !path_.isEmpty ) return open(path_);
     return false;
   }
+
   bool VMDReader::isOpened() const
   {
     return is_opened_;
   }
+
   bool VMDReader::openImpl(std::shared_ptr<IReader> reader)
   {
-
     if ( !reader->isOpened() )
     {
       return false;
@@ -61,11 +63,11 @@ namespace s3d_mmd
     return true;
   }
 
-  VMDReader::VMDReader() :is_opened_(false) {}
+  VMDReader::VMDReader() : is_opened_(false) {}
 
   /// <summary>VMDファイルからデータを取り出す</summary>
   /// <param name="file_name"></param>
-  VMDReader::VMDReader(const FilePath & file_name) : VMDReader(BinaryReader(file_name))
+  VMDReader::VMDReader(const FilePath& file_name) : VMDReader(BinaryReader(file_name))
   {
     is_opened_ = false;
     if ( open(file_name) )
@@ -74,11 +76,10 @@ namespace s3d_mmd
     }
   }
 
-  bool VMDReader::open(const FilePath & file_name)
+  bool VMDReader::open(const FilePath& file_name)
   {
     auto res = open(BinaryReader(file_name));
-    if ( res )
-      path_ = file_name;
+    if ( res ) path_ = file_name;
     return res;
   }
 
@@ -89,12 +90,9 @@ namespace s3d_mmd
     {
       m_lastFrame = 0;
 
-      for ( auto& i : morphFrames )
-        m_lastFrame = std::max(m_lastFrame, static_cast<int>(i.frameNo));
+      for ( auto& i : morphFrames ) m_lastFrame = std::max(m_lastFrame, static_cast<int>(i.frameNo));
 
-      for ( auto& i : keyFrames )
-        m_lastFrame = std::max(m_lastFrame, static_cast<int>(i.frameNo));
-
+      for ( auto& i : keyFrames ) m_lastFrame = std::max(m_lastFrame, static_cast<int>(i.frameNo));
     }
     else
     {
@@ -110,7 +108,6 @@ namespace s3d_mmd
     keyFrames.clear();
     reader_.reset();
     m_lastFrame = 0;
-
   }
 
   bool VMDReader::hasChanged() const
@@ -141,5 +138,4 @@ namespace s3d_mmd
     }
     return Widen(std::string(header.vmdModelName, endPos));
   }
-
 }

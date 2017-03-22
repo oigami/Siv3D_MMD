@@ -1,11 +1,11 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
 #include <MMD/vmd_struct.h>
+
 namespace s3d_mmd
 {
   class VMDReader
   {
-
     int m_lastFrame;
     vmd_struct::Header header;
     Array<vmd_struct::Bone> keyFrames;
@@ -40,18 +40,19 @@ namespace s3d_mmd
 
     void close();
 
-    bool hasChanged()const;
+    bool hasChanged() const;
 
     bool isEmpty() const;
 
     bool reload();
 
-    bool isOpened()const;
+    bool isOpened() const;
+
     explicit operator bool() const { return isOpened(); }
 
-    const FilePath& path()const { return path_; }
+    const FilePath& path() const { return path_; }
 
-    const vmd_struct::Header& getHeader()const { return header; }
+    const vmd_struct::Header& getHeader() const { return header; }
 
     /// <summary>モーションの最終フレームを返す</summary>
     /// <returns>モーションの最終フレーム</returns>
@@ -59,7 +60,7 @@ namespace s3d_mmd
 
     double getVersion() const;
 
-    const Array<vmd_struct::Bone>& getBoneFrames()const { return keyFrames; }
+    const Array<vmd_struct::Bone>& getBoneFrames() const { return keyFrames; }
 
     const Array<vmd_struct::Morph>& getMorphFrames() const { return morphFrames; }
 

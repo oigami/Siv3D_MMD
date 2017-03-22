@@ -3,23 +3,22 @@
 #include <MMD/pmd_struct.h>
 #include <MMD/key_frame_data.h>
 #include <MMD/mmd_motion.h>
+
 namespace s3d_mmd
 {
-
   namespace vmd
   {
     namespace detail
     {
-
-
       /// キーフレームアニメーション
       template<
         class T /* IKeyFrameData を継承
                    auto calcFrame() const;
                    auto calcFrame(int nowFrameNo, const T& next) const; があること */
-      > struct KeyFrameData
+      >
+      struct KeyFrameData
       {
-        KeyFrameData() :m_nowFrameIndex(0), m_nowFrameNo(0) {}
+        KeyFrameData() : m_nowFrameIndex(0), m_nowFrameNo(0) {}
 
         const T& getNowFrame() const
         {
@@ -90,8 +89,7 @@ namespace s3d_mmd
         /// <returns></returns>
         auto calcFrame() const
         {
-          if ( haveNextFrame() )
-            return m_keyFrames[m_nowFrameIndex].calcFrame(m_nowFrameNo, getNextFrame());
+          if ( haveNextFrame() ) return m_keyFrames[m_nowFrameIndex].calcFrame(m_nowFrameNo, getNextFrame());
           return m_keyFrames[m_nowFrameIndex].calcFrame();
         }
 
@@ -102,20 +100,17 @@ namespace s3d_mmd
       };
 
       using MorphData = KeyFrameData<mmd::key_frame::MorphFrame>;
-
-
     }
   }
 
   class VMD::Pimpl
   {
-
-    bool m_isEmpty;     // データがないかどうか
-    bool m_isFrameEnd;  /// <summary> フレームが終了したか true:終了 </summary>
-    bool m_isLoop;      /// <summary> ループするかどうか </summary>
+    bool m_isEmpty; // データがないかどうか
+    bool m_isFrameEnd; /// <summary> フレームが終了したか true:終了 </summary>
+    bool m_isLoop; /// <summary> ループするかどうか </summary>
     SecondsF m_loopBegin; /// <summary> ループする時間 </summary>
-    SecondsF m_loopEnd;   /// <summary> ループする時間 </summary>
-    Stopwatch m_nowTime;   /// <summary> 現在の再生時間 </summary>
+    SecondsF m_loopEnd; /// <summary> ループする時間 </summary>
+    Stopwatch m_nowTime; /// <summary> 現在の再生時間 </summary>
 
 
     /// <summary> キーフレームの名前とデータ </summary>
@@ -129,9 +124,9 @@ namespace s3d_mmd
     Pimpl(mmd::MMDMotion& data);
     Pimpl() = default;
 
-    void UpdateBone(mmd::Bones &bons);
+    void UpdateBone(mmd::Bones& bons);
     void UpdateTime();
-    void UpdateMorph(mmd::FaceMorph& m_morph)const;
+    void UpdateMorph(mmd::FaceMorph& m_morph) const;
 
     void play();
 
@@ -139,11 +134,11 @@ namespace s3d_mmd
 
     void stop();
 
-    bool isPlaying()const;
+    bool isPlaying() const;
 
-    bool isPaused()const;
+    bool isPaused() const;
 
-    bool isLoop()const;
+    bool isLoop() const;
 
     void setLoop(bool loop);
 
@@ -170,20 +165,16 @@ namespace s3d_mmd
   };
 
 
-
   void VMD::Pimpl::resetFrame()
   {
     auto nowFrameNo = getPosFrame();
 
-    for ( auto& i : m_keyFrameData )
-      i.second.resetFrame(nowFrameNo);
+    for ( auto& i : m_keyFrameData ) i.second.resetFrame(nowFrameNo);
 
-    for ( auto& i : m_morphData )
-      i.second.resetFrame(nowFrameNo);
-
+    for ( auto& i : m_morphData ) i.second.resetFrame(nowFrameNo);
   }
 
-  VMD::Pimpl::Pimpl(mmd::MMDMotion & data)
+  VMD::Pimpl::Pimpl(mmd::MMDMotion& data)
   {
     m_isEmpty = true;
     m_loopBegin = SecondsF::zero();
@@ -203,14 +194,13 @@ namespace s3d_mmd
       sort(m_morphData[i.first].m_keyFrames.begin(), m_morphData[i.first].m_keyFrames.end());
       m_isEmpty = false;
     }
-
   }
 
-  void VMD::Pimpl::UpdateBone(mmd::Bones &bones)
+  void VMD::Pimpl::UpdateBone(mmd::Bones& bones)
   {
     UpdateTime();
     using namespace DirectX;
-    for ( auto &i : bones )
+    for ( auto& i : bones )
     {
       const auto it = m_keyFrameData.find(i.name);
       if ( it == m_keyFrameData.end() ) continue;
@@ -219,7 +209,6 @@ namespace s3d_mmd
 
       // 親ボーン座標系のボーン行列を求める
       i.boneMat = frame.rotation.toMatrix() * DirectX::XMMatrixTranslationFromVector(frame.position) * i.initMat;
-
     }
   }
 
@@ -234,21 +223,17 @@ namespace s3d_mmd
       return;
     }
 
-    for ( auto& i : m_keyFrameData )
-      i.second.updateFrame(frameCount);
+    for ( auto& i : m_keyFrameData ) i.second.updateFrame(frameCount);
 
-    for ( auto& i : m_morphData )
-      i.second.updateFrame(frameCount);
-
+    for ( auto& i : m_morphData ) i.second.updateFrame(frameCount);
   }
 
-  void VMD::Pimpl::UpdateMorph(mmd::FaceMorph & morph) const
+  void VMD::Pimpl::UpdateMorph(mmd::FaceMorph& morph) const
   {
     for ( auto& i : m_morphData )
     {
       if ( !i.second.haveNowFrame() ) continue;
-      if ( auto index = morph.getFaceIndex(i.first) )
-        morph.setWeight(*index, i.second.calcFrame());
+      if ( auto index = morph.getFaceIndex(i.first) ) morph.setWeight(*index, i.second.calcFrame());
     }
   }
 
@@ -279,14 +264,14 @@ namespace s3d_mmd
     m_isLoop = loop;
   }
 
-  void VMD::Pimpl::setLoopBySec(bool loop, const SecondsF & loopBegin, const SecondsF & loopEnd)
+  void VMD::Pimpl::setLoopBySec(bool loop, const SecondsF& loopBegin, const SecondsF& loopEnd)
   {
     m_isLoop = loop;
     m_loopBegin = loopBegin;
     m_loopEnd = loopEnd;
   }
 
-  void VMD::Pimpl::setPosSec(const SecondsF & pos)
+  void VMD::Pimpl::setPosSec(const SecondsF& pos)
   {
     m_nowTime.set(pos);
     resetFrame();
@@ -304,5 +289,4 @@ namespace s3d_mmd
   {
     return m_isEmpty;
   }
-
 }

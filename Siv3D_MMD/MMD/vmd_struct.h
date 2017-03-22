@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
 #include <MMD/math_util.h>
+
 namespace s3d_mmd
 {
   namespace vmd_struct
@@ -25,8 +26,8 @@ namespace s3d_mmd
       using CountType = std::uint32_t;
       char boneName[15];
       std::uint32_t frameNo;
-      Float3 location;  // 移動量
-      Float4 rotation;  // モデルローカル座標系
+      Float3 location; // 移動量
+      Float4 rotation; // モデルローカル座標系
       Vector4D<std::uint8_t> x1; // 軸の補完パラメータ (x,y,z,r)
       Vector4D<std::uint8_t> y1; // 軸の補完パラメータ (x,y,z,r)
       Vector4D<std::uint8_t> x2; // 軸の補完パラメータ (x,y,z,r)
@@ -44,55 +45,55 @@ namespace s3d_mmd
       std::uint32_t frameNo;
       float m_weight;
 
-      bool operator<(const Morph& m)const { return frameNo < m.frameNo; }
+      bool operator<(const Morph& m) const { return frameNo < m.frameNo; }
     };
 
     struct Camera
     {
       using CountType = std::uint32_t;
-      std::uint32_t frameNo;   // フレーム番号
-      float distance;          // 目標点とカメラの距離(目標点がカメラ前面でマイナス)
-      Float3 lookAtPos;        // 目標点
-      Float3 rotation;         // カメラの回転(rad)(x軸はMMD数値入力のマイナス値)
+      std::uint32_t frameNo; // フレーム番号
+      float distance; // 目標点とカメラの距離(目標点がカメラ前面でマイナス)
+      Float3 lookAtPos; // 目標点
+      Float3 rotation; // カメラの回転(rad)(x軸はMMD数値入力のマイナス値)
       std::uint8_t bezier[24]; // 補間パラメータ
       std::uint32_t viewAngle; // 視野角(deg)
-      std::uint8_t parth;      // パースペクティブ, 0:ON, 1:OFF
+      std::uint8_t parth; // パースペクティブ, 0:ON, 1:OFF
     };
 
     struct Light
     {
       using CountType = std::uint32_t;
       std::uint32_t frameNo; // フレーム番号
-      float r;               // 照明色赤(MMD入力値を256で割った値)
-      float g;               // 照明色緑(MMD入力値を256で割った値)
-      float b;               // 照明色青(MMD入力値を256で割った値)
-      float x;               // 照明x位置(MMD入力値)
-      float y;               // 照明y位置(MMD入力値)
-      float z;               // 照明z位置(MMD入力値)
+      float r; // 照明色赤(MMD入力値を256で割った値)
+      float g; // 照明色緑(MMD入力値を256で割った値)
+      float b; // 照明色青(MMD入力値を256で割った値)
+      float x; // 照明x位置(MMD入力値)
+      float y; // 照明y位置(MMD入力値)
+      float z; // 照明z位置(MMD入力値)
     };
 
     struct SelfShadow
     {
       using CountType = std::uint32_t;
       std::uint32_t frameNo; // フレーム番号
-      std::uint8_t type;     // セルフシャドウ種類, 0:OFF, 1:mode1, 2:mode2
-      float distance;        // シャドウ距離(MMD入力値Lを(10000-L)/100000とした値)
+      std::uint8_t type; // セルフシャドウ種類, 0:OFF, 1:mode1, 2:mode2
+      float distance; // シャドウ距離(MMD入力値Lを(10000-L)/100000とした値)
     };
 
     struct InfoIk
     {
-      char name[20];       // "右足ＩＫ\0"などのIKボーン名の文字列 20byte
+      char name[20]; // "右足ＩＫ\0"などのIKボーン名の文字列 20byte
       std::uint8_t on_off; // IKのon/off, 0:OFF, 1:ON
     };
 
     struct ShowIkWithoutArray
     {
       using CountType = std::uint32_t;
-      std::uint32_t frameNo;  // フレーム番号
-      std::uint8_t show;      // モデル表示, 0:OFF, 1:ON
+      std::uint32_t frameNo; // フレーム番号
+      std::uint8_t show; // モデル表示, 0:OFF, 1:ON
       std::uint32_t ik_count; // 記録するIKの数
 
-                              //InfoIK ik[ik_count];  // IK on/off情報配列
+      //InfoIK ik[ik_count];  // IK on/off情報配列
     };
 
 #pragma pack(pop)
@@ -101,6 +102,5 @@ namespace s3d_mmd
     {
       Array<InfoIk> ik;
     };
-
   }
 }

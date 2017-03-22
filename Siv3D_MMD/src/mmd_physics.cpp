@@ -1,11 +1,9 @@
 ﻿#include <MMD/MMD.h>
 #include "mmd_physics.h"
+
 namespace s3d_mmd
 {
-
-  MmdPhysics::MmdPhysics(physics3d::Physics3DWorld world) :m_world(world)
-  {
-  }
+  MmdPhysics::MmdPhysics(physics3d::Physics3DWorld world) : m_world(world) { }
 
   MmdPhysics::~MmdPhysics()
   {
@@ -35,6 +33,7 @@ namespace s3d_mmd
     m_rigidMat.clear();
     m_initOffsetMat.clear();
   }
+
   void MmdPhysics::SetBones(std::shared_ptr<mmd::Bones> bones)
   {
     this->m_bones = bones;
@@ -78,7 +77,6 @@ namespace s3d_mmd
         const float depth = 2 * item.shape_d;
 
         rigidBody = m_world.createBox(center, Box({ 0, 0, 0 }, width, height, depth), material, filter, bodyType);
-
       }
       else if ( item.shape_type == 2 )
       { // カプセル
@@ -92,14 +90,14 @@ namespace s3d_mmd
     }
   }
 
-  void MmdPhysics::CreateJoint(const Array<s3d_mmd::pmd_struct::Joint> &pmdJoints)
+  void MmdPhysics::CreateJoint(const Array<s3d_mmd::pmd_struct::Joint>& pmdJoints)
   {
     const size_t pmdJointsSize = pmdJoints.size();
     m_jointRelatedRigidIndex.reserve(pmdJointsSize);
     m_jointMatrix.reserve(pmdJointsSize);
     m_6DofSpringConstraint.reserve(pmdJointsSize);
 
-    for ( auto &joint : pmdJoints )
+    for ( auto& joint : pmdJoints )
     {
       const Float3& pos = joint.joint_pos;
       const Float3& r = joint.joint_rot;
@@ -107,8 +105,8 @@ namespace s3d_mmd
       const Quaternion rotation = Quaternion::RollPitchYaw(r.z, r.x, r.y);
       const Mat4x4 world = rotation.toMatrix() * Mat4x4::Translate(pos.x, pos.y, pos.z);
       //const Mat4x4 world = Mat4x4::AffineTransform(1.0, rotation, joint.joint_pos);
-      auto &rigidbodyA = m_rigidBodies[joint.joint_rigidbody_a];
-      auto &rigidbodyB = m_rigidBodies[joint.joint_rigidbody_b];
+      auto& rigidbodyA = m_rigidBodies[joint.joint_rigidbody_a];
+      auto& rigidbodyB = m_rigidBodies[joint.joint_rigidbody_b];
 
       // ジョイントの行列（剛体ローカル座標系）
       physics3d::Physics3D6DofSpringConstraintState state;
@@ -137,18 +135,16 @@ namespace s3d_mmd
     const std::uint_fast32_t rigidBodiesSize = static_cast<std::uint_fast32_t>(m_rigidBodies.size());
     for ( std::uint_fast32_t i = 0; i < rigidBodiesSize; ++i )
     {
-      if ( m_rigidbodyRelatedBoneIndex[i] == 0xFFFF )
-        continue;
-      const mmd::Bone &bone = (*m_bones)[m_rigidbodyRelatedBoneIndex[i]];
+      if ( m_rigidbodyRelatedBoneIndex[i] == 0xFFFF ) continue;
+      const mmd::Bone& bone = (*m_bones)[m_rigidbodyRelatedBoneIndex[i]];
       const Matrix m = m_rigidbodyInit[i] * bone.offsetMat;
       m_rigidMat.push_back(m);
       const Matrix tempInitOffsetMat = bone.initMatML * m_rigidbodyInvInit[i];
       m_initOffsetMat.push_back(tempInitOffsetMat);
     }
-
   }
 
-  void MmdPhysics::BoneUpdate(const Mat4x4 &world, Array<Mat4x4> &boneWorld)
+  void MmdPhysics::BoneUpdate(const Mat4x4& world, Array<Mat4x4>& boneWorld)
   {
     if ( !m_bones )
     {
@@ -165,7 +161,7 @@ namespace s3d_mmd
         continue;
       }
       mmd::Bone& bone = (*m_bones)[m_rigidbodyRelatedBoneIndex[i]];
-      auto &rigidBodie = m_rigidBodies[i];
+      auto& rigidBodie = m_rigidBodies[i];
       const Mat4x4 worldInv = world.inverse();
       switch ( m_rigidbodyType[i] )
       {
@@ -187,10 +183,9 @@ namespace s3d_mmd
         break;
       }
 
-      //物理演算(bone合わせ)
+        //物理演算(bone合わせ)
       case 2:
       {
-
         //うまく動いてるか不明
         // TODO: http://mikudan.blog120.fc2.com/blog-entry-318.html を参考に書き換える
         bone.extraBoneControl = false;
@@ -211,7 +206,6 @@ namespace s3d_mmd
         rigidBodie.setTransform(rigidWorld);
         break;
       }
-
       }
     }
     m_bones->calcWorld(world, boneWorld);
@@ -228,6 +222,6 @@ namespace s3d_mmd
 
     (*m_bones)[i].extraBoneControl = true;
     const Quaternion rotation = Quaternion::RollPitchYaw(rot.z, rot.x, rot.y);
-    return{ p, rotation };
+    return { p, rotation };
   }
 }

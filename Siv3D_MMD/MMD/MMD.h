@@ -17,9 +17,9 @@
 #include <MMD/vmd_controller.h>
 #include <MMD/mmd_motion.h>
 #include <MMD/physics3d.h>
+
 namespace s3d_mmd
 {
-
   class MMD
   {
     class Pimpl;
@@ -28,8 +28,10 @@ namespace s3d_mmd
   public:
 
     MMD() = default;
-    MMD(const MMDModel &model, const physics3d::Physics3DWorld& world = physics3d::Physics3DWorld());
-    MMD(const FilePath &filename, const physics3d::Physics3DWorld& world = physics3d::Physics3DWorld()) :MMD(MMDModel(filename), world) {}
+    MMD(const MMDModel& model, const physics3d::Physics3DWorld& world = physics3d::Physics3DWorld());
+
+    MMD(const FilePath& filename, const physics3d::Physics3DWorld& world = physics3d::Physics3DWorld()) : MMD(MMDModel(filename), world) {}
+
     ~MMD();
 
 
@@ -52,9 +54,9 @@ namespace s3d_mmd
 
     std::shared_ptr<mmd::Bones> bones() const;
     mmd::FaceMorph& morphs() const;
-    const String &name() const;
-    const String &comment() const;
-    const Texture &vertexTexture() const;
+    const String& name() const;
+    const String& comment() const;
+    const Texture& vertexTexture() const;
 
     /// <summary>
     /// VMDをセットする
@@ -73,7 +75,5 @@ namespace s3d_mmd
   private:
 
     void PhysicsUpdate() const;
-
   };
-
 }
