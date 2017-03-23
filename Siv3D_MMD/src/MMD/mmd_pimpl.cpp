@@ -2,37 +2,80 @@
 
 namespace s3d_mmd
 {
-  Float2 MMD::Pimpl::WriteTextureVertex(ImageRGBA32F& vertexImage, const mmd::MeshVertex& v, int& vPos, Array<Float4> morph)
+  namespace
   {
-    int x = vPos % 1016;
-    int y = vPos / 1016;
-    assert(y < 1016);
-
-    // モーフの数を16個ずつ処理することで高速化する
-    morph.resize((morph.size() + 15) / 16 * 16);
-    const int dataSize = static_cast<int>(3 + morph.size() + 1);
-    if ( 1024 < x + dataSize )
+    class TextureVertex
     {
-      vPos += -x + vertexImage.width;
-      x = 0;
-      y++;
-    }
+    public:
+      explicit TextureVertex(int x, int y) : m_width(x), m_image(x, y), m_pos(0) {}
 
-    auto image = vertexImage[y];
+      std::pair<RGBA32F*, Point> createIndex(int writeSize)
+      {
+        int x = m_pos % m_width;
+        if ( x + writeSize >= m_width )
+        {
+          x = 0;
+          m_pos += m_width - x;
+        }
+        int y = m_pos / m_width;
+        m_pos += writeSize;
+        return { m_image[y] + x, { x, y } };
+      }
+
+      Texture createTexture() const { return Texture(m_image); }
+
+    private:
+
+      int m_width;
+      ImageRGBA32F m_image;
+      int m_pos;
+    };
+
+    struct FaceMorph
+    {
+      Float3 vertex;
+      int index;
+    };
+  }
+
+  int GetWriteMorphSize(const Array<FaceMorph>& morph)
+  {
+    // モーフの数を16個ずつ処理することで高速化する
+    return (morph.size() + 15) / 16 * 16;
+  }
+
+  Float2 WriteTextureVertex(const mmd::MeshVertex& v, TextureVertex& tex, const Array<FaceMorph>& morph)
+  {
+    const int writeMorphCount = GetWriteMorphSize(morph);
+    const int dataSize = static_cast<int>(3 + writeMorphCount);
+    auto p = tex.createIndex(dataSize);
+    auto image = p.first;
+
     auto asFloat = [](int a) { return *reinterpret_cast<float*>(&a); };
     assert(v.boneNum[0] < 256 && v.boneNum[1] < 256);
-    image[x] = RGBA32F(asFloat(v.boneNum[0]), asFloat(v.boneNum[1]), 0.0f, 0.0f);
-    image[x + 1] = RGBA32F(v.boneWeight.x, v.boneWeight.y, v.boneWeight.z, v.boneWeight.w);
-    int f = static_cast<int>(morph.size());
-    image[x + 2] = RGBA32F(v.texcoord.x, v.texcoord.y, asFloat(f), v.isEdge ? 1.0f : 0.0f);
+    // ボーン番号2つ
+    image[0] = RGBA32F(asFloat(v.boneNum[0]), asFloat(v.boneNum[1]), 0.0f, 0.0f);
+    // ボーンの重み4つ（現在2つしか処理していない）
+    image[1] = RGBA32F(v.boneWeight.x, v.boneWeight.y, v.boneWeight.z, v.boneWeight.w);
+    // テクスチャの座標とモーフの数とエッジかどうかのフラグ
+    const int f = static_cast<int>(writeMorphCount);
+    image[2] = RGBA32F(v.texcoord.x, v.texcoord.y, asFloat(f), v.isEdge ? 1.0f : 0.0f);
 
-    int now = x + 2;
-    for ( auto& i : morph )
+    int now = 2;
+    for ( auto& m : morph )
     {
-      image[++now] = RGBA32F(i.x, i.y, i.z, asFloat(static_cast<int>(i.w)));
+      // 頂点モーフを動かす時の方向と対応するモーフの番号
+      const auto& i = m.vertex;
+      image[++now] = RGBA32F(i.x, i.y, i.z, asFloat(static_cast<int>(m.index)));
     }
-    vPos += dataSize;
-    return { asFloat(x), asFloat(y) };
+
+    for ( auto& i : step(writeMorphCount - morph.size()) )
+    {
+      // 高速化のためのパディング
+      image[++now] = RGBA32F(0, 0, 0, asFloat(static_cast<int>(0)));
+    }
+    const auto& pos = p.second;
+    return { asFloat(pos.x), asFloat(pos.y) };
   }
 
   MMD::Pimpl::Pimpl(const MMDModel& model, const physics3d::Physics3DWorld& world)
@@ -50,12 +93,7 @@ namespace s3d_mmd
     // 物理演算データの生成
     m_mmdPhysics.Create(m_bones, model.rigidBodies(), model.joints());
 
-    ImageRGBA32F vertexImage(1024, 1024);
-    struct FaceMorph
-    {
-      Array<Float4> vertex;
-    };
-    std::unordered_map<int, FaceMorph> faceMorphVertex;
+    std::unordered_map<int, Array<FaceMorph>> faceMorphVertex;
 
     { // モーフデータの生成
 
@@ -76,8 +114,7 @@ namespace s3d_mmd
         // 通常のタイプの時はbaseのindexを使い頂点indexをグローバルな方に戻す
         for ( auto& j : i.skin_vert_data )
         {
-          faceMorphVertex[baseMorph[j.skin_vert_index]].vertex.push_back({ j.skin_vert_pos,
-            static_cast<float>(index) });
+          faceMorphVertex[baseMorph[j.skin_vert_index]].push_back({ j.skin_vert_pos,index });
         }
         faceIndex.insert({ Widen(i.skin_name), index });
         index++;
@@ -91,9 +128,30 @@ namespace s3d_mmd
     {
       indices[i] = model.indices()[i];
     }
-
-    int vPos = 0;
     { // メッシュの生成
+      const Array<FaceMorph> emptyMorph;
+      int allWriteSize = 0;
+      for ( auto& v : model.vertices() )
+      {
+        auto it = faceMorphVertex.find(v.vertexNum);
+        allWriteSize += 3 + GetWriteMorphSize(it != faceMorphVertex.end() ? it->second : emptyMorph);
+      }
+
+      auto nextPow2 = [](uint32 x)
+        {
+          x--;
+          x |= x >> 1;
+          x |= x >> 2;
+          x |= x >> 4;
+          x |= x >> 8;
+          x |= x >> 16;
+          return ++x;
+        };
+      int size = nextPow2(allWriteSize);
+      // 折り返しの都合で全部埋まるとは限らないので適当に増やしておく
+      int padding = model.skinData().size() * (size / 4096) / 4096;
+      TextureVertex textureVertex(4096, nextPow2(size / 4096 + 1 + padding));
+
       MeshData meshData;
       meshData.indices = indices;
 
@@ -101,7 +159,7 @@ namespace s3d_mmd
       for ( auto& v : model.vertices() )
       {
         auto it = faceMorphVertex.find(v.vertexNum);
-        Float2 pos = WriteTextureVertex(vertexImage, v, vPos, it != faceMorphVertex.end() ? it->second.vertex : Array<Float4>{});
+        Float2 pos = WriteTextureVertex(v, textureVertex, it != faceMorphVertex.end() ? it->second : emptyMorph);
         meshData.vertices.push_back({ v.position , v.normal, pos });
       }
       m_nodes.reserve(model.nodes().size());
@@ -110,20 +168,11 @@ namespace s3d_mmd
         m_nodes.push_back(mmd::Node{ i.indexStart, i.indexCount, i.material });
       }
       m_mesh = Mesh(meshData);
+      m_vertexTexture = textureVertex.createTexture();
     }
 
     { // エッジの生成
-      MeshData meshData;
-      meshData.indices = indices;
-      meshData.vertices.resize(model.vertices().size());
       m_edges.reserve(model.nodes().size());
-      for ( auto& i : step(model.vertices().size()) )
-      {
-        const auto& v = model.vertices()[i];
-        auto it = faceMorphVertex.find(v.vertexNum);
-        Float2 pos = WriteTextureVertex(vertexImage, v, vPos, it != faceMorphVertex.end() ? it->second.vertex : Array<Float4>{});
-        meshData.vertices[i] = { v.position, v.normal, pos };
-      }
       for ( auto& node : model.nodes() )
       {
         if ( node.material.isEdge )
@@ -133,9 +182,7 @@ namespace s3d_mmd
       }
 
       m_edges.shrink_to_fit();
-      m_edgeMesh = Mesh(meshData);
     }
-    m_vertexTexture = Texture(vertexImage);
   }
 
   template<class Getter, class Setter, Getter getter, Setter setter>
@@ -220,7 +267,7 @@ namespace s3d_mmd
       Graphics3D::SetRasterizerState(RasterizerState::SolidCullFront);
       for ( const auto& node : m_edges )
       {
-        m_edgeMesh.drawSubset(node.indexStart, node.indexCount, worldMat, node.material.diffuse);
+        m_mesh.drawSubset(node.indexStart, node.indexCount, worldMat, node.material.diffuse);
       }
       Graphics3D::SetRasterizerState(rasterizerState);
     }

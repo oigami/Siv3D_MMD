@@ -134,8 +134,6 @@ namespace s3d_mmd
     void pushGPUData();
   public:
 
-    Float2 WriteTextureVertex(ImageRGBA32F& vertexImage, const mmd::MeshVertex& v, int& vPos, Array<Float4> morph);
-
     Pimpl(const MMDModel& model, const physics3d::Physics3DWorld& world);
 
     void drawForward(const Mat4x4& worldMat);
@@ -166,6 +164,5 @@ namespace s3d_mmd
     MmdPhysics m_mmdPhysics;
     bool isPhysicsEnabled = true;
     Mesh m_mesh;
-    Mesh m_edgeMesh;
   };
 }
