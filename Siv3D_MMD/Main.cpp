@@ -27,12 +27,12 @@ void Main()
   //Bone &bone10 = model.bones()->get(10);
   //bone10.extraBoneControl = true;
   const Font font(30);
-  /*GUI gui(GUIStyle::Default);
+  GUI gui(GUIStyle::Default);
   gui.setTitle(L"タイトル");
 
-  gui.add(L"frame", GUISlider::Create(0, 1000, 0));*/
+  gui.add(L"frame", GUISlider::Create(0, 10, 0));
   MouseCamera3D camera;
-  while ( System::Update() )
+  while (System::Update())
   {
     world.update();
     //world.debugDraw();
@@ -42,7 +42,7 @@ void Main()
     meshGround.draw();
 
     //bone10.extraBoneMat *= Quaternion(10_deg, 0, 0, 1).toMatrix();
-    model.update().drawForward(1.0, Mat4x4::Translate({10,10,0}));
+    model.update().drawForward(gui.slider(L"frame").value, Mat4x4::Translate({ 10,10,0 }));
     auto mat = *model.bones()->calcBoneMatML(L"頭");
     //camera.lookat = mat.transform(Vec3(0, 0, 0));
     //camera.pos = mat.transform(Vec3(0, 0, -10));

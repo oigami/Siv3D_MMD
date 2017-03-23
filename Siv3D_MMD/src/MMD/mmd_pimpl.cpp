@@ -24,7 +24,7 @@ namespace s3d_mmd
     image[x] = RGBA32F(asFloat(v.boneNum[0]), asFloat(v.boneNum[1]), 0.0f, 0.0f);
     image[x + 1] = RGBA32F(v.boneWeight.x, v.boneWeight.y, v.boneWeight.z, v.boneWeight.w);
     int f = static_cast<int>(morph.size());
-    image[x + 2] = RGBA32F(v.texcoord.x, v.texcoord.y, asFloat(f), 0.0f);
+    image[x + 2] = RGBA32F(v.texcoord.x, v.texcoord.y, asFloat(f), v.isEdge ? 1.0f : 0.0f);
 
     int now = x + 2;
     for ( auto& i : morph )
@@ -205,8 +205,12 @@ namespace s3d_mmd
     }
   }
 
-  void MMD::Pimpl::drawEdge(const Mat4x4& worldMat)
+  void MMD::Pimpl::drawEdge(double edgeSize, const Mat4x4& worldMat)
   {
+    ConstantBuffer<float[4]> data;
+    (*data)[0] = static_cast<float>(edgeSize);
+    Graphics3D::SetConstant(ShaderStage::Vertex, 3, data);
+
     mmd::EdgeShader::init();
     if ( auto attach = ShaderAttach(mmd::EdgeShader::vs(), mmd::EdgeShader::ps()) )
     {

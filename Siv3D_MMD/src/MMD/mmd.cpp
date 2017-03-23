@@ -24,7 +24,7 @@ namespace s3d_mmd
 
   void MMD::drawEdge(double edgeSize, const Mat4x4& worldMat) const
   {
-    m_handle->drawEdge(worldMat);
+    m_handle->drawEdge(edgeSize, worldMat);
   }
 
   void MMD::drawForward(const Mat4x4& worldMat) const

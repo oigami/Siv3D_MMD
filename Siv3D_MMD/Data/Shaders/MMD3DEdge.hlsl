@@ -12,6 +12,7 @@ struct TexVertex
   float2 w;
   float2 tex;
   int2 idx;
+  float isEdge;
 };
 Texture2D texVertex1 : register(t1);
 SamplerState DiffuseSampler
@@ -42,6 +43,10 @@ cbuffer MorphBuff : register(b2)
 {
   float4 morphWeight[1024];
 }
+cbuffer EdgeBuff : register(b3)
+{
+  float4 edgeSize;
+}
 TexVertex GetVertex(float2 pos, float4 vertexPos)
 {
   TexVertex ret;
@@ -52,9 +57,10 @@ TexVertex GetVertex(float2 pos, float4 vertexPos)
   ret.w = texVertex1.Load(vPos.xyz).xy;
 
   vPos.x += 1;
-  float3 tex_and_n = texVertex1.Load(vPos.xyz).xyz;
-  ret.tex = tex_and_n.xy;
-  vPos.w = asint(tex_and_n.z);
+  float4 tex_n_and_isEdge = texVertex1.Load(vPos.xyz);
+  ret.isEdge = tex_n_and_isEdge.w;
+  ret.tex = tex_n_and_isEdge.xy;
+  vPos.w = asint(tex_n_and_isEdge.z);
 
   ret.pos = vertexPos;
   while (vPos.w)
@@ -77,10 +83,10 @@ VS_OUTPUT VS(VS_INPUT input)
   TexVertex v = GetVertex(input.tex, input.pos);
   float4x3 comb = (float4x3) BoneMatrix[v.idx.x] * v.w.x;
   comb += (float4x3) BoneMatrix[v.idx.y] * v.w.y;
-  v.pos.xyz += input.normal.xyz * 0.03;
+  v.pos.xyz += input.normal.xyz * 0.03 * edgeSize.x * v.isEdge;
 
   const float4 pos = mul(input.worldMatrix, float4(mul(v.pos, comb), v.pos.w));
-  float3 normal_head = mul(v.pos + float4(input.normal, 0), comb);
+  float3 normal_head = mul(v.pos + float4(input.normal, 0) , comb);
 
   output.pos = mul(pos, g_viewProjectionMatrix);
   output.tex = input.tex;

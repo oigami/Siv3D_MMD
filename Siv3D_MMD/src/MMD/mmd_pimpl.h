@@ -140,7 +140,7 @@ namespace s3d_mmd
 
     void drawForward(const Mat4x4& worldMat);
 
-    void drawEdge(const Mat4x4& worldMat);
+    void drawEdge(double edgeSize, const Mat4x4& worldMat);
 
     void physicsUpdate();
 
