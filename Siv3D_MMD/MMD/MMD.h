@@ -14,7 +14,7 @@
 #include <MMD/mmd_model.h>
 #include <MMD/mmd_bone.h>
 #include <MMD/mmd_morph.h>
-#include <MMD/vmd_controller.h>
+#include <MMD/vmd.h>
 #include <MMD/mmd_motion.h>
 #include <MMD/physics3d.h>
 

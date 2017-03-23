@@ -171,6 +171,7 @@
     <ClCompile Include="src\math_util.cpp" />
     <ClCompile Include="src\key_frame_data.cpp" />
     <ClCompile Include="src\MMD\mmd_pimpl.cpp" />
+    <ClCompile Include="src\VMD\vmd_pimpl.cpp" />
     <ClCompile Include="src\VMD\vmd_writer.cpp" />
     <ClCompile Include="src\mmd_motion.cpp" />
     <ClCompile Include="src\mmd_morph.cpp" />
@@ -180,7 +181,7 @@
     <ClCompile Include="src\MMDModel\mmd_model.cpp" />
     <ClCompile Include="src\mmd_physics.cpp" />
     <ClCompile Include="src\pmd_reader.cpp" />
-    <ClCompile Include="src\VMD\vmd_controller.cpp" />
+    <ClCompile Include="src\VMD\vmd.cpp" />
     <ClCompile Include="src\VMD\vmd_reader.cpp" />
     <ClCompile Include="stdafx\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -302,7 +303,7 @@
     <ClInclude Include="MMD\physics3d.h" />
     <ClInclude Include="MMD\pmd_reader.h" />
     <ClInclude Include="MMD\pmd_struct.h" />
-    <ClInclude Include="MMD\vmd_controller.h" />
+    <ClInclude Include="MMD\vmd.h" />
     <ClInclude Include="MMD\vmd_reader.h" />
     <ClInclude Include="MMD\vmd_struct.h" />
     <ClInclude Include="MMD\vmd_writer.h" />
@@ -311,7 +312,7 @@
     <ClInclude Include="MMD\mmd_motion.h" />
     <ClInclude Include="src\reader_helper.h" />
     <ClInclude Include="src\MMD\mmd_pimpl.h" />
-    <ClInclude Include="src\VMD\vmd_controller_pimpl.h" />
+    <ClInclude Include="src\VMD\vmd_pimpl.h" />
     <ClInclude Include="ShaderAttacher.h" />
     <ClInclude Include="stdafx\stdafx.h" />
   </ItemGroup>
