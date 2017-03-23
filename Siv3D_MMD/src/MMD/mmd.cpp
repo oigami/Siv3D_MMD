@@ -1,6 +1,6 @@
-#include <MMD/MMD.h>
+﻿#include <MMD/MMD.h>
 #include <MMD/mmd_model.h>
-#include "detail/mmd_pimpl.h"
+#include "mmd_pimpl.h"
 
 namespace s3d_mmd
 {

@@ -1,5 +1,5 @@
-﻿#include <MMD/mmd_model.h>
-#include <MMD/pmd_reader.h>
+﻿#include "stdafx/stdafx.h"
+#include "mmd_model_pimpl.h"
 
 namespace s3d_mmd
 {
@@ -9,32 +9,6 @@ namespace s3d_mmd
     uint32 handleCounter = 0;
 
     uint32 createHandle() { return ++handleCounter; }
-
-    class IndexMap
-    {
-      std::unordered_map<int, int> m_map;
-      int m_nowIndex;
-    public:
-      IndexMap() { reset(); }
-
-      void reset()
-      {
-        m_map.clear();
-        m_nowIndex = 0;
-      }
-
-      /// <summary>
-      /// インデックスを0から振り直す
-      /// </summary>
-      /// <param name="index"></param>
-      /// <returns> インデックス、 新規挿入したかどうか </returns>
-      std::pair<int, bool> insert(int index)
-      {
-        auto iter = m_map.insert({ index , m_nowIndex });
-        if ( iter.second ) m_nowIndex++;
-        return { iter.first->second, iter.second };
-      }
-    };
   }
 
   const std::shared_ptr<ITextureLoader> MMDModel::defaultLoader = std::make_shared<TextureAssetTextureLoader>();
@@ -64,7 +38,6 @@ namespace s3d_mmd
     }
     return meshVertices;
   }
-
 
   Array<mmd::Ik> CreateIkData(const pmd_struct::IkData& ikData)
   {
@@ -125,162 +98,50 @@ namespace s3d_mmd
     return { std::move(bones), CreateIkData(ikData) };
   }
 
-  class MMDModel::Pimpl
+  MMDModel::Pimpl::Pimpl(const FilePath& path, const std::shared_ptr<ITextureLoader> textureLoader)
   {
-  public:
-    std::shared_ptr<ITextureLoader> m_textureLoader;
+    m_textureLoader = textureLoader;
+    PMDReader loader(path);
+    load(loader, path);
+  }
 
-    Pimpl(const FilePath& path, const std::shared_ptr<ITextureLoader> textureLoader)
+  MMDModel::Pimpl::Pimpl(PMDReader& loader, const std::shared_ptr<ITextureLoader> textureLoader)
+  {
+    m_textureLoader = textureLoader;
+    load(loader, L"");
+  }
+
+  void MMDModel::Pimpl::load(const PMDReader& loader, const String& path)
+  {
+    if ( loader.isLoaded() == false )
     {
-      m_textureLoader = textureLoader;
-      PMDReader loader(path);
-      load(loader, path);
+      return;
     }
+    m_baseDir = path;
+    createNode(loader, path);
+    m_bones = std::make_shared<mmd::Bones>();
+    *m_bones = CreateBones(loader.getBones(), loader.getIkData());
+    m_modelName = loader.getModelName();
+    m_comment = loader.getComment();
+    m_rigidBodies = loader.getRigidBodies();
+    m_joints = loader.getJoints();
+    m_skinData = loader.getSkinData();
+    m_handle = createHandle();
+  }
 
-    Pimpl(PMDReader& loader, const std::shared_ptr<ITextureLoader> textureLoader)
+  void MMDModel::Pimpl::release()
+  {
+    for ( auto& i : m_nodes )
     {
-      m_textureLoader = textureLoader;
-      load(loader, L"");
+      m_textureLoader->removeTexture(m_baseDir, FileSystem::FileName(i.material.diffuseTextureName));
     }
-
-    void load(const PMDReader& loader, const String& path)
-    {
-      if ( loader.isLoaded() == false )
-      {
-        return;
-      }
-      m_baseDir = path;
-      createNode(loader, path);
-      m_bones = std::make_shared<mmd::Bones>();
-      *m_bones = CreateBones(loader.getBones(), loader.getIkData());
-      m_modelName = loader.getModelName();
-      m_comment = loader.getComment();
-      m_rigidBodies = loader.getRigidBodies();
-      m_joints = loader.getJoints();
-      m_skinData = loader.getSkinData();
-      m_handle = createHandle();
-    }
-
-    Pimpl() : m_handle(NullHandleID) {}
-
-    void release()
-    {
-      for ( auto& i : m_nodes )
-      {
-        m_textureLoader->removeTexture(m_baseDir, FileSystem::FileName(i.material.diffuseTextureName));
-      }
-      m_textureLoader.reset();
-      m_handle = NullHandleID;
-      m_nodes.clear();
-      m_nodes.shrink_to_fit();
-      m_bones = std::make_shared<mmd::Bones>();
-      m_modelName.clear();
-      m_comment.clear();
-    }
-
-    Array<mmd::ModelNode> m_nodes;
-    std::shared_ptr<mmd::Bones> m_bones;
-
-    pmd_struct::RigidBodies m_rigidBodies;
-    pmd_struct::Joints m_joints;
-    pmd_struct::SkinData m_skinData;
-    String m_modelName;
-    String m_comment;
-    HandleIDType m_handle;
-    std::vector<mmd::MeshVertex> m_vertecies;
-    std::vector<uint16> m_indices;
-    String m_baseDir;
-
-    mmd::Material createMaterial(const pmd_struct::Material& pmdMaterial, const FilePath& m_filepath) const;
-    void createNode(const PMDReader& loader, const FilePath& m_filepath);
-  };
-
-  MMDModel::MMDModel() {}
-
-  MMDModel::MMDModel(const FilePath& path, std::shared_ptr<ITextureLoader> textureLoader)
-  {
-    m_handle = std::make_shared<Pimpl>(path, textureLoader);
-  }
-
-  MMDModel::~MMDModel()
-  {
-    m_handle = std::make_shared<Pimpl>();
-  }
-
-  void MMDModel::release()
-  {
-    m_handle->release();
-  }
-
-  HandleIDType MMDModel::id() const
-  {
-    return m_handle->m_handle;
-  }
-
-  bool MMDModel::isEmpty() const
-  {
-    return !m_handle;
-  }
-
-  bool MMDModel::operator==(const MMDModel& model) const
-  {
-    return m_handle == model.m_handle;
-  }
-
-  bool MMDModel::operator!=(const MMDModel& model) const
-  {
-    return !(*this == model);
-  }
-
-  /// <summary>
-  /// モデルノードの一覧を取得します。
-  /// </summary>
-  /// <returns>
-  /// モデルノードの一覧
-  /// </returns>
-  Array<mmd::ModelNode>& MMDModel::nodes() const
-  {
-    return m_handle->m_nodes;
-  }
-
-  Array<mmd::MeshVertex>& MMDModel::vertices() const
-  {
-    return m_handle->m_vertecies;
-  }
-
-  Array<uint16>& MMDModel::indices() const
-  {
-    return m_handle->m_indices;
-  }
-
-  std::shared_ptr<mmd::Bones> MMDModel::bones() const
-  {
-    return m_handle->m_bones;
-  }
-
-  const pmd_struct::RigidBodies& MMDModel::rigidBodies() const
-  {
-    return m_handle->m_rigidBodies;
-  }
-
-  const pmd_struct::Joints& MMDModel::joints() const
-  {
-    return m_handle->m_joints;
-  }
-
-  const pmd_struct::SkinData MMDModel::skinData() const
-  {
-    return m_handle->m_skinData;
-  }
-
-  const String& MMDModel::name() const
-  {
-    return m_handle->m_modelName;
-  }
-
-  const String& MMDModel::comment() const
-  {
-    return m_handle->m_comment;
+    m_textureLoader.reset();
+    m_handle = NullHandleID;
+    m_nodes.clear();
+    m_nodes.shrink_to_fit();
+    m_bones = std::make_shared<mmd::Bones>();
+    m_modelName.clear();
+    m_comment.clear();
   }
 
 
@@ -296,7 +157,7 @@ namespace s3d_mmd
 
     material.isEdge = pmdMaterial.edge_flag != 0;
     const float alpha = pmdMaterial.alpha;
-    material.isCullNone = alpha + alphaEps < 1.0;
+    material.isCullNone = alpha + 1e-7 < 1.0;
     if ( pmdMaterial.texture_file_name[0] != '\0' )
     {
       //TODO: スフィアに未対応
@@ -314,7 +175,6 @@ namespace s3d_mmd
 
     return material;
   }
-
 
   void MMDModel::Pimpl::createNode(const PMDReader& loader, const FilePath& m_filepath)
   {
