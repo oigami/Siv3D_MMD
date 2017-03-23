@@ -196,11 +196,11 @@ namespace s3d_mmd
       Graphics3D::SetAmbientLightForward(i.material.ambient);
       if ( i.material.diffuseTextureName.isEmpty )
       {
-        m_mesh.drawSubsetForward(i.indexStart, i.indexCount, i.material.diffuse);
+        m_mesh.drawSubsetForward(i.indexStart, i.indexCount, worldMat, i.material.diffuse);
       }
       else
       {
-        m_mesh.drawSubsetForward(i.indexStart, i.indexCount, i.material.texture, i.material.diffuse);
+        m_mesh.drawSubsetForward(i.indexStart, i.indexCount, worldMat, i.material.texture, i.material.diffuse);
       }
     }
   }
@@ -216,7 +216,7 @@ namespace s3d_mmd
       Graphics3D::SetRasterizerState(RasterizerState::SolidCullFront);
       for ( const auto& node : m_edges )
       {
-        m_edgeMesh.drawSubset(node.indexStart, node.indexCount, node.material.diffuse);
+        m_edgeMesh.drawSubset(node.indexStart, node.indexCount, worldMat, node.material.diffuse);
       }
       Graphics3D::SetRasterizerState(rasterizerState);
     }

@@ -23,17 +23,9 @@ SamplerState DiffuseSampler
 struct VS_OUTPUT
 {
   float4 pos : SV_POSITION;
-  float3 normal : TEXCOORD0;
-  float3 worldPosition : TEXCOORD1;
-  float4 color : TEXCOORD2;
-  float2 tex : TEXCOORD3;
-};
-
-struct PS_OUTPUT
-{
-  float4 color : SV_Target0;
-  float  depth : SV_Target1;
-  float4 normal : SV_Target2;
+  float3 worldPosition : TEXCOORD0;
+  float4 color : TEXCOORD1;
+  float2 tex : TEXCOORD2;
 };
 
 //-------------------------------------------------------------
@@ -65,9 +57,10 @@ TexVertex GetVertex(float2 pos, float4 vertexPos)
   vPos.w = asint(tex_and_n.z);
 
   ret.pos = vertexPos;
-  while ( vPos.w )
+  while (vPos.w)
   {
-    [unroll] for ( int i = 16 - 1; i >= 0; i-- )
+    [unroll]
+    for (int i = 16 - 1; i >= 0; i--)
     {
       vPos.xw += int2(1, -1);
       float4 data = texVertex1.Load(vPos.xyz);
@@ -82,18 +75,17 @@ VS_OUTPUT VS(VS_INPUT input)
 {
   VS_OUTPUT output;
   TexVertex v = GetVertex(input.tex, input.pos);
-  float4x3 comb = (float4x3)BoneMatrix[v.idx.x] * v.w.x;
-  comb += (float4x3)BoneMatrix[v.idx.y] * v.w.y;
+  float4x3 comb = (float4x3) BoneMatrix[v.idx.x] * v.w.x;
+  comb += (float4x3) BoneMatrix[v.idx.y] * v.w.y;
   v.pos.xyz += input.normal.xyz * 0.03;
 
-  float4 pos = float4(mul(v.pos, comb), v.pos.w);
+  const float4 pos = mul(input.worldMatrix, float4(mul(v.pos, comb), v.pos.w));
   float3 normal_head = mul(v.pos + float4(input.normal, 0), comb);
 
-  output.normal = normalize(normal_head.xyz - pos.xyz);
   output.pos = mul(pos, g_viewProjectionMatrix);
   output.tex = input.tex;
   output.worldPosition = pos.xyz;
-  //output.normal = norm.xyz;
+  output.color = 0;
   return output;
 }
 
@@ -109,11 +101,7 @@ cbuffer pscbMesh0 : register(b0)
   float4 g_fogColor;
 }
 
-PS_OUTPUT PS(VS_OUTPUT input)
+float4 PS(VS_OUTPUT input) : SV_Target
 {
-  PS_OUTPUT output;
-  output.color = float4(0.0, 0.0, 0.0, 1.0);
-  output.depth = distance(g_cameraPosition.xyz, input.worldPosition);
-  output.normal = float4(input.normal, 1);
-  return output;
+  return float4(0.0, 0.0, 0.0, 1.0);
 }

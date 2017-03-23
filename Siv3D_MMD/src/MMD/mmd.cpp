@@ -16,10 +16,10 @@ namespace s3d_mmd
     m_handle->physicsUpdate();
   }
 
-  void MMD::drawForward(double edgeSize) const
+  void MMD::drawForward(double edgeSize, const Mat4x4& worldMat) const
   {
-    drawForward();
-    drawEdge(edgeSize);
+    drawForward(worldMat);
+    drawEdge(edgeSize, worldMat);
   }
 
   void MMD::drawEdge(double edgeSize, const Mat4x4& worldMat) const

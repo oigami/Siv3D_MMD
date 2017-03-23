@@ -23,7 +23,7 @@ SamplerState DiffuseSampler
 };
 
 //頂点シェーダ
-cbuffer BoneBuff: register(b1)
+cbuffer BoneBuff : register(b1)
 {
   float4x4 BoneMatrix[256];
 }
@@ -46,9 +46,10 @@ TexVertex GetVertex(float2 pos, float4 vertexPos)
   vPos.w = asint(tex_and_n.z);
 
   ret.pos = vertexPos;
-  while ( vPos.w )
+  while (vPos.w)
   {
-    [unroll] for ( int i = 16 - 1; i >= 0; i-- )
+    [unroll]
+    for (int i = 16 - 1; i >= 0; i--)
     {
       vPos.xw += int2(1, -1);
       float4 data = texVertex1.Load(vPos.xyz);
@@ -68,7 +69,7 @@ struct VS_OUTPUT
 struct PS_OUTPUT
 {
   float4 color : SV_Target0;
-  float  depth : SV_Target1;
+  float depth : SV_Target1;
   float4 normal : SV_Target2;
 };
 
@@ -80,10 +81,10 @@ cbuffer vscbMesh0 : register(b0)
 VS_OUTPUT VS(VS_INPUT input)
 {
   TexVertex v = GetVertex(input.tex, input.pos);
-  float4x3 comb = (float4x3)BoneMatrix[v.idx.x] * v.w.x;
-  comb += (float4x3)BoneMatrix[v.idx.y] * v.w.y;
+  float4x3 comb = (float4x3) BoneMatrix[v.idx.x] * v.w.x;
+  comb += (float4x3) BoneMatrix[v.idx.y] * v.w.y;
 
-  const float4 pos = float4(mul(v.pos, comb), v.pos.w);
+  const float4 pos = mul(input.worldMatrix, float4(mul(v.pos, comb), v.pos.w));
 
   VS_OUTPUT Out;
   Out.pos = mul(pos, g_viewProjectionMatrix);
