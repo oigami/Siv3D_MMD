@@ -73,7 +73,15 @@ namespace s3d_mmd
     /// </summary>
     void dettach() const;
 
-    bool isOpen() const;
+    void release();
+
+    bool isOpened() const;
+
+    explicit operator bool() const
+    {
+      return isOpened();
+    }
+
   private:
 
     void PhysicsUpdate() const;

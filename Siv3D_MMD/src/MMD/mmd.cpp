@@ -47,7 +47,9 @@ namespace s3d_mmd
     m_handle->attach(VMD());
   }
 
-  bool MMD::isOpen() const
+  void MMD::release() { m_handle.reset(); }
+
+  bool MMD::isOpened() const
   {
     return !!m_handle;
   }
