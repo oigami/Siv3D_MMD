@@ -14,7 +14,7 @@ void Main()
   Graphics::SetBackground(Color(80, 160, 230));
   Graphics3D::SetAmbientLight(ColorF(0.3));
   physics3d::Physics3DWorld world;
-  MMD::SetDefaultPhysicsFactory(std::make_shared<MMDPhysicsFactory>(world));
+  MMD::SetDefaultPhysicsWorld(std::make_shared<MMDPhysicsWorld>(world));
   const MMD model(L"Data/初音ミク/初音ミクVer2.pmd");
   Println(model.name());
   Println(model.comment());

@@ -20,14 +20,16 @@ namespace s3d_mmd
     virtual ~IMMDPhysics() = default;
   };
 
-  class IMMDPhysicsFactory
+  class IMMDPhysicsWorld
   {
   public:
 
     virtual std::shared_ptr<IMMDPhysics> create() = 0;
 
+    virtual void update() = 0;
+
   protected:
-    virtual ~IMMDPhysicsFactory() = default;
+    virtual ~IMMDPhysicsWorld() = default;
   };
 
 }

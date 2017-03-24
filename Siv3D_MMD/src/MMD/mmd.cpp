@@ -6,7 +6,7 @@ namespace s3d_mmd
 {
   namespace
   {
-    class EmptyMMDPhysicsFactory : public IMMDPhysicsFactory
+    class EmptyMMDPhysicsWorld : public IMMDPhysicsWorld
     {
     public:
       std::shared_ptr<IMMDPhysics> create() override
@@ -22,19 +22,21 @@ namespace s3d_mmd
         };
         return std::make_shared<EmptyPhycics>();
       }
+
+      void update() override {}
     };
   }
 
-  static std::shared_ptr<IMMDPhysicsFactory> defaultPhysicsFactory = std::make_shared<EmptyMMDPhysicsFactory>();
+  static std::shared_ptr<IMMDPhysicsWorld> defaultPhysicsWorld = std::make_shared<EmptyMMDPhysicsWorld>();
 
-  void MMD::SetDefaultPhysicsFactory(std::shared_ptr<IMMDPhysicsFactory> factory)
+  void MMD::SetDefaultPhysicsWorld(std::shared_ptr<IMMDPhysicsWorld> factory)
   {
-    defaultPhysicsFactory = std::move(factory);
+    defaultPhysicsWorld = std::move(factory);
   }
 
   MMD::MMD(const MMDModel& model, std::shared_ptr<IMMDPhysics> physics)
   {
-    m_handle = std::make_shared<Pimpl>(model, physics ? physics : defaultPhysicsFactory->create());
+    m_handle = std::make_shared<Pimpl>(model, physics ? physics : defaultPhysicsWorld->create());
   }
 
   MMD::~MMD() {}

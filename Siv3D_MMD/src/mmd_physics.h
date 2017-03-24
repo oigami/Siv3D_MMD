@@ -52,18 +52,34 @@ namespace s3d_mmd
     Array<physics3d::Physics3D6DofSpringConstraint> m_6DofSpringConstraint;
   };
 
-  class MMDPhysicsFactory : public IMMDPhysicsFactory
+  class MMDPhysicsWorld : public IMMDPhysicsWorld
   {
     bool m_isShared = true;
-    physics3d::Physics3DWorld m_world;
+    Array<physics3d::Physics3DWorld> m_worlds;
   public:
-    MMDPhysicsFactory(physics3d::Physics3DWorld world): m_world(world) { }
+    MMDPhysicsWorld(physics3d::Physics3DWorld world)
+    {
+      m_worlds.push_back(world);
+    }
 
-    MMDPhysicsFactory(): m_isShared(false) {}
+    MMDPhysicsWorld(): m_isShared(false) {}
 
     std::shared_ptr<IMMDPhysics> create() override
     {
-      return std::make_shared<MmdPhysics>(m_isShared ? m_world : physics3d::Physics3DWorld());
+      if (m_isShared)
+      {
+        return std::make_shared<MmdPhysics>(m_worlds[0]);
+      }
+      physics3d::Physics3DWorld world;
+      m_worlds.push_back(world);
+      return std::make_shared<MmdPhysics>(world);
+    }
+
+    void update() override{
+      for (auto& i : m_worlds)
+      {
+        i.update();
+      }
     }
   };
 }

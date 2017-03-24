@@ -83,7 +83,7 @@ namespace s3d_mmd
     }
 
 
-    static void SetDefaultPhysicsFactory(std::shared_ptr<IMMDPhysicsFactory> physics);
+    static void SetDefaultPhysicsWorld(std::shared_ptr<IMMDPhysicsWorld> physics);
 
   private:
 
