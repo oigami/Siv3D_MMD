@@ -10,7 +10,7 @@ namespace s3d_mmd
     Destroy();
   }
 
-  void MmdPhysics::Create(std::shared_ptr<mmd::Bones> bones,
+  void MmdPhysics::create(std::shared_ptr<mmd::Bones> bones,
                           const std::vector<pmd_struct::RigidBody>& pmdRigidBodies,
                           const std::vector<pmd_struct::Joint>& pmdJoints)
   {
@@ -144,7 +144,7 @@ namespace s3d_mmd
     }
   }
 
-  void MmdPhysics::BoneUpdate(const Mat4x4& world, Array<Mat4x4>& boneWorld)
+  void MmdPhysics::boneUpdate(const Mat4x4& world, Array<Mat4x4>& boneWorld)
   {
     if ( !m_bones )
     {

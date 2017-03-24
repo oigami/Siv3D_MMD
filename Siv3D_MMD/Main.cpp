@@ -1,4 +1,5 @@
-﻿#ifndef LIB_COMPILE
+﻿#include "src/mmd_physics.h"
+#ifndef LIB_COMPILE
 # include <Siv3D.hpp>
 #include "MMD/MMD.h"
 using namespace s3d_mmd;
@@ -13,7 +14,8 @@ void Main()
   Graphics::SetBackground(Color(80, 160, 230));
   Graphics3D::SetAmbientLight(ColorF(0.3));
   physics3d::Physics3DWorld world;
-  const MMD model(L"Data/初音ミク/初音ミクVer2.pmd", world);
+  MMD::SetDefaultPhysicsFactory(std::make_shared<MMDPhysicsFactory>(world));
+  const MMD model(L"Data/初音ミク/初音ミクVer2.pmd");
   Println(model.name());
   Println(model.comment());
   const Mesh meshGround(MeshData::Plane({ 40, 40 }, { 6, 6 }));

@@ -167,6 +167,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MMD\immd_physics.h" />
     <ClCompile Include="src\MMDModel\mmd_model_pimpl.cpp" />
     <ClCompile Include="src\math_util.cpp" />
     <ClCompile Include="src\key_frame_data.cpp" />

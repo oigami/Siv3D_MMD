@@ -4,9 +4,37 @@
 
 namespace s3d_mmd
 {
-  MMD::MMD(const MMDModel& model, const physics3d::Physics3DWorld& world)
+  namespace
   {
-    m_handle = std::make_shared<Pimpl>(model, world);
+    class EmptyMMDPhysicsFactory : public IMMDPhysicsFactory
+    {
+    public:
+      std::shared_ptr<IMMDPhysics> create() override
+      {
+        class EmptyPhycics : public IMMDPhysics
+        {
+        public:
+          void create(std::shared_ptr<mmd::Bones>,
+                      const std::vector<pmd_struct::RigidBody>&,
+                      const std::vector<pmd_struct::Joint>&) override { }
+
+          void boneUpdate(const Mat4x4&, Array<Mat4x4>&) override { }
+        };
+        return std::make_shared<EmptyPhycics>();
+      }
+    };
+  }
+
+  static std::shared_ptr<IMMDPhysicsFactory> defaultPhysicsFactory = std::make_shared<EmptyMMDPhysicsFactory>();
+
+  void MMD::SetDefaultPhysicsFactory(std::shared_ptr<IMMDPhysicsFactory> factory)
+  {
+    defaultPhysicsFactory = std::move(factory);
+  }
+
+  MMD::MMD(const MMDModel& model, std::shared_ptr<IMMDPhysics> physics)
+  {
+    m_handle = std::make_shared<Pimpl>(model, physics ? physics : defaultPhysicsFactory->create());
   }
 
   MMD::~MMD() {}

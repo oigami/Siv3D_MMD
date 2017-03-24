@@ -41,7 +41,7 @@ namespace s3d_mmd
   int GetWriteMorphSize(const Array<FaceMorph>& morph)
   {
     // モーフの数を16個ずつ処理することで高速化する
-    return (morph.size() + 15) / 16 * 16;
+    return static_cast<int>(morph.size() + 15) / 16 * 16;
   }
 
   Float2 WriteTextureVertex(const mmd::MeshVertex& v, TextureVertex& tex, const Array<FaceMorph>& morph)
@@ -66,7 +66,7 @@ namespace s3d_mmd
     {
       // 頂点モーフを動かす時の方向と対応するモーフの番号
       const auto& i = m.vertex;
-      image[++now] = RGBA32F(i.x, i.y, i.z, asFloat(static_cast<int>(m.index)));
+      image[++now] = RGBA32F(i.x, i.y, i.z, asFloat(m.index));
     }
 
     for ( auto& i : step(writeMorphCount - morph.size()) )
@@ -78,7 +78,7 @@ namespace s3d_mmd
     return { asFloat(pos.x), asFloat(pos.y) };
   }
 
-  MMD::Pimpl::Pimpl(const MMDModel& model, const physics3d::Physics3DWorld& world)
+  MMD::Pimpl::Pimpl(const MMDModel& model, std::shared_ptr<IMMDPhysics> world)
     : m_mmdPhysics(world)
   {
     m_bones = model.bones();
@@ -91,7 +91,7 @@ namespace s3d_mmd
     m_comment = model.comment();
 
     // 物理演算データの生成
-    m_mmdPhysics.Create(m_bones, model.rigidBodies(), model.joints());
+    m_mmdPhysics->create(m_bones, model.rigidBodies(), model.joints());
 
     std::unordered_map<int, Array<FaceMorph>> faceMorphVertex;
 
@@ -304,7 +304,7 @@ namespace s3d_mmd
 
   void MMD::Pimpl::physicsUpdate()
   {
-    if ( isPhysicsEnabled ) m_mmdPhysics.BoneUpdate(Mat4x4::Identity(), worlds);
+    if ( isPhysicsEnabled ) m_mmdPhysics->boneUpdate(Mat4x4::Identity(), worlds);
   }
 
   void MMD::Pimpl::update()

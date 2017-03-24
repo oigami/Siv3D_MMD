@@ -3,12 +3,13 @@
 #include <MMD/physics3d.h>
 #include <MMD/mmd_bone.h>
 #include <MMD/pmd_struct.h>
+#include <MMD/immd_physics.h>
 #include<vector>
 #include<memory>
 
 namespace s3d_mmd
 {
-  class MmdPhysics
+  class MmdPhysics : public IMMDPhysics
   {
     void SetBones(std::shared_ptr<mmd::Bones> bones);
 
@@ -21,14 +22,13 @@ namespace s3d_mmd
     MmdPhysics(physics3d::Physics3DWorld world = physics3d::Physics3DWorld());
     ~MmdPhysics();
 
-    void Create(std::shared_ptr<mmd::Bones> bones,
+    void create(std::shared_ptr<mmd::Bones> bones,
                 const std::vector<pmd_struct::RigidBody>& pmdRigidBodies,
-                const std::vector<pmd_struct::Joint>& pmdJoints);
+                const std::vector<pmd_struct::Joint>& pmdJoints) override;
+
+    void boneUpdate(const Mat4x4& mat, Array<Mat4x4>& boneWorld) override;
 
     void Destroy();
-
-    void BoneUpdate(const Mat4x4& mat, Array<Mat4x4>& boneWorld);
-
 
   private:
 
@@ -50,6 +50,21 @@ namespace s3d_mmd
     Array<Matrix> m_rigidMat; // rigidbody_init * bones.offsetMatML
     Array<Matrix> m_initOffsetMat; // bones.initMatML * rigidbodyInvInit
     Array<physics3d::Physics3D6DofSpringConstraint> m_6DofSpringConstraint;
-  };;
+  };
+
+  class MMDPhysicsFactory : public IMMDPhysicsFactory
+  {
+    bool m_isShared = true;
+    physics3d::Physics3DWorld m_world;
+  public:
+    MMDPhysicsFactory(physics3d::Physics3DWorld world): m_world(world) { }
+
+    MMDPhysicsFactory(): m_isShared(false) {}
+
+    std::shared_ptr<IMMDPhysics> create() override
+    {
+      return std::make_shared<MmdPhysics>(m_isShared ? m_world : physics3d::Physics3DWorld());
+    }
+  };
 }
 #endif

@@ -134,7 +134,7 @@ namespace s3d_mmd
     void pushGPUData();
   public:
 
-    Pimpl(const MMDModel& model, const physics3d::Physics3DWorld& world);
+    Pimpl(const MMDModel& model, std::shared_ptr<IMMDPhysics> world);
 
     void drawForward(const Mat4x4& worldMat);
 
@@ -161,7 +161,7 @@ namespace s3d_mmd
 
     VMD m_vmd;
 
-    MmdPhysics m_mmdPhysics;
+    std::shared_ptr<IMMDPhysics> m_mmdPhysics;
     bool isPhysicsEnabled = true;
     Mesh m_mesh;
   };

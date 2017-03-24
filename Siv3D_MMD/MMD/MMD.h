@@ -17,6 +17,7 @@
 #include <MMD/vmd.h>
 #include <MMD/mmd_motion.h>
 #include <MMD/physics3d.h>
+#include <MMD/immd_physics.h>
 
 namespace s3d_mmd
 {
@@ -28,12 +29,11 @@ namespace s3d_mmd
   public:
 
     MMD() = default;
-    MMD(const MMDModel& model, const physics3d::Physics3DWorld& world = physics3d::Physics3DWorld());
+    MMD(const MMDModel& model, std::shared_ptr<IMMDPhysics> physics = std::shared_ptr<IMMDPhysics>());
 
-    MMD(const FilePath& filename, const physics3d::Physics3DWorld& world = physics3d::Physics3DWorld()) : MMD(MMDModel(filename), world) {}
+    MMD(const FilePath& filename, std::shared_ptr<IMMDPhysics> physics = std::shared_ptr<IMMDPhysics>()): MMD(MMDModel(filename), physics) {}
 
     ~MMD();
-
 
     /// <summary>
     /// ボーンを更新する
@@ -81,6 +81,9 @@ namespace s3d_mmd
     {
       return isOpened();
     }
+
+
+    static void SetDefaultPhysicsFactory(std::shared_ptr<IMMDPhysicsFactory> physics);
 
   private:
 
