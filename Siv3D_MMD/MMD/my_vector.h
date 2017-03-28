@@ -50,6 +50,11 @@ namespace s3d_mmd
     constexpr MyVector(detail::FVec3 v, double w)
       : component(s3d::ToVector(v, w)) { }
 
+    bool isZero3() const
+    {
+      return DirectX::XMVector3Equal(component, DirectX::XMVectorZero());
+    }
+
     //-----------------------------------------------
     //
     //  初期化関数

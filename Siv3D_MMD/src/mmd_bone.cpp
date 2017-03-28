@@ -67,10 +67,17 @@ namespace s3d_mmd
         ret = XMMatrixMultiply(ret, m_bones[parent].boneMat);
       }
       return ret;
-      /*auto &bones = m_bones[index];
-      if (bones.parent != -1) {
-        return XMMatrixMultiply(bones.boneMat, calcBoneMatML(bones.parent));
-      } else return bones.boneMat;*/
+    }
+
+    Vector Bones::calcBonePositionML(int index) const
+    {
+      Vector ret = m_bones[index].boneMat.r[3];
+
+      for ( int parent = index; parent = m_bones[parent].parent , parent != -1; )
+      {
+        ret = DirectX::XMVector3TransformCoord(ret, m_bones[parent].boneMat);
+      }
+      return ret;
     }
 
     Optional<Mat4x4> Bones::calcBoneMatML(const String& boneName) const

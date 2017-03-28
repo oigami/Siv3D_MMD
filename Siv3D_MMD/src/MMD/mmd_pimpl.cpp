@@ -325,21 +325,21 @@ namespace s3d_mmd
   void MMD::Pimpl::updateIK(const mmd::Ik& ikData)
   {
     auto& bones = *m_bones;
-    const Mat4x4& targetMat = bones.calcBoneMatML(ikData.ik_bone_index);
+    const auto& targetMat = bones.calcBonePositionML(ikData.ik_bone_index);
 
     for ( int i = ikData.iterations - 1; i >= 0; i-- )
     {
       for ( auto& attentionIdx : ikData.ik_child_bone_index )
       {
         auto& bone = bones[attentionIdx];
-        const Mat4x4& effectorMat = bones.calcBoneMatML(ikData.ik_target_bone_index);
+        const auto& effectorMat = bones.calcBonePositionML(ikData.ik_target_bone_index);
         const auto& invCoord = bones.calcBoneMatML(attentionIdx).inverse();
 
 
         // エフェクタのローカル方向（注目ボーン基準）
-        const MyVector& localEffectorDir = MyVector::TransformCoord3(effectorMat.r[3], invCoord).normalize3();
+        const MyVector& localEffectorDir = MyVector::TransformCoord3(effectorMat, invCoord).normalize3();
         // ターゲットのローカル方向（注目ボーン基準）
-        const MyVector& localTargetDir = MyVector::TransformCoord3(targetMat.r[3], invCoord).normalize3();
+        const MyVector& localTargetDir = MyVector::TransformCoord3(targetMat, invCoord).normalize3();
 
         const float angle = std::min(DirectX::XMVectorGetX(DirectX::XMVectorACos(DirectX::XMVectorClamp(localEffectorDir.dot3(localTargetDir),
                                                                                                         DirectX::g_XMNegativeOne, DirectX::g_XMOne))), ikData.control_weight);
@@ -350,7 +350,7 @@ namespace s3d_mmd
           axis = axis * MyVector(1.0f, 0.0f, 1.0f, 0.0f);
         }
 
-        if ( DirectX::XMVector3Equal(axis, DirectX::XMVectorZero()) ) continue;
+        if ( axis.isZero3() ) continue;
 
         const Quaternion& rotation = DirectX::XMQuaternionRotationAxis(axis, angle);
         const Mat4x4& xmboneMatBL = bone.boneMat;
@@ -361,7 +361,7 @@ namespace s3d_mmd
           eulerAngle.x = Clamp(eulerAngle.x, Radians(-180.f), Radians(-10.f));
           eulerAngle.y = 0;
           eulerAngle.z = 0;
-          bone.boneMat = DirectX::XMMatrixMultiply(eulerAngle.CreateMatrix(), DirectX::XMMatrixTranslationFromVector(xmboneMatBL.r[3]));
+          bone.boneMat = eulerAngle.CreateMatrix() * DirectX::XMMatrixTranslationFromVector(xmboneMatBL.r[3]);
         }
         else
         {

@@ -56,28 +56,33 @@ namespace s3d_mmd
     )
     {
       using namespace DirectX;
-      const DirectX::XMVECTOR p1_3x = { x.p1.x, y.p1.x, z.p1.x, r.p1.x };
-      const DirectX::XMVECTOR p2_3x = { x.p2.x, y.p2.x, z.p2.x, r.p2.x };
-      constexpr DirectX::XMVECTOR twoNegative{ -2, -2, -2, -2 };
-      const DirectX::XMVECTOR b = DirectX::XMVectorMultiplyAdd(p1_3x, twoNegative, p2_3x);
-      const DirectX::XMVECTOR c = p1_3x - p2_3x + DirectX::g_XMOne;
-      const DirectX::XMVECTOR d = c * 3;
-      const DirectX::XMVECTOR e = p2_3x * DirectX::g_XMTwo - p1_3x * DirectX::g_XMFour;
-      const DirectX::XMVECTOR xx{ _x, _x, _x, _x };
-      DirectX::XMVECTOR t1{ 0.5f, 0.5f, 0.5f, 0.5f };
+      DirectX::XMVECTOR t1 = DirectX::XMVectorReplicate(_x);
       DirectX::XMVECTOR t2 = t1 * t1;
 
-      constexpr int N = 16;
-
-      for ( int i = N - 1; i >= 0; --i )
       {
-        using DirectX::XMVectorMultiplyAdd;
-        t1 = t1
-          - (t1 * XMVectorMultiplyAdd(t1, b, XMVectorMultiplyAdd(t2, c, p1_3x)) - xx)
-          / XMVectorMultiplyAdd(t2, d, XMVectorMultiplyAdd(t1, e, p1_3x));
-        t2 = t1 * t1;
+        const DirectX::XMVECTOR p1_3x = DirectX::XMVectorSet(x.p1.x, y.p1.x, z.p1.x, r.p1.x);
+        const DirectX::XMVECTOR p2_3x = DirectX::XMVectorSet(x.p2.x, y.p2.x, z.p2.x, r.p2.x);
+        constexpr DirectX::XMVECTOR twoNegative{ -2, -2, -2, -2 };
+        const DirectX::XMVECTOR b = DirectX::XMVectorMultiplyAdd(p1_3x, twoNegative, p2_3x);
+        const DirectX::XMVECTOR c = p1_3x - p2_3x + DirectX::g_XMOne;
+        const DirectX::XMVECTOR d = c * 3;
+        const DirectX::XMVECTOR e = p2_3x * DirectX::g_XMTwo - p1_3x * DirectX::g_XMFour;
+        const DirectX::XMVECTOR xx = DirectX::XMVectorReplicate(_x);
+
+
+        constexpr int N = 8;
+
+        for ( int i = N - 1; i >= 0; --i )
+        {
+          using DirectX::XMVectorMultiplyAdd;
+          t1 = t1
+            - (t1 * XMVectorMultiplyAdd(t1, b, XMVectorMultiplyAdd(t2, c, p1_3x)) - xx)
+            / XMVectorMultiplyAdd(t2, d, XMVectorMultiplyAdd(t1, e, p1_3x));
+          t2 = t1 * t1;
+        }
       }
 
+      constexpr DirectX::XMVECTOR twoNegative{ -2, -2, -2, -2 };
       const DirectX::XMVECTOR p1_3y{ x.p1.y, y.p1.y, z.p1.y, r.p1.y };
       const DirectX::XMVECTOR p2_3y{ x.p2.y, y.p2.y, z.p2.y, r.p2.y };
       return t1 * DirectX::XMVectorMultiplyAdd(t1, p2_3y + twoNegative * p1_3y, DirectX::XMVectorMultiplyAdd(t2, p1_3y - p2_3y + DirectX::g_XMOne, p1_3y));
