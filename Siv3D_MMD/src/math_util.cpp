@@ -4,6 +4,20 @@ namespace s3d_mmd
 {
   namespace math
   {
+    Mat4x4 Mul(Vector translation, Mat4x4 mat)
+    {
+      const auto x = DirectX::XMVectorSwizzle<0, 0, 0, 0>(translation);
+      const auto y = DirectX::XMVectorSwizzle<1, 1, 1, 1>(translation);
+      const auto z = DirectX::XMVectorSwizzle<2, 2, 2, 2>(translation);
+
+      using DirectX::operator*;
+      using DirectX::operator+;
+      using DirectX::operator+=;
+
+      mat.r[3] += x * mat.r[0] + y * mat.r[1] + z * mat.r[2];
+      return mat;
+    }
+
     Bezie::Bezie(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2)
     {
       p1.x = x1 / 127.0f * 3.0f;
@@ -56,7 +70,7 @@ namespace s3d_mmd
     )
     {
       using namespace DirectX;
-      DirectX::XMVECTOR t1 = DirectX::XMVectorReplicate(_x);
+      DirectX::XMVECTOR t1 = DirectX::XMVectorReplicate(0.5f);
       DirectX::XMVECTOR t2 = t1 * t1;
 
       {

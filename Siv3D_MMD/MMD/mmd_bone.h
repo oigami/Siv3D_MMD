@@ -15,16 +15,15 @@ namespace s3d_mmd
     };
 
     // ボーン
-    struct Bone
+    struct alignas(16) Bone
     {
       Bone();
 
-
+      Vector initMat; // 初期姿勢行列(ボーンローカル座標系)
+      Vector initMatML; // 初期姿勢行列(モデルローカル座標系)
+      Vector offsetMat; // ボーンオフセット行列(モデルローカル座標系)
       Mat4x4 boneMatML; // 独自に動かす場合のボーン行列(extraBoneControlがtrueの時使用)
-      Mat4x4 initMat; // 初期姿勢行列(ボーンローカル座標系)
-      Mat4x4 initMatML; // 初期姿勢行列(モデルローカル座標系)
       Mat4x4 boneMat; // 現在のボーン行列(ボーンローカル座標系)
-      Mat4x4 offsetMat; // ボーンオフセット行列(モデルローカル座標系)
       String name; // ボーン名
       int id; // ボーンID（通し番号）
       int parent; // 親ボーン
@@ -39,7 +38,7 @@ namespace s3d_mmd
       std::unordered_map<String, int> m_boneNameIndex;
       Array<mmd::Bone> m_bones;
       Array<mmd::Ik> m_ikData;
-      void initMatCalc(mmd::Bone* me, const Matrix& parentoffsetMat);
+      void initMatCalc(mmd::Bone* me, Vector parentoffsetMat);
 
       void calcWorld(const mmd::Bone& me, const Mat4x4& parentWorldMat, Array<Mat4x4>& worlds) const;
 

@@ -3,6 +3,8 @@ namespace s3d_mmd
 {
   namespace math
   {
+    Mat4x4 Mul(Vector translation, Mat4x4 mat);
+
     class EulerAngles
     {
       enum class Type

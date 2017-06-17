@@ -1,5 +1,6 @@
 ﻿#include <Siv3D.hpp>
 #include <MMD/mmd_bone.h>
+#include "MMD/math_util.h"
 
 namespace s3d_mmd
 {
@@ -7,29 +8,31 @@ namespace s3d_mmd
   {
     Bone::Bone() : extraBoneControl(false), type(), id(), parent(-1), firstChild(-1), sibling(-1)
     {
-      initMat = Mat4x4::Identity();
-      offsetMat = Mat4x4::Identity();
+      initMat = DirectX::XMVectorZero();
+      offsetMat = DirectX::XMVectorZero();
       boneMat = Mat4x4::Identity();
       boneMatML = Mat4x4::Identity();
     }
 
     void Bones::initMatCalc()
     {
-      initMatCalc(m_bones.data(), Mat4x4::Identity());
-      for ( auto& i : m_bones ) i.boneMat = i.initMat;
+      initMatCalc(m_bones.data(), DirectX::XMVectorZero());
+      for ( auto& i : m_bones ) i.boneMat = DirectX::XMMatrixTranslationFromVector(i.initMat);
     }
 
-    void Bones::initMatCalc(Bone* me, const Matrix& parentoffsetMat)
+    void Bones::initMatCalc(Bone* me, Vector parentoffsetMat)
     {
       if ( me->firstChild != -1 ) initMatCalc(&m_bones[me->firstChild], me->offsetMat);
       if ( me->sibling != -1 ) initMatCalc(&m_bones[me->sibling], parentoffsetMat);
-      me->initMat = me->initMatML * parentoffsetMat;
+      using namespace DirectX;
+      me->initMat = me->initMatML + parentoffsetMat;
     }
+
 
     void Bones::calcWorld(const Bone& me, const Mat4x4& parentWorldMat, Array<Mat4x4>& worlds) const
     {
       const Mat4x4 m = me.boneMat * parentWorldMat;
-      worlds[me.id] = me.offsetMat * m;
+      worlds[me.id] = math::Mul(me.offsetMat, m);
       if ( me.firstChild != -1 ) calcWorld(m_bones[me.firstChild], m, worlds);
       if ( me.sibling != -1 ) calcWorld(m_bones[me.sibling], parentWorldMat, worlds);
     }
@@ -52,7 +55,7 @@ namespace s3d_mmd
       {
         if ( m_bones[i].extraBoneControl )
         {
-          worlds[i] = m_bones[i].offsetMat * m_bones[i].boneMatML * world;
+          worlds[i] = math::Mul(m_bones[i].offsetMat, m_bones[i].boneMatML) * world;
         }
       }
     }

@@ -137,9 +137,10 @@ namespace s3d_mmd
     {
       if ( m_rigidbodyRelatedBoneIndex[i] == 0xFFFF ) continue;
       const mmd::Bone& bone = (*m_bones)[m_rigidbodyRelatedBoneIndex[i]];
-      const Matrix m = m_rigidbodyInit[i] * bone.offsetMat;
+      Matrix m = m_rigidbodyInit[i];
+      m.r[3] = m.r[3] + bone.offsetMat;
       m_rigidMat.push_back(m);
-      const Matrix tempInitOffsetMat = bone.initMatML * m_rigidbodyInvInit[i];
+      const Matrix tempInitOffsetMat = math::Mul(bone.initMatML, m_rigidbodyInvInit[i]);
       m_initOffsetMat.push_back(tempInitOffsetMat);
     }
   }
@@ -218,7 +219,7 @@ namespace s3d_mmd
       i = 0; //関連ボーンがない場合は0のセンターボーンが基準
     }
     // 関連ボーンがある場合は、ボーン相対座標からモデルローカル座標に変換。MmdStruct::PmdRigidBody.pos_posを参照
-    auto p = ToVector(pos.x, pos.y, pos.z, 0.0f) + (*m_bones)[i].initMatML.r[3];
+    auto p = ToVector(pos.x, pos.y, pos.z, 0.0f) + (*m_bones)[i].initMatML;
 
     (*m_bones)[i].extraBoneControl = true;
     const Quaternion rotation = Quaternion::RollPitchYaw(rot.z, rot.x, rot.y);

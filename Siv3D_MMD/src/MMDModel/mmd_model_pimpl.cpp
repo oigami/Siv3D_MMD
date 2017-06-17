@@ -92,8 +92,9 @@ namespace s3d_mmd
       bone.id = i;
       bone.type = item.bone_type;
       const Mat4x4 modelLocalInitMat = Mat4x4::Translate(item.bone_head_pos[0], item.bone_head_pos[1], item.bone_head_pos[2]);
-      bone.initMatML = bone.boneMatML = bone.initMat = modelLocalInitMat; // モデルローカル座標系
-      bone.offsetMat = XMMatrixInverse(0, modelLocalInitMat);
+      bone.boneMatML = modelLocalInitMat;
+      bone.initMatML = bone.initMat = DirectX::XMVectorSet(item.bone_head_pos[0], item.bone_head_pos[1], item.bone_head_pos[2], 1); // モデルローカル座標系
+      bone.offsetMat = DirectX::XMVectorMultiply(Vector{ -1.0f, -1.0f, -1.0f, 0.0f }, bone.initMat);
     }
     return { std::move(bones), CreateIkData(ikData) };
   }
