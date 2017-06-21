@@ -29,14 +29,14 @@ namespace s3d_mmd
     }
 
 
-    void Bones::calcWorld(const Bone& me, const Mat4x4& parentWorldMat, Array<Mat4x4>& worlds) const
+    void Bones::calcWorld(const Bone& me, const Mat4x4& parentWorldMat)
     {
       auto boneMat = me.boneRotation.toMatrix();
       boneMat.r[3] = me.bonePosition;
-      const Mat4x4 m = boneMat * parentWorldMat;
-      worlds[me.id] = math::Mul(me.offsetMat, m);
-      if ( me.firstChild != -1 ) calcWorld(m_bones[me.firstChild], m, worlds);
-      if ( me.sibling != -1 ) calcWorld(m_bones[me.sibling], parentWorldMat, worlds);
+      m_lastUpdatedModelLocals[me.id] = boneMat * parentWorldMat;
+      m_lastUpdatedWorlds[me.id] = math::Mul(me.offsetMat, m_lastUpdatedModelLocals[me.id]);
+      if ( me.firstChild != -1 ) calcWorld(m_bones[me.firstChild], m_lastUpdatedModelLocals[me.id]);
+      if ( me.sibling != -1 ) calcWorld(m_bones[me.sibling], parentWorldMat);
     }
 
     Bones::Bones(Array<Bone> bones, Array<mmd::Ik> ikData) : m_bones(std::move(bones)), m_ikData(std::move(ikData))
@@ -50,10 +50,11 @@ namespace s3d_mmd
 
     Array<Mat4x4>& Bones::calcWorld(const Mat4x4& world)
     {
-      const std::uint_fast32_t bonsSize = static_cast<std::uint_fast32_t>(m_bones.size());
-      m_lastUpdatedWorlds.resize(bonsSize);
-      calcWorld(m_bones[0], world, m_lastUpdatedWorlds);
-      for ( int i : step(bonsSize) )
+      const std::uint_fast32_t boneSize = static_cast<std::uint_fast32_t>(m_bones.size());
+      m_lastUpdatedWorlds.resize(boneSize);
+      m_lastUpdatedModelLocals.resize(boneSize);
+      calcWorld(m_bones[0], world);
+      for ( int i : step(boneSize) )
       {
         if ( m_bones[i].extraBoneControl )
         {

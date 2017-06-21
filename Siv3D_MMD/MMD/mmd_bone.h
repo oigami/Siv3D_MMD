@@ -39,10 +39,11 @@ namespace s3d_mmd
       std::unordered_map<String, int> m_boneNameIndex;
       Array<mmd::Bone> m_bones;
       Array<mmd::Ik> m_ikData;
+      Array<Mat4x4> m_lastUpdatedModelLocals;
       Array<Mat4x4> m_lastUpdatedWorlds;
       void initMatCalc(mmd::Bone* me, Vector parentoffsetMat);
 
-      void calcWorld(const mmd::Bone& me, const Mat4x4& parentWorldMat, Array<Mat4x4>& worlds) const;
+      void calcWorld(const Bone& me, const Mat4x4& parentWorldMat);
 
     public:
 
@@ -63,6 +64,10 @@ namespace s3d_mmd
 
       Array<Mat4x4>& lastUpdatedWorld() { return m_lastUpdatedWorlds; }
       const Array<Mat4x4>& lastUpdatedWorld()const { return m_lastUpdatedWorlds; }
+
+      Array<Mat4x4>& lastUpdatedModelLocal() { return m_lastUpdatedModelLocals; }
+      const Array<Mat4x4>& lastUpdatedModelLocal()const { return m_lastUpdatedModelLocals; }
+
 
       // モデルローカル座標系でのボーン行列を計算
       Mat4x4 calcBoneMatML(int index) const;
