@@ -145,7 +145,7 @@ namespace s3d_mmd
     }
   }
 
-  void MmdPhysics::boneUpdate(const Mat4x4& world, Array<Mat4x4>& boneWorld)
+  void MmdPhysics::boneUpdate(const Mat4x4& world)
   {
     if ( !m_bones )
     {
@@ -209,7 +209,7 @@ namespace s3d_mmd
       }
       }
     }
-    m_bones->calcWorld(world, boneWorld);
+    m_bones->calcWorld(world);
   }
 
   std::pair<Vector, Quaternion> MmdPhysics::CreateRigidMatrix(const s3d::Float3& pos, const s3d::Float3& rot, int i)

@@ -18,7 +18,7 @@ namespace s3d_mmd
                       const std::vector<pmd_struct::RigidBody>&,
                       const std::vector<pmd_struct::Joint>&) override { }
 
-          void boneUpdate(const Mat4x4&, Array<Mat4x4>&) override { }
+          void boneUpdate(const Mat4x4&) override {}
         };
         return std::make_shared<EmptyPhycics>();
       }

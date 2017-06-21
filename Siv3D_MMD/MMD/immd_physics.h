@@ -14,7 +14,7 @@ namespace s3d_mmd
     virtual void create(std::shared_ptr<mmd::Bones> bones,
                         const std::vector<pmd_struct::RigidBody>& pmdRigidBodies,
                         const std::vector<pmd_struct::Joint>& pmdJoints) = 0;
-    virtual void boneUpdate(const Mat4x4& mat, Array<Mat4x4>& boneWorld) = 0;
+    virtual void boneUpdate(const Mat4x4& world) = 0;
 
   protected:
     virtual ~IMMDPhysics() = default;

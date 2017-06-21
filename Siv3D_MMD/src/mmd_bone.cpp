@@ -46,18 +46,19 @@ namespace s3d_mmd
       initMatCalc();
     }
 
-    void Bones::calcWorld(const Mat4x4& world, Array<Mat4x4>& worlds) const
+    Array<Mat4x4>& Bones::calcWorld(const Mat4x4& world)
     {
       const std::uint_fast32_t bonsSize = static_cast<std::uint_fast32_t>(m_bones.size());
-      worlds.resize(bonsSize);
-      calcWorld(m_bones[0], world, worlds);
+      m_lastUpdatedWorlds.resize(bonsSize);
+      calcWorld(m_bones[0], world, m_lastUpdatedWorlds);
       for ( int i : step(bonsSize) )
       {
         if ( m_bones[i].extraBoneControl )
         {
-          worlds[i] = math::Mul(m_bones[i].offsetMat, m_bones[i].boneMatML) * world;
+          m_lastUpdatedWorlds[i] = math::Mul(m_bones[i].offsetMat, m_bones[i].boneMatML) * world;
         }
       }
+      return m_lastUpdatedWorlds;
     }
 
     // モデルローカル座標系でのボーン行列を計算

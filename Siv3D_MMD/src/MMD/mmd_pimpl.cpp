@@ -278,7 +278,7 @@ namespace s3d_mmd
     // ボーンをGPUに送信
     {
       ConstantBuffer<mmd::ConstantBoneData> data;
-
+      auto& worlds = m_bones->lastUpdatedWorld();
       for ( auto& i : step(static_cast<int>(worlds.size())) )
       {
         data->bones[i] = worlds[i].transposed();
@@ -304,7 +304,7 @@ namespace s3d_mmd
 
   void MMD::Pimpl::physicsUpdate()
   {
-    if ( isPhysicsEnabled ) m_mmdPhysics->boneUpdate(Mat4x4::Identity(), worlds);
+    if ( isPhysicsEnabled ) m_mmdPhysics->boneUpdate(Mat4x4::Identity());
   }
 
   void MMD::Pimpl::update()
@@ -317,7 +317,7 @@ namespace s3d_mmd
 
     for ( auto& i : m_bones->ikData() ) updateIK(i);
 
-    m_bones->calcWorld(Mat4x4::Identity(), worlds);
+    m_bones->calcWorld(Mat4x4::Identity());
 
     physicsUpdate();
   }

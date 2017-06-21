@@ -38,6 +38,7 @@ namespace s3d_mmd
       std::unordered_map<String, int> m_boneNameIndex;
       Array<mmd::Bone> m_bones;
       Array<mmd::Ik> m_ikData;
+      Array<Mat4x4> m_lastUpdatedWorlds;
       void initMatCalc(mmd::Bone* me, Vector parentoffsetMat);
 
       void calcWorld(const mmd::Bone& me, const Mat4x4& parentWorldMat, Array<Mat4x4>& worlds) const;
@@ -57,7 +58,10 @@ namespace s3d_mmd
       void initMatCalc();
 
       //ワールド変換行列の配列を計算する再帰関数
-      void calcWorld(const Mat4x4& world, Array<Mat4x4>& worlds) const;
+      Array<Mat4x4>& calcWorld(const Mat4x4 & world);
+
+      Array<Mat4x4>& lastUpdatedWorld() { return m_lastUpdatedWorlds; }
+      const Array<Mat4x4>& lastUpdatedWorld()const { return m_lastUpdatedWorlds; }
 
       // モデルローカル座標系でのボーン行列を計算
       Mat4x4 calcBoneMatML(int index) const;

@@ -26,7 +26,7 @@ namespace s3d_mmd
                 const std::vector<pmd_struct::RigidBody>& pmdRigidBodies,
                 const std::vector<pmd_struct::Joint>& pmdJoints) override;
 
-    void boneUpdate(const Mat4x4& mat, Array<Mat4x4>& boneWorld) override;
+    void boneUpdate(const Mat4x4& world) override;
 
     void Destroy();
 

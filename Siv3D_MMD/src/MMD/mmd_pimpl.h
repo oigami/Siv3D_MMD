@@ -157,7 +157,6 @@ namespace s3d_mmd
     std::shared_ptr<mmd::Bones> m_bones;
     mmd::FaceMorph m_faceMorph;
     Texture m_vertexTexture;
-    Array<Mat4x4> worlds;
 
     VMD m_vmd;
 

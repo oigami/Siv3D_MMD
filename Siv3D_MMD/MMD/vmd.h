@@ -43,7 +43,7 @@ namespace s3d_mmd
     /// 再生位置を変更する（60fps)
     /// </summary>
     /// <param name="frameNo"></param>
-    void SetPosFrame(const int frameNo);
+    void setPosFrame(const int frameNo) const;
 
     bool isEmpty() const;
   };

@@ -56,7 +56,7 @@ namespace s3d_mmd
     return m_handle->setPosSec(pos);
   }
 
-  void VMD::SetPosFrame(const int frameNo)
+  void VMD::setPosFrame(const int frameNo) const
   {
     return m_handle->setPosFrame(frameNo);
   }
