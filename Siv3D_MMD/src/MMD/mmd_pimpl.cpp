@@ -353,19 +353,18 @@ namespace s3d_mmd
         if ( axis.isZero3() ) continue;
 
         const Quaternion& rotation = DirectX::XMQuaternionRotationAxis(axis, angle);
-        const Mat4x4& xmboneMatBL = bone.boneMat;
         if ( bone.name == L"左ひざ" || bone.name == L"右ひざ" )
         {
-          const Quaternion& rv = (rotation * DirectX::XMQuaternionRotationMatrix(xmboneMatBL)).normalize();
+          const Quaternion& rv = (rotation * bone.boneRotation).normalize();
           math::EulerAngles eulerAngle(rv.toMatrix());
           eulerAngle.x = Clamp(eulerAngle.x, Radians(-180.f), Radians(-10.f));
           eulerAngle.y = 0;
           eulerAngle.z = 0;
-          bone.boneMat = eulerAngle.CreateMatrix() * DirectX::XMMatrixTranslationFromVector(xmboneMatBL.r[3]);
+          bone.boneRotation = eulerAngle.CreateRotation();
         }
         else
         {
-          bone.boneMat = rotation.toMatrix() * xmboneMatBL;
+          bone.boneRotation = rotation * bone.boneRotation;
         }
       }
     }

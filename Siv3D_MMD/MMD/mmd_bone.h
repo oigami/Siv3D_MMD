@@ -19,11 +19,12 @@ namespace s3d_mmd
     {
       Bone();
 
-      Vector initMat; // 初期姿勢行列(ボーンローカル座標系)
+      Vector bonePosition; // 現在のボーンのPosition(ボーンローカル座標系)
+      Quaternion boneRotation; // 現在のボーンのQuaternion(ボーンローカル座標系)
+      Vector initMatBoneLocal; // 初期姿勢行列(ボーンローカル座標系)
       Vector initMatML; // 初期姿勢行列(モデルローカル座標系)
       Vector offsetMat; // ボーンオフセット行列(モデルローカル座標系)
       Mat4x4 boneMatML; // 独自に動かす場合のボーン行列(extraBoneControlがtrueの時使用)
-      Mat4x4 boneMat; // 現在のボーン行列(ボーンローカル座標系)
       String name; // ボーン名
       int id; // ボーンID（通し番号）
       int parent; // 親ボーン

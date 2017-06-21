@@ -8,16 +8,16 @@ namespace s3d_mmd
   {
     Bone::Bone() : extraBoneControl(false), type(), id(), parent(-1), firstChild(-1), sibling(-1)
     {
-      initMat = DirectX::XMVectorZero();
+      initMatBoneLocal = DirectX::XMVectorZero();
       offsetMat = DirectX::XMVectorZero();
-      boneMat = Mat4x4::Identity();
+      bonePosition = DirectX::XMVectorZero();
       boneMatML = Mat4x4::Identity();
     }
 
     void Bones::initMatCalc()
     {
       initMatCalc(m_bones.data(), DirectX::XMVectorZero());
-      for ( auto& i : m_bones ) i.boneMat = DirectX::XMMatrixTranslationFromVector(i.initMat);
+      for ( auto& i : m_bones ) i.bonePosition = i.initMatBoneLocal;
     }
 
     void Bones::initMatCalc(Bone* me, Vector parentoffsetMat)
@@ -25,13 +25,15 @@ namespace s3d_mmd
       if ( me->firstChild != -1 ) initMatCalc(&m_bones[me->firstChild], me->offsetMat);
       if ( me->sibling != -1 ) initMatCalc(&m_bones[me->sibling], parentoffsetMat);
       using namespace DirectX;
-      me->initMat = me->initMatML + parentoffsetMat;
+      me->initMatBoneLocal = me->initMatML + parentoffsetMat;
     }
 
 
     void Bones::calcWorld(const Bone& me, const Mat4x4& parentWorldMat, Array<Mat4x4>& worlds) const
     {
-      const Mat4x4 m = me.boneMat * parentWorldMat;
+      auto boneMat = me.boneRotation.toMatrix();
+      boneMat.r[3] = me.bonePosition;
+      const Mat4x4 m = boneMat * parentWorldMat;
       worlds[me.id] = math::Mul(me.offsetMat, m);
       if ( me.firstChild != -1 ) calcWorld(m_bones[me.firstChild], m, worlds);
       if ( me.sibling != -1 ) calcWorld(m_bones[me.sibling], parentWorldMat, worlds);
@@ -64,22 +66,28 @@ namespace s3d_mmd
     // モデルローカル座標系でのボーン行列を計算
     Mat4x4 Bones::calcBoneMatML(int index) const
     {
-      Mat4x4 ret = m_bones[index].boneMat;
-
-      for ( int parent = index; parent = m_bones[parent].parent , parent != -1; )
+      Quaternion q = m_bones[index].boneRotation;
+      Vector pos = m_bones[index].bonePosition;
+      for ( int parent = index; parent = m_bones[parent].parent, parent != -1; )
       {
-        ret = XMMatrixMultiply(ret, m_bones[parent].boneMat);
+        q = q * m_bones[parent].boneRotation;
+        using DirectX::operator+;
+        pos = DirectX::XMVector3Rotate(pos, m_bones[parent].boneRotation.component) + m_bones[parent].bonePosition;
       }
-      return ret;
+      auto tmp = q.toMatrix();
+      tmp.r[3] = pos;
+      return tmp;
     }
 
     Vector Bones::calcBonePositionML(int index) const
     {
-      Vector ret = m_bones[index].boneMat.r[3];
+      Vector ret = m_bones[index].bonePosition;
 
-      for ( int parent = index; parent = m_bones[parent].parent , parent != -1; )
+      for ( int parent = index; parent = m_bones[parent].parent, parent != -1; )
       {
-        ret = DirectX::XMVector3TransformCoord(ret, m_bones[parent].boneMat);
+        using DirectX::operator+=;
+        ret = DirectX::XMVector3Rotate(ret, m_bones[parent].boneRotation.component);
+        ret += m_bones[parent].bonePosition;
       }
       return ret;
     }

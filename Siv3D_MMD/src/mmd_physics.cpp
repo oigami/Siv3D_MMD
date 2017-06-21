@@ -197,9 +197,9 @@ namespace s3d_mmd
         Mat4x4 boneParentMat = m_bones->calcParentBoneMat(m_rigidbodyRelatedBoneIndex[i]);
 
         rigidWorld *= boneParentMat.inverse();
-        const Mat4x4 boneMat = bone.boneMat * boneParentMat;
-        rigidWorld.r[3] = bone.boneMat.r[3];
-        bone.boneMat = rigidWorld;
+        const Mat4x4 boneMat = DirectX::XMMatrixTranslationFromVector(bone.bonePosition) * boneParentMat;
+        rigidWorld.r[3] = DirectX::XMVectorZero();
+        bone.boneRotation = DirectX::XMQuaternionRotationMatrix(rigidWorld);
 
         //剛体の位置更新
         rigidWorld = rigidBodie.getTransform();

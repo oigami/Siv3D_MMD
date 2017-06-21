@@ -45,8 +45,8 @@ namespace s3d_mmd
       const auto& frame = it->second.calcFrame();
 
       // 親ボーン座標系のボーン行列を求める
-      i.boneMat = frame.rotation.toMatrix();
-      i.boneMat.r[3] = frame.position + i.initMat;
+      i.boneRotation = frame.rotation;
+      i.bonePosition = frame.position + i.initMatBoneLocal;
     }
   }
 

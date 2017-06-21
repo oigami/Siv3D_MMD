@@ -90,7 +90,6 @@ namespace s3d_mmd
 
       Mat4x4 CreateMatrix() const
       {
-        Mat4x4 rot;
         using namespace DirectX;
         switch ( type )
         {
@@ -103,6 +102,11 @@ namespace s3d_mmd
         }
         assert(0);
         return Mat4x4::Identity();
+      }
+
+      Quaternion CreateRotation() const
+      {
+        return Quaternion::RollPitchYaw(z, x, y);
       }
     };
 
