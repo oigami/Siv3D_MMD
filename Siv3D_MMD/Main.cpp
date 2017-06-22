@@ -21,10 +21,11 @@ void Main()
   const Mesh meshGround(MeshData::Plane({ 40, 40 }, { 6, 6 }));
 
   mmd::MMDMotion motion(VMDReader(L"Data/きしめん.vmd"));
+  mmd::MMDMotion output = motion;
   motion.saveVMD(L"Data/きしめん.vmd.sav");
   const VMD vmd(L"Data/gokuraku.vmd");
 
-  vmd.play();
+  //vmd.play();
   model.attach(vmd);
   //Bone &bone10 = model.bones()->get(10);
   //bone10.extraBoneControl = true;
@@ -34,9 +35,63 @@ void Main()
 
   gui.add(L"frame", GUISlider::Create(0, 10, 0));
   MouseCamera3D camera;
-  while (System::Update())
+  System::Update();
+  int nowFrame = 0;
+  int lastFrame = motion.getLastFrame();
+  std::array<String, 18> lists = {
+    // 鼻
+    L"右目",
+    L"首",
+    L"右腕", L"右ひじ", L"右手首",
+    L"左腕", L"左ひじ", L"左手首",
+    L"右足", L"右ひざ", L"右足首",
+    L"左足", L"左ひざ", L"左足首",
+    L"右目", L"左目",
+    // 右耳, 左耳
+    L"右目", L"左目"
+  };
+  std::array<int, 18> lists_int;
+  for ( auto& i : step(18) )
   {
-    world.update();
+    lists_int[i] = *model.bones()->getBoneIndex(lists[i]);
+  }
+  std::array<std::vector<int>, 18> linkList = {
+    std::vector<int>{ 1,15,14 },
+    { 2,5,8,11 },
+    { 3 },
+    { 4 },
+    {},
+    { 6 },
+    { 7 },
+    {},
+    { 9 },
+    { 10 },
+    {},
+    { 12 },
+    { 13 },
+    {},
+    { 16 },
+    { 17 },
+    {},
+    {}
+  };
+  std::array<Vec3, 18> diff = {
+    Vec3(0.3, -0.9, -0.8),
+    Vec3(0, -0.8, 0),
+    Vec3(), Vec3(), Vec3(),
+    Vec3(), Vec3(), Vec3(),
+    Vec3(), Vec3(), Vec3(),
+    Vec3(), Vec3(), Vec3(),
+    Vec3(0,-0.6,-0.6), Vec3(0,-0.6,-0.6),
+    Vec3(-0.3, -0.6, 0), Vec3(0.3, -0.6, 0),
+  };
+
+
+  while ( System::Update() )
+  {
+    vmd.setPosFrame(nowFrame++);
+    //world.update();
+
     //world.debugDraw();
     font(Profiler::FPS(), L"fps").draw();
     //vmd.setTime(gui.slider(L"frame").valueInt);
@@ -44,8 +99,31 @@ void Main()
     meshGround.draw();
 
     //bone10.extraBoneMat *= Quaternion(10_deg, 0, 0, 1).toMatrix();
-    model.update().drawForward(gui.slider(L"frame").value, Mat4x4::Translate({ 10,10,0 }));
-    auto mat = *model.bones()->calcBoneMatML(L"頭");
+    model.update();
+    auto& localMats = model.bones()->lastUpdatedModelLocal();
+    auto mat = (localMats[(*model.bones()->getBoneIndex(L"右目"))]);
+    mat = Mat4x4::Translate(0, 0, -0.6) * mat;
+    Sphere(ToVec3(mat.r[3]), 0.1).draw(Palette::Red);
+
+    std::array<Mat4x4, 18> worlds;
+    for ( auto& i : step(18) )
+    {
+      worlds[i] = Mat4x4::Translate(diff[i]) * localMats[lists_int[i]];
+    }
+    for ( auto& i : step(18) )
+    {
+      auto v = ToVec3(worlds[i].r[3]);
+      Sphere(v, 0.1).draw();
+
+      for ( auto& j : linkList[i] )
+      {
+        auto v2 = ToVec3(worlds[j].r[3]);
+        Line3D(v, v2).drawForward(Palette::Yellow);
+      }
+    }
+    model.drawForward();
+    font(gui.slider(L"frame").value).draw(0, 50);
+    //auto mat = *model.bones()->calcBoneMatML(L"頭");
     //camera.lookat = mat.transform(Vec3(0, 0, 0));
     //camera.pos = mat.transform(Vec3(0, 0, -10));
     camera.update();
@@ -57,5 +135,6 @@ void Main()
 
     //bulletPtr.DebugDraw();
   }
+  output.saveVMD(L"output/きしめん.vmd");
 }
 #endif

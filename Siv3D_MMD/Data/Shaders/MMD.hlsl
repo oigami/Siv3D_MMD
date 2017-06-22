@@ -89,6 +89,7 @@ VS_OUTPUT VS(VS_INPUT input)
   VS_OUTPUT Out;
   Out.pos = mul(pos, g_viewProjectionMatrix);
   Out.color = input.diffuseColor;
+  Out.color.a = 0.3;
   Out.worldPosition = pos.xyz;
   Out.tex = v.tex;
   return Out;
