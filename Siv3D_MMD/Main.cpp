@@ -23,7 +23,7 @@ void Main()
   mmd::MMDMotion motion(VMDReader(L"Data/きしめん.vmd"));
   mmd::MMDMotion output = motion;
   motion.saveVMD(L"Data/きしめん.vmd.sav");
-  const VMD vmd(L"Data/gokuraku.vmd");
+  const VMD vmd(L"Data/きしめん.vmd");
 
   //vmd.play();
   model.attach(vmd);
@@ -86,6 +86,9 @@ void Main()
     Vec3(-0.3, -0.6, 0), Vec3(0.3, -0.6, 0),
   };
 
+  Camera camerax;
+  camerax.pos = Vec3(0, 10, -40);
+  camerax.lookat = Vec3(0, 10, 0);
 
   while ( System::Update() )
   {
@@ -101,9 +104,6 @@ void Main()
     //bone10.extraBoneMat *= Quaternion(10_deg, 0, 0, 1).toMatrix();
     model.update();
     auto& localMats = model.bones()->lastUpdatedModelLocal();
-    auto mat = (localMats[(*model.bones()->getBoneIndex(L"右目"))]);
-    mat = Mat4x4::Translate(0, 0, -0.6) * mat;
-    Sphere(ToVec3(mat.r[3]), 0.1).draw(Palette::Red);
 
     std::array<Mat4x4, 18> worlds;
     for ( auto& i : step(18) )
@@ -113,7 +113,7 @@ void Main()
     for ( auto& i : step(18) )
     {
       auto v = ToVec3(worlds[i].r[3]);
-      Sphere(v, 0.1).draw();
+      //Sphere(v, 0.1).draw();
 
       for ( auto& j : linkList[i] )
       {
@@ -126,9 +126,23 @@ void Main()
     //auto mat = *model.bones()->calcBoneMatML(L"頭");
     //camera.lookat = mat.transform(Vec3(0, 0, 0));
     //camera.pos = mat.transform(Vec3(0, 0, -10));
+    std::array<Vec2, 18> tmp;
+    for ( auto& i : step(18) )
+    {
+      auto v = worlds[i].r[3];
+      tmp[i] = ToVec3(DirectX::XMVector3TransformCoord(v, camerax.calcViewProjectionMatrix())).xy();
+      Vec2 halfSize(Window::Width() / 2, Window::Height() / 2);
+      tmp[i] = tmp[i] * halfSize;
+
+      tmp[i].x += halfSize.x;
+      tmp[i].y *= -1;
+      tmp[i].y += halfSize.y;
+      Circle(tmp[i], 5).draw(Palette::Red);
+    }
+
     camera.update();
     camera.setCamera();
-
+    Graphics3D::SetCamera(camerax);
     //Graphics3D::FreeCamera();
     //Graphics3D::SetCamera(camera);
     //if (Input::KeyB.pressed)
