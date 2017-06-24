@@ -5,6 +5,7 @@
 #include <src/reader_helper.h>
 #include <src/VMD/vmd_pimpl.h>
 #include <MMD/mmd_motion.h>
+#include <chrono>
 
 namespace s3d_mmd
 {
@@ -60,6 +61,10 @@ namespace s3d_mmd
   {
     return m_handle->setPosFrame(frameNo);
   }
+
+  int VMD::lengthFrame() const { return m_handle->lengthFrame(); }
+
+  SecondsF VMD::lengthSec() const { return m_handle->lengthSec(); }
 
   bool VMD::isEmpty() const
   {

@@ -111,7 +111,7 @@ namespace s3d_mmd
     SecondsF m_loopBegin; /// <summary> ループする時間 </summary>
     SecondsF m_loopEnd; /// <summary> ループする時間 </summary>
     Stopwatch m_nowTime; /// <summary> 現在の再生時間 </summary>
-
+    int m_lastFrame; /// <summary> 最終フレーム </summary>
 
     /// <summary> キーフレームの名前とデータ </summary>
     std::unordered_map<String, vmd::detail::KeyFrameData<mmd::BoneKeyFrame>> m_keyFrameData;
@@ -156,10 +156,11 @@ namespace s3d_mmd
     /// 現在の再生位置を取得する (60fps)
     /// </summary>
     /// <returns></returns>
-    int getPosFrame();
+    int getPosFrame() const;
 
     SecondsF lengthSec() const;
-    SecondsF lengthFrame() const;
+
+    int lengthFrame() const;
 
     bool isEmpty() const;
   };

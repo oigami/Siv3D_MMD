@@ -45,6 +45,10 @@ namespace s3d_mmd
     /// <param name="frameNo"></param>
     void setPosFrame(const int frameNo) const;
 
+    int lengthFrame() const;
+
+    SecondsF lengthSec() const;
+
     bool isEmpty() const;
   };
 }

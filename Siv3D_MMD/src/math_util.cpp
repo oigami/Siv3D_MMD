@@ -69,6 +69,7 @@ namespace s3d_mmd
                                     const Bezie& r
     )
     {
+      return DirectX::XMVectorSet(x.GetY(_x), y.GetY(_x), z.GetY(_x), r.GetY(_x));
       using namespace DirectX;
       DirectX::XMVECTOR t1 = DirectX::XMVectorReplicate(0.5f);
       DirectX::XMVECTOR t2 = t1 * t1;

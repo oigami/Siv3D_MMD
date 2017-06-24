@@ -25,8 +25,9 @@ namespace s3d_mmd
   template<class SizeType, class Type>
   bool ReadSizeAndArray(IReader& reader, std::vector<Type>& arr)
   {//Arrayで受け取れないのでvectorにしておく
-    SizeType num;
+    SizeType num = 0;
     if ( !reader.read(num) ) return false;
+    if ( reader.size() < reader.getPos() + num * sizeof(Type) ) return false;
     return ReadArray(reader, num, arr);
   }
 

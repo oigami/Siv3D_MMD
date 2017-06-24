@@ -18,6 +18,7 @@ namespace s3d_mmd
     m_loopEnd = SecondsF::zero();
     m_isLoop = false;
     m_isFrameEnd = true;
+    m_lastFrame = data.getLastFrame();
 
     for ( auto& i : data.bones() )
     {
@@ -121,7 +122,11 @@ namespace s3d_mmd
     resetFrame();
   }
 
-  int VMD::Pimpl::getPosFrame() { return m_nowTime.ms() * 60 / 1000; }
+  int VMD::Pimpl::getPosFrame() const { return m_nowTime.ms() * 60 / 1000; }
+
+  SecondsF VMD::Pimpl::lengthSec() const { return SecondsF(m_lastFrame / 60.0f); }
+
+  int VMD::Pimpl::lengthFrame() const { return m_lastFrame; }
 
   bool VMD::Pimpl::isEmpty() const
   {
