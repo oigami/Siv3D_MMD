@@ -308,6 +308,7 @@
     <ClInclude Include="MMD\vmd_reader.h" />
     <ClInclude Include="MMD\vmd_struct.h" />
     <ClInclude Include="MMD\vmd_writer.h" />
+    <ClInclude Include="picojson.h" />
     <ClInclude Include="src\MMDModel\mmd_model_pimpl.h" />
     <ClInclude Include="src\mmd_physics.h" />
     <ClInclude Include="MMD\mmd_motion.h" />
