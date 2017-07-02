@@ -16,7 +16,7 @@ using namespace s3d_mmd;
 
 namespace fs = std::experimental::filesystem;
 constexpr int InputPoseNum = 18;
-constexpr int OutputPoseNum = 12;
+constexpr int OutputPoseNum = 15;
 
 struct DataX
 {
@@ -45,7 +45,7 @@ struct DataX
     Camera camerax;
     camerax.pos = Vec3(0, 10, -40);
     camerax.lookat = Vec3(0, 10, 0);
-
+    int count = 0;
     for ( auto& file : dataFile_ )
     {
       VMD vmd(file);
@@ -54,6 +54,7 @@ struct DataX
       int lastFrame = vmd.lengthFrame();
       for ( auto& frame : step(0, lastFrame / 5, 5) )
       {
+        count++;
         vmd.setPosFrame(frame);
         mmd_.update();
 
@@ -69,7 +70,15 @@ struct DataX
 
         for ( auto& i : step(OutputPoseNum) )
         {
-          output->pos3D[i] = ToVec4(bones[pose3d_int[i]].boneRotation.component);
+          auto parent_id = bones[pose3d_int[i]].parent;
+          auto t = bones.lastUpdatedWorld()[pose3d_int[i]];
+          if ( parent_id != -1 )
+          {
+            t = bones.lastUpdatedWorld()[parent_id].inverse() * t;
+          }
+          t.r[3] = DirectX::XMVectorZero();
+          output->pos3D[i] = ToVec4(DirectX::XMQuaternionRotationMatrix(t));
+          output->pos3D[i] = ToVec4(bones[pose3d_int[i]].boneRotation.normalize().component);
         }
 
         auto& tmp = output->pos2D;
@@ -144,35 +153,43 @@ template<ll MOD>struct Mint
   }
 };
 typedef Mint<mod>mint;
-
+void CreateData();
 void Main()
 {
-  Window::SetStyle(WindowStyle::Sizeable);
+  CreateData();
   Graphics::SetBackground(Color(80, 160, 230));
   Graphics3D::SetAmbientLight(ColorF(0.3));
+
+  const MMD model(L"Data/初音ミク/初音ミクVer2.pmd");
+
+  const VMD vmd(L"out.vmd");
+  auto length_frame = vmd.lengthFrame();
+
+  model.attach(vmd);
+
+  MouseCamera3D camera;
+
+  GUI gui(GUIStyle::Default);
+  gui.add(L"frame", GUISlider::Create(0, length_frame, 0));
+
+  while ( System::Update() )
+  {
+    int now_frame = gui.slider(L"frame").valueInt;
+    vmd.setPosFrame(now_frame);
+    model.update().drawForward();
+    camera.update();
+    camera.setCamera();
+  }
+}
+
+void CreateData()
+{
+  Window::SetStyle(WindowStyle::Sizeable);
   physics3d::Physics3DWorld world;
   MMD::SetDefaultPhysicsWorld(std::make_shared<MMDPhysicsWorld>(world));
   const MMDModel model(L"Data/初音ミク/初音ミクVer2.pmd");
-  Println(model.name());
-  Println(model.comment());
-  const Mesh meshGround(MeshData::Plane({ 40, 40 }, { 6, 6 }));
 
-  mmd::MMDMotion motion(VMDReader(L"Data/きしめん.vmd"));
-  mmd::MMDMotion output = motion;
-  motion.saveVMD(L"Data/きしめん.vmd.sav");
-  const VMD vmd(L"Data/きしめん.vmd");
-
-  //vmd.play();
-  //Bone &bone10 = model.bones()->get(10);
-  //bone10.extraBoneControl = true;
-  const Font font(30);
-  GUI gui(GUIStyle::Default);
-  gui.setTitle(L"タイトル");
-
-  gui.add(L"frame", GUISlider::Create(0, 10, 0));
-  MouseCamera3D camera;
   System::Update();
-  int nowFrame = 0;
 
   auto pose2d_int = [&model]()
   {
@@ -202,6 +219,7 @@ void Main()
     std::array<String, OutputPoseNum> lists = {
       L"頭",
       L"首",
+      L"センター",L"上半身",L"下半身",
       L"右肩", L"右腕", L"右ひじ",
       L"左肩", L"左腕", L"左ひじ",
       L"右足", L"右ひざ",
@@ -213,7 +231,6 @@ void Main()
     }
     return tmp;
   }();
-
 
   std::array<std::vector<int>, InputPoseNum> linkList = {
     std::vector<int>{ 1,15,14 },
@@ -249,14 +266,14 @@ void Main()
   constexpr int threadNum = 8;
 
   std::array<DataX, threadNum> data = {
-   DataX { model },
-    { model },
-    { model },
-    { model },
-    { model },
-    { model },
-    { model },
-    { model },
+   DataX { MMDModel(L"Data/初音ミク/初音ミクVer2.pmd") },
+    { MMDModel(L"Data/初音ミク/初音ミクVer2.pmd")  },
+    { MMDModel(L"Data/初音ミク/初音ミクVer2.pmd")  },
+    { MMDModel(L"Data/初音ミク/初音ミクVer2.pmd")  },
+    { MMDModel(L"Data/初音ミク/初音ミクVer2.pmd")  },
+    { MMDModel(L"Data/初音ミク/初音ミクVer2.pmd")  },
+    { MMDModel(L"Data/初音ミク/初音ミクVer2.pmd")  },
+    { MMDModel(L"Data/初音ミク/初音ミクVer2.pmd")  },
   };
   fs::directory_iterator it("D:\\VisualStudio\\git\\Pose3dChainer\\dl\\vmd"), last;
 

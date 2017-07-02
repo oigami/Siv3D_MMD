@@ -138,15 +138,15 @@ namespace s3d_mmd
       }
 
       auto nextPow2 = [](uint32 x)
-        {
-          x--;
-          x |= x >> 1;
-          x |= x >> 2;
-          x |= x >> 4;
-          x |= x >> 8;
-          x |= x >> 16;
-          return ++x;
-        };
+      {
+        x--;
+        x |= x >> 1;
+        x |= x >> 2;
+        x |= x >> 4;
+        x |= x >> 8;
+        x |= x >> 16;
+        return ++x;
+      };
       int size = nextPow2(allWriteSize);
       // 折り返しの都合で全部埋まるとは限らないので適当に増やしておく
       int padding = model.skinData().size() * (size / 4096) / 4096;
@@ -214,11 +214,11 @@ namespace s3d_mmd
   };
 
   using RasterizerStateBinder2D = StateBinderClassHelper<RasterizerState,
-                                                         Graphics3D::GetRasterizerState,
-                                                         Graphics3D::SetRasterizerState>::type;
+    Graphics3D::GetRasterizerState,
+    Graphics3D::SetRasterizerState>::type;
   using RasterizerStateForwardBinder2D = StateBinderClassHelper<RasterizerState,
-                                                                Graphics3D::GetRasterizerStateForward,
-                                                                Graphics3D::SetRasterizerStateForward>::type;
+    Graphics3D::GetRasterizerStateForward,
+    Graphics3D::SetRasterizerStateForward>::type;
 
   void MMD::Pimpl::drawForward(const Mat4x4& worldMat)
   {

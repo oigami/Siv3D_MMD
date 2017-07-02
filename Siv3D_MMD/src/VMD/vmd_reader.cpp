@@ -57,7 +57,7 @@ namespace s3d_mmd
       {
         if ( !ifs.read(static_cast<vmd_struct::ShowIkWithoutArray&>(i)) ) return false;
         i.ik.resize(i.ik_count);
-        if ( !ifs.read(i.ik.data(), i.ik_count) ) return false;
+        if ( !ifs.read(i.ik.data(), i.ik_count * sizeof(i.ik[0])) ) return false;
       }
     }
     return true;
@@ -69,11 +69,6 @@ namespace s3d_mmd
   /// <param name="file_name"></param>
   VMDReader::VMDReader(const FilePath& file_name) : VMDReader(BinaryReader(file_name))
   {
-    is_opened_ = false;
-    if ( open(file_name) )
-    {
-      path_ = file_name;
-    }
   }
 
   bool VMDReader::open(const FilePath& file_name)
